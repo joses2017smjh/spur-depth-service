@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "spur-depth"
+version = "0.1.0"
+description = "Metric depth estimation service for robotic apple-tree pruning"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Jose Sanchez", email = "sanchej7@oregonstate.edu" }]
+
+# Pinned to the versions the shipped checkpoint was trained and validated
+# under. numpy is intentionally >=2.0: the training environment runs 2.2.6,
+# and pinning back to 1.26 would mean the service runs a different numpy
+# from the one that produced the reported numbers.
+dependencies = [
+  "torch==2.10.0",
+  "torchvision==0.25.0",
+  "numpy==2.2.6",
+  "opencv-python==4.11.0.86",
+  "pillow>=10.0",
+]
+
+[project.optional-dependencies]
+export = ["onnx>=1.17", "onnxruntime>=1.20", "onnxsim>=0.4.36"]
+serve = ["fastapi>=0.115", "uvicorn[standard]>=0.32", "pydantic>=2.9", "python-multipart>=0.0.12", "prometheus-client>=0.21"]
+dev = ["pytest>=8.0", "ruff>=0.7"]
+
+[tool.setuptools.packages.find]
+include = ["spur_depth*"]
+
+[tool.setuptools.package-data]
+"spur_depth.models.dinov2" = ["LICENSE"]
+
+[tool.ruff]
+line-length = 100
+# Vendored third-party code is not ours to restyle.
+extend-exclude = ["spur_depth/models/dinov2"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+ignore = ["E501", "E741"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+  "gpu: requires a CUDA device",
+  "trt: requires TensorRT",
+  "legacy_pyc: requires a Python 3.10 interpreter and the original bytecode",
+]

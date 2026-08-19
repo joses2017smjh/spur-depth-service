@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+build/
+dist/
+
+# Secrets / local config
+.env
+
+# Weights, engines, exports — fetched by digest, never committed (see weights.lock)
+*.pth
+*.pt
+*.onnx
+*.plan
+*.engine
+weights/
+engines/
+
+# Data. Fixtures under tests/fixtures/ are force-added.
+*.npy
+!tests/fixtures/**/*.npy
+
+# Run outputs
+outputs/
+logs/
+wandb/
+demo_depth.png
