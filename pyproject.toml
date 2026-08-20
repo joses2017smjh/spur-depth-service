@@ -11,22 +11,32 @@ requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [{ name = "Jose Sanchez", email = "sanchej7@oregonstate.edu" }]
 
-# Pinned to the versions the shipped checkpoint was trained and validated
-# under. numpy is intentionally >=2.0: the training environment runs 2.2.6,
-# and pinning back to 1.26 would mean the service runs a different numpy
-# from the one that produced the reported numbers.
+# Broad enough for CI CPU wheels. Exact training pins live in
+# constraints-train.txt (torch 2.10.0+cu128, numpy 2.2.6).
 dependencies = [
-  "torch==2.10.0",
-  "torchvision==0.25.0",
-  "numpy==2.2.6",
-  "opencv-python==4.11.0.86",
+  "torch>=2.1",
+  "torchvision>=0.16",
+  "numpy>=1.26",
+  "opencv-python-headless>=4.8",
   "pillow>=10.0",
 ]
 
 [project.optional-dependencies]
-export = ["onnx>=1.17", "onnxruntime>=1.20", "onnxsim>=0.4.36"]
-serve = ["fastapi>=0.115", "uvicorn[standard]>=0.32", "pydantic>=2.9", "python-multipart>=0.0.12", "prometheus-client>=0.21"]
-dev = ["pytest>=8.0", "ruff>=0.7"]
+export = ["onnx>=1.16", "onnxruntime>=1.18"]
+serve = [
+  "fastapi>=0.115",
+  "uvicorn[standard]>=0.32",
+  "pydantic>=2.9",
+  "python-multipart>=0.0.12",
+  "prometheus-client>=0.21",
+]
+dev = ["pytest>=8.0", "ruff>=0.7", "httpx>=0.27"]
+
+[project.scripts]
+spur-depth-serve = "spur_depth.serve.__main__:main"
+spur-depth-bench = "spur_depth.bench.latency:main"
+spur-depth-eval = "spur_depth.bench.eval_rmse:main"
+spur-depth-export = "spur_depth.export.to_onnx:main"
 
 [tool.setuptools.packages.find]
 include = ["spur_depth*"]
@@ -37,7 +47,12 @@ include = ["spur_depth*"]
 [tool.ruff]
 line-length = 100
 # Vendored third-party code is not ours to restyle.
-extend-exclude = ["spur_depth/models/dinov2"]
+extend-exclude = [
+  "spur_depth/models/dinov2",
+  "spur_depth/models/mv_stereo_dino.py",
+  "spur_depth/models/losses.py",
+  "spur_depth/data/trunk_stereo_triplet.py",
+]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I"]
@@ -49,4 +64,6 @@ markers = [
   "gpu: requires a CUDA device",
   "trt: requires TensorRT",
   "legacy_pyc: requires a Python 3.10 interpreter and the original bytecode",
+  "onnx: requires onnx and onnxruntime",
+  "ckpt: requires the 1.3 GB trained refiner checkpoint",
 ]

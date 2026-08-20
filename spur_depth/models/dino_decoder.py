@@ -37,9 +37,7 @@ class DINODecoder(nn.Module):
         self.up0 = Up(128, _SKIP_CH, 64)  # 128 + 256 → 64
         self.head = nn.Conv2d(64, 1, kernel_size=1)
 
-    def forward(
-        self, b: torch.Tensor, skips: Tuple[torch.Tensor, ...]
-    ) -> torch.Tensor:
+    def forward(self, b: torch.Tensor, skips: Tuple[torch.Tensor, ...]) -> torch.Tensor:
         """
         Args:
             b:     (B, 512, H/14, W/14) — fused multi-view bottleneck

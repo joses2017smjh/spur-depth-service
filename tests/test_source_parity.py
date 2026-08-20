@@ -35,9 +35,7 @@ import pytest
 
 torch = pytest.importorskip("torch")
 
-_DEFAULT_PYC = Path(
-    "/nfs/hpc/share/sanchej7/Computer_Vision/MVP_MODEL/_mvp_precompiled.pyc"
-)
+_DEFAULT_PYC = Path("/nfs/hpc/share/sanchej7/Computer_Vision/MVP_MODEL/_mvp_precompiled.pyc")
 _PYC = Path(os.environ.get("SPUR_LEGACY_PYC", _DEFAULT_PYC))
 
 pytestmark = [
@@ -46,9 +44,7 @@ pytestmark = [
         sys.version_info[:2] != (3, 10),
         reason="_mvp_precompiled.pyc is Python 3.10 bytecode (magic 3439)",
     ),
-    pytest.mark.skipif(
-        not _PYC.is_file(), reason=f"legacy bytecode not available at {_PYC}"
-    ),
+    pytest.mark.skipif(not _PYC.is_file(), reason=f"legacy bytecode not available at {_PYC}"),
 ]
 
 # Deterministic shapes: the shipped 3-pair config runs at H=280, W=512.
@@ -99,6 +95,7 @@ def _build(cls, name):
 # ──────────────────────────────────────────────────────────────────────────────
 # 1. Structural parity — same keys, same order, same shapes
 # ──────────────────────────────────────────────────────────────────────────────
+
 
 @pytest.mark.parametrize(
     "name",
@@ -170,6 +167,7 @@ def _init_legacy_tail(legacy, shell):
 # ──────────────────────────────────────────────────────────────────────────────
 # 2. Forward parity — same weights in, same tensor out
 # ──────────────────────────────────────────────────────────────────────────────
+
 
 @pytest.mark.parametrize(
     "name,shape",

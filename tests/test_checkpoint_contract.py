@@ -32,9 +32,10 @@ _DEFAULT_CKPT = Path(
 )
 _CKPT = Path(os.environ.get("SPUR_CKPT", _DEFAULT_CKPT))
 
-pytestmark = pytest.mark.skipif(
-    not _CKPT.is_file(), reason=f"checkpoint not available at {_CKPT}"
-)
+pytestmark = [
+    pytest.mark.ckpt,
+    pytest.mark.skipif(not _CKPT.is_file(), reason=f"checkpoint not available at {_CKPT}"),
+]
 
 # The shipped configuration, from run_spur_dino_da2ft_3pair_fusion_dgx2.sh
 SHIPPED = dict(n_views=6, use_pose=False, no_fusion=False, pred_mode="absolute")
@@ -70,7 +71,7 @@ def test_vendored_backbone_matches_checkpoint(state_dict):
 
     vendored = {k: tuple(v.shape) for k, v in dinov2_vitl14().state_dict().items()}
     ckpt = {
-        k[len("encoder.dino."):]: tuple(v.shape)
+        k[len("encoder.dino.") :]: tuple(v.shape)
         for k, v in state_dict.items()
         if k.startswith("encoder.dino.")
     }

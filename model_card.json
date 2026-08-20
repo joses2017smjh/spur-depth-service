@@ -1,0 +1,45 @@
+{
+  "model": "MVStereoDINOUNet",
+  "config": {
+    "n_views": 6,
+    "use_pose": false,
+    "no_fusion": false,
+    "pred_mode": "absolute",
+    "H": 280,
+    "W": 512
+  },
+  "checkpoint_sha256": "2750c4d8f5db7c0d5d40138f08ee9d4bc39a1b184063d33f3dfe9386438ac8ca",
+  "checkpoint_bytes": 1321172397,
+  "checkpoint_name": "dino_da2ft_3pair_fusion_nopose_spur_seed1/exp1/seed_01/best_epoch_0023.pt",
+  "git_sha": "8b1bcc2",
+  "seed": 1,
+  "val_rmse_m": 0.0445,
+  "val_rmse_std_m": 0.0057,
+  "val_rmse_per_seed_m": [0.044330, 0.048304, 0.042303, 0.036427, 0.051258],
+  "eval_mask": "trunk, 0.5–10.0 m",
+  "precision": "fp32",
+  "latency_ms": {
+    "note": "PyTorch, same hardware for every row. TensorRT is P3 and is not claimed here.",
+    "paper_dgx": {"p50": 484.7, "gpu": "DGX A100/H100", "source": "capstone report"},
+    "local_quadro_rtx_8000_fp32": {
+      "p50": 489.2,
+      "p95": 492.0,
+      "p99": 492.6,
+      "mean": 488.6,
+      "std": 2.6,
+      "per_view": 81.5,
+      "file": "bench/results/quadro-rtx-8000_2026-08-18.json"
+    },
+    "local_quadro_rtx_8000_fp16": {
+      "p50": 185.5,
+      "p95": 185.6,
+      "p99": 189.7,
+      "mean": 185.6,
+      "std": 1.6,
+      "per_view": 30.9,
+      "file": "bench/results/quadro-rtx-8000_2026-08-18.json",
+      "note": "PyTorch autocast/half weights, not TensorRT."
+    }
+  },
+  "train_domain": "synthetic Blender, bark_brown_02, dormant Envy/UFO — this model has never seen a real orchard"
+}

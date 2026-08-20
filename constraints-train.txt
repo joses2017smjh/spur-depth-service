@@ -1,0 +1,5 @@
+# Training-time pins (the env that produced 0.0445 m). The package itself
+# accepts a broader range so CI can install CPU wheels.
+torch==2.10.0
+torchvision==0.25.0
+numpy==2.2.6

@@ -47,9 +47,7 @@ class DepthSideBranch(nn.Module):
             nn.ReLU(inplace=True),
         )
 
-    def forward(
-        self, d: torch.Tensor
-    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    def forward(self, d: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         """
         Args:
             d: (B, 1, H, W) — PRO depth map for one view

@@ -1,0 +1,33 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - run: pip install ruff
+      - run: ruff check .
+      - run: ruff format --check .
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: CPU torch
+        run: pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+      - name: package + test extras
+        run: pip install -e ".[serve,export,dev]"
+      - name: pytest (no GPU, no bytecode, no 1.3GB ckpt)
+        run: pytest -m "not gpu and not legacy_pyc and not ckpt" -q
+        env:
+          SPUR_SKIP_WEIGHTS: "1"

@@ -1,0 +1,2 @@
+# artifact  sha256  bytes  notes
+refiner_seed1  2750c4d8f5db7c0d5d40138f08ee9d4bc39a1b184063d33f3dfe9386438ac8ca  1321172397  MVStereoDINOUNet 3-pair fusion, --no_pose, seed 1, best_epoch_0023.pt

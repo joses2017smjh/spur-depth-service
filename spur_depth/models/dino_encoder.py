@@ -100,9 +100,7 @@ class DINOv2ViTLEncoder(nn.Module):
         self.out_ch = _BOTT_CH
 
     @staticmethod
-    def _tokens_to_spatial(
-        tokens: torch.Tensor, h_tok: int, w_tok: int
-    ) -> torch.Tensor:
+    def _tokens_to_spatial(tokens: torch.Tensor, h_tok: int, w_tok: int) -> torch.Tensor:
         """Reshape flat token sequence → 2D spatial map.
 
         DINOv2 pads images to the nearest multiple of patch_size (14) before
@@ -155,18 +153,10 @@ class DINOv2ViTLEncoder(nn.Module):
         b = self.proj_b(f24)  # bottleneck, stays at (h_tok, w_tok)
 
         # Upsample ViT skips to UNet skip resolutions
-        s0_vit = F.interpolate(
-            f6, size=(H, W), mode="bilinear", align_corners=False
-        )
-        s1_vit = F.interpolate(
-            f12, size=(H // 2, W // 2), mode="bilinear", align_corners=False
-        )
-        s2_vit = F.interpolate(
-            f18, size=(H // 4, W // 4), mode="bilinear", align_corners=False
-        )
-        s3 = F.interpolate(
-            s3, size=(H // 8, W // 8), mode="bilinear", align_corners=False
-        )
+        s0_vit = F.interpolate(f6, size=(H, W), mode="bilinear", align_corners=False)
+        s1_vit = F.interpolate(f12, size=(H // 2, W // 2), mode="bilinear", align_corners=False)
+        s2_vit = F.interpolate(f18, size=(H // 4, W // 4), mode="bilinear", align_corners=False)
+        s3 = F.interpolate(s3, size=(H // 8, W // 8), mode="bilinear", align_corners=False)
 
         # ---- Depth stream: trainable side branch ----
         d0, d1, d2 = self.depth_branch(depth)

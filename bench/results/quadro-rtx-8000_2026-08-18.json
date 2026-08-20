@@ -1,0 +1,66 @@
+[
+  {
+    "stage": "refiner",
+    "backend": "torch",
+    "precision": "fp32",
+    "weights": "trained",
+    "shape": {
+      "n_views": 6,
+      "H": 280,
+      "W": 512,
+      "batch": 1
+    },
+    "warmup": 20,
+    "n": 200,
+    "mean_ms": 488.5511447143555,
+    "std_ms": 2.626018718645844,
+    "min_ms": 482.766845703125,
+    "p50_ms": 489.154541015625,
+    "p95_ms": 492.0243225097656,
+    "p99_ms": 492.5859375,
+    "max_ms": 496.25225830078125,
+    "env": {
+      "gpu": "Quadro RTX 8000",
+      "driver": "595.71.05",
+      "torch": "2.10.0+cu128",
+      "torch_cuda": "12.8",
+      "cudnn": 91002,
+      "python": "3.10.19",
+      "git_sha": "8b1bcc2",
+      "date": "2026-08-18"
+    },
+    "per_view_ms": 81.5257568359375
+  },
+  {
+    "stage": "refiner",
+    "backend": "torch",
+    "precision": "fp16",
+    "weights": "trained",
+    "shape": {
+      "n_views": 6,
+      "H": 280,
+      "W": 512,
+      "batch": 1
+    },
+    "warmup": 20,
+    "n": 200,
+    "mean_ms": 185.58921745300293,
+    "std_ms": 1.615700783435565,
+    "min_ms": 185.12562561035156,
+    "p50_ms": 185.48403930664062,
+    "p95_ms": 185.64300537109375,
+    "p99_ms": 189.69395446777344,
+    "max_ms": 207.1309814453125,
+    "env": {
+      "gpu": "Quadro RTX 8000",
+      "driver": "595.71.05",
+      "torch": "2.10.0+cu128",
+      "torch_cuda": "12.8",
+      "cudnn": 91002,
+      "python": "3.10.19",
+      "git_sha": "8b1bcc2",
+      "date": "2026-08-18"
+    },
+    "per_view_ms": 30.91400655110677
+  }
+]

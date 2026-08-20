@@ -38,9 +38,9 @@ class ConvBlock(nn.Module):
 class Up(nn.Module):
     """Decoder upsampling step: double resolution, concatenate skip, ConvBlock.
 
-      1. Bilinear upsample x to the skip connection's spatial size
-      2. Concatenate with skip along the channel dim
-      3. ConvBlock to process the combined features
+    1. Bilinear upsample x to the skip connection's spatial size
+    2. Concatenate with skip along the channel dim
+    3. ConvBlock to process the combined features
     """
 
     def __init__(self, in_ch: int, skip_ch: int, out_ch: int) -> None:
