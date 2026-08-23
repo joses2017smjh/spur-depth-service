@@ -1,0 +1,21 @@
+{
+  "tree": "lpy_envy_00042",
+  "n_boxes": 6,
+  "flow_mean_px": 8.473190307617188,
+  "cloud_points": 12975,
+  "fused_median_m": 2.262688159942627,
+  "appearance": {
+    "stats": {
+      "luminance_mean": 0.5476132311335028,
+      "luminance_std": 0.10272728062474659,
+      "focus_var": 200.42852565192706,
+      "saturated_frac": 0.0
+    }
+  },
+  "box_anchor": {
+    "n": 115767.0,
+    "median_z_m": 2.265982151031494,
+    "implied_width_m": 1.6315070989530305,
+    "scale": 5.438356996510102
+  }
+}

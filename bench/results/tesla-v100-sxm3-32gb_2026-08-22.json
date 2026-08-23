@@ -1,0 +1,130 @@
+[
+  {
+    "stage": "refiner",
+    "backend": "torch",
+    "precision": "fp32",
+    "weights": "trained",
+    "shape": {
+      "n_views": 6,
+      "H": 280,
+      "W": 512,
+      "batch": 1
+    },
+    "warmup": 20,
+    "n": 200,
+    "mean_ms": 516.4147720336914,
+    "std_ms": 809.8475367050219,
+    "min_ms": 391.7383728027344,
+    "p50_ms": 396.4139404296875,
+    "p95_ms": 575.6917724609375,
+    "p99_ms": 3247.14794921875,
+    "max_ms": 10130.66796875,
+    "env": {
+      "gpu": "Tesla V100-SXM3-32GB",
+      "driver": "580.126.20",
+      "torch": "2.10.0+cu128",
+      "torch_cuda": "12.8",
+      "cudnn": 91002,
+      "python": "3.10.19",
+      "git_sha": "03aff29",
+      "date": "2026-08-22"
+    },
+    "per_view_ms": 66.06899007161458
+  },
+  {
+    "stage": "refiner",
+    "backend": "torch",
+    "precision": "fp16",
+    "weights": "trained",
+    "shape": {
+      "n_views": 6,
+      "H": 280,
+      "W": 512,
+      "batch": 1
+    },
+    "warmup": 20,
+    "n": 200,
+    "mean_ms": 480.78153762817385,
+    "std_ms": 570.4596946662701,
+    "min_ms": 164.068359375,
+    "p50_ms": 275.1836242675781,
+    "p95_ms": 1446.182861328125,
+    "p99_ms": 3030.77587890625,
+    "max_ms": 3878.517822265625,
+    "env": {
+      "gpu": "Tesla V100-SXM3-32GB",
+      "driver": "580.126.20",
+      "torch": "2.10.0+cu128",
+      "torch_cuda": "12.8",
+      "cudnn": 91002,
+      "python": "3.10.19",
+      "git_sha": "03aff29",
+      "date": "2026-08-22"
+    },
+    "per_view_ms": 45.86393737792969
+  },
+  {
+    "stage": "refiner",
+    "backend": "torch",
+    "precision": "fp32",
+    "weights": "trained",
+    "shape": {
+      "n_views": 6,
+      "H": 280,
+      "W": 512,
+      "batch": 1
+    },
+    "warmup": 20,
+    "n": 200,
+    "mean_ms": 393.5306201171875,
+    "std_ms": 2.1367312071959974,
+    "min_ms": 389.1885986328125,
+    "p50_ms": 393.4678955078125,
+    "p95_ms": 397.2178039550781,
+    "p99_ms": 397.76153564453125,
+    "max_ms": 398.11993408203125,
+    "env": {
+      "gpu": "Tesla V100-SXM3-32GB",
+      "driver": "580.126.20",
+      "torch": "2.10.0+cu128",
+      "torch_cuda": "12.8",
+      "cudnn": 91002,
+      "python": "3.10.19",
+      "git_sha": "03aff29",
+      "date": "2026-08-22"
+    },
+    "per_view_ms": 65.57798258463542
+  },
+  {
+    "stage": "refiner",
+    "backend": "torch",
+    "precision": "fp16",
+    "weights": "trained",
+    "shape": {
+      "n_views": 6,
+      "H": 280,
+      "W": 512,
+      "batch": 1
+    },
+    "warmup": 20,
+    "n": 200,
+    "mean_ms": 156.06118934631348,
+    "std_ms": 0.0962228371351704,
+    "min_ms": 155.92959594726562,
+    "p50_ms": 156.0483856201172,
+    "p95_ms": 156.1712646484375,
+    "p99_ms": 156.33203125,
+    "max_ms": 156.82662963867188,
+    "env": {
+      "gpu": "Tesla V100-SXM3-32GB",
+      "driver": "580.126.20",
+      "torch": "2.10.0+cu128",
+      "torch_cuda": "12.8",
+      "cudnn": 91002,
+      "python": "3.10.19",
+      "git_sha": "03aff29",
+      "date": "2026-08-22"
+    },
+    "per_view_ms": 26.00806427001953
+  }
+]

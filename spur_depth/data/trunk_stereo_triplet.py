@@ -33,6 +33,7 @@ import csv
 import json
 import math
 import os
+import sys
 from collections import defaultdict
 from pathlib import Path
 
@@ -42,6 +43,8 @@ import torch.nn.functional as F
 from PIL import Image
 from torch.utils.data import Dataset
 from torchvision.transforms.functional import normalize, to_tensor
+
+from spur_depth.calib import PRO_ALPHA, PRO_BETA, PRO_DEPTH_EPS
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -62,11 +65,10 @@ _DEPTH_SUBDIR_PRO = os.sep + os.environ.get("INPUT_DEPTH_SUBDIR", "pro_refine") 
 # zeroed at the background sentinel before resize), not to the network input.
 _INPUT_DEPTH_INTERP = os.environ.get("INPUT_DEPTH_INTERP", "bilinear")
 
-# PRO depth calibration — from Baseline_Model/eval/benchmark_summary.json
-# pro.best_config: global fit, erode_r=10, min_gt_std=0.05, fit_space=depth
-_PRO_ALPHA     = -0.06610793956568871
-_PRO_BETA      =  1.555980697834118
-_PRO_DEPTH_EPS =  1e-3
+# PRO depth calibration — see spur_depth/calib/pro_best_config.json (C1).
+_PRO_ALPHA     = PRO_ALPHA
+_PRO_BETA      = PRO_BETA
+_PRO_DEPTH_EPS = PRO_DEPTH_EPS
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -221,10 +223,13 @@ class TrunkStereoTripletMVPDataset(Dataset):
         # Active index: only rows with ≥2 neighbours
         self._active: list[int] = [i for i in range(len(self.rows)) if i in self._nearby]
 
-        print(f"  {Path(manifest_path).name}: {len(valid_rows):,} valid rows, "
-              f"{len(self._active):,} active (≥2 neighbours) "
-              f"(skipped {skipped_ann} missing ann, {skipped_pro} missing PRO, "
-              f"{n_no_nb} no neighbours)")
+        print(
+            f"  {Path(manifest_path).name}: {len(valid_rows):,} valid rows, "
+            f"{len(self._active):,} active (≥2 neighbours) "
+            f"(skipped {skipped_ann} missing ann, {skipped_pro} missing PRO, "
+            f"{n_no_nb} no neighbours)",
+            file=sys.stderr,
+        )
 
     def __len__(self) -> int:
         return len(self._active)

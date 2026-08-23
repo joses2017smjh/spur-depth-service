@@ -1,0 +1,13 @@
+{
+  "variant": "dino_da2ft_3pair_fusion_nopose",
+  "dataset": "full_spur",
+  "eval_mask": "trunk, 0.5–10.0 m",
+  "source": "checkpoint files (best_rmse), not re-scored on disk; Data/full_spur is not mounted",
+  "seeds": [
+    {"seed": 1, "epoch": 23, "best_rmse_m": 0.044330},
+    {"seed": 2, "epoch": 22, "best_rmse_m": 0.048304},
+    {"seed": 3, "epoch": 29, "best_rmse_m": 0.042303},
+    {"seed": 4, "epoch": 23, "best_rmse_m": 0.036427},
+    {"seed": 5, "epoch": 17, "best_rmse_m": 0.051258}
+  ]
+}

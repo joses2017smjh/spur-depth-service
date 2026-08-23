@@ -1,4 +1,4 @@
-.PHONY: test lint demo export-fuse
+.PHONY: test lint demo export-fuse export-both cpp aggregate stack
 
 PYTHON ?= python
 
@@ -14,3 +14,15 @@ demo:
 
 export-fuse:
 	$(PYTHON) -m spur_depth.export.to_onnx --graph fuse_decode --out engines/
+
+export-both:
+	$(PYTHON) -m spur_depth.export.to_onnx --graph both --ckpt "$$SPUR_CKPT" --out engines/
+
+cpp:
+	$(MAKE) -C cpp/scale_shift test
+
+aggregate:
+	$(PYTHON) -m spur_depth.bench.aggregate_runs
+
+stack:
+	$(PYTHON) -m spur_depth.pipeline.run --out docs/readme

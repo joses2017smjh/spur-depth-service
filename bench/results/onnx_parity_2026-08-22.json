@@ -1,0 +1,33 @@
+{
+  "opset": 18,
+  "graphs": [
+    {
+      "graph": "encoder",
+      "max_abs": 1.52587890625e-05,
+      "pass": true,
+      "onnx_bytes": 1225496462,
+      "note": "XFORMERS_DISABLED=1; sequential GPU torch then CPU ORT; gate <1e-4"
+    },
+    {
+      "graph": "fuse_decode",
+      "max_abs": 9.5367431640625e-07,
+      "torch_shape": [
+        1,
+        6,
+        1,
+        280,
+        512
+      ],
+      "onnx_shape": [
+        1,
+        6,
+        1,
+        280,
+        512
+      ],
+      "pass": true
+    }
+  ],
+  "encoder_onnx_gb": 1.225496462,
+  "fuse_decode_onnx_mb": 26.859439
+}

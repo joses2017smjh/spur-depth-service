@@ -16,6 +16,18 @@ jobs:
       - run: ruff check .
       - run: ruff format --check .
 
+  secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: gitleaks
+        run: |
+          curl -sSfL https://github.com/gitleaks/gitleaks/releases/download/v8.21.2/gitleaks_8.21.2_linux_x64.tar.gz \
+            | tar -xz gitleaks
+          ./gitleaks detect --source . --verbose
+
   test:
     runs-on: ubuntu-latest
     steps:
@@ -31,3 +43,18 @@ jobs:
         run: pytest -m "not gpu and not legacy_pyc and not ckpt" -q
         env:
           SPUR_SKIP_WEIGHTS: "1"
+
+  cpp:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: cpp/scale_shift
+    steps:
+      - uses: actions/checkout@v4
+      - name: toolchain
+        run: sudo apt-get update && sudo apt-get install -y cmake g++ libomp-dev
+      - name: cmake --preset ci && ctest
+        run: |
+          cmake --preset ci
+          cmake --build --preset ci
+          ctest --preset ci --output-on-failure

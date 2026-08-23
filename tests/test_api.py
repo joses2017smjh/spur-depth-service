@@ -60,6 +60,17 @@ def test_metrics_prometheus_text(client):
     assert "spur_depth_stage_ms" in r.text or r.headers["content-type"].startswith("text/plain")
 
 
+def test_drift_endpoint_after_predict(client):
+    client.post("/predict", files={"image": ("t.png", _png(), "image/png")})
+    r = client.get("/drift")
+    assert r.status_code == 200
+    body = r.json()
+    assert "n_logged" in body
+    assert body["n_logged"] >= 1
+    metrics = client.get("/metrics").text
+    assert "spur_depth_requests_logged" in metrics
+
+
 def test_predict_dummy_happy_path(client):
     r = client.post("/predict", files={"image": ("t.png", _png(), "image/png")})
     assert r.status_code == 200, r.text

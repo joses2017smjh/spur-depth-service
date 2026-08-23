@@ -2,9 +2,16 @@
 
 python -m spur_depth.export.to_onnx --graph fuse_decode --out engines/
 python -m spur_depth.export.to_onnx --graph encoder --ckpt $SPUR_CKPT --out engines/
+
+xFormers' flash-attention kernels are CUDA-only and are not ONNX ops. Disable
+them *before* importing the model so tracing uses ``scaled_dot_product_attention``.
 """
 
 from __future__ import annotations
+
+import os
+
+os.environ["XFORMERS_DISABLED"] = "1"
 
 import argparse
 import json
@@ -52,6 +59,12 @@ def _export(model: torch.nn.Module, args, input_names, output_names, path: Path)
 
 def _maybe_check(path: Path) -> dict:
     info = {"path": str(path), "bytes": path.stat().st_size}
+    # onnx.checker materialises the full protobuf. ViT-L encoder is ~1.2 GB and
+    # the checker has OOM-killed this process on a 32 GB interactive job.
+    if info["bytes"] > 400 * 1024 * 1024:
+        info["checker"] = "skipped (>400 MB; run onnx.checker on a fatter node)"
+        info["nodes"] = None
+        return info
     try:
         import onnx
 
@@ -123,10 +136,78 @@ def export_encoder(out_dir: Path, ckpt: str | None) -> dict:
     return _maybe_check(path)
 
 
+def export_da2(
+    out_dir: Path,
+    ckpt: str | None,
+    da2_root: str,
+    height: int,
+    width: int,
+    max_depth: float,
+) -> dict:
+    """Engine A: DepthAnythingV2.forward at a static multiple-of-14 size."""
+    if not ckpt or not Path(ckpt).is_file():
+        raise FileNotFoundError(
+            "DA2 export needs --da2-ckpt (the fine-tune best.pth). "
+            "Refusing to export randomly initialised metric depth."
+        )
+    if height % 14 or width % 14:
+        raise ValueError(f"DA2 ONNX size must be a multiple of 14, got {height}x{width}")
+
+    sys.path.insert(0, da2_root)
+    # DA2 vendors its own DINOv2. It does not honour XFORMERS_DISABLED; its
+    # MemEffAttention calls CUDA-only xFormers kernels and ONNX tracing dies
+    # on CPU (job 21004172). Force the SDPA fallback before constructing.
+    import depth_anything_v2.dinov2_layers.attention as _da2_attn  # noqa: E402
+
+    _da2_attn.XFORMERS_AVAILABLE = False
+    from depth_anything_v2.dpt import DepthAnythingV2  # noqa: E402
+
+    from spur_depth.export.wrappers import DA2ForwardWrapper
+
+    print(f"[da2] construct ViT-L  ckpt={ckpt}", file=sys.stderr, flush=True)
+    raw = DepthAnythingV2(
+        encoder="vitl",
+        features=256,
+        out_channels=[256, 512, 1024, 1024],
+        max_depth=max_depth,
+    )
+    print("[da2] torch.load (CPU) ...", file=sys.stderr, flush=True)
+    blob = torch.load(ckpt, map_location="cpu", weights_only=False)
+    sd = blob["model"] if isinstance(blob, dict) and "model" in blob else blob
+    sd = {k.replace("module.", ""): v for k, v in sd.items()}
+    print(f"[da2] load_state_dict  keys={len(sd)}", file=sys.stderr, flush=True)
+    raw.load_state_dict(sd, strict=True)
+    raw.eval()
+    wrapped = DA2ForwardWrapper(raw)
+    rgb = torch.randn(1, 3, height, width)
+    path = out_dir / "da2.onnx"
+    print(f"[da2] onnx.export {height}x{width} -> {path}", file=sys.stderr, flush=True)
+    _export(wrapped, (rgb,), ["rgb"], ["depth"], path)
+    print(f"[da2] wrote {path.stat().st_size} bytes", file=sys.stderr, flush=True)
+    info = _maybe_check(path)
+    info["graph"] = "da2"
+    info["H"] = height
+    info["W"] = width
+    info["max_depth"] = max_depth
+    return info
+
+
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    p.add_argument("--graph", choices=["fuse_decode", "encoder", "both"], default="fuse_decode")
+    p.add_argument("--graph", choices=["fuse_decode", "encoder", "da2", "both"], default="fuse_decode")
     p.add_argument("--ckpt", type=str, default=None)
+    p.add_argument("--da2-ckpt", type=str, default=os.environ.get("SPUR_DA2_CKPT"))
+    p.add_argument(
+        "--da2-root",
+        type=str,
+        default=os.environ.get(
+            "DA2_ROOT",
+            "/nfs/hpc/share/sanchej7/Computer_Vision/depth-anything-v2/metric_depth",
+        ),
+    )
+    p.add_argument("--da2-h", type=int, default=518)
+    p.add_argument("--da2-w", type=int, default=924, help="518×924 is 1080×1920 after DA2's 14-multiple resize")
+    p.add_argument("--max-depth", type=float, default=20.0)
     p.add_argument("--out", type=str, default="engines")
     args = p.parse_args(argv)
 
@@ -136,6 +217,8 @@ def main(argv=None) -> int:
         reports.append(export_fuse_decode(out_dir, args.ckpt))
     if args.graph in ("encoder", "both"):
         reports.append(export_encoder(out_dir, args.ckpt))
+    if args.graph == "da2":
+        reports.append(export_da2(out_dir, args.da2_ckpt, args.da2_root, args.da2_h, args.da2_w, args.max_depth))
     print(json.dumps(reports, indent=2))
     return 0
 

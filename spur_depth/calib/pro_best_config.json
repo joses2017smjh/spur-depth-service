@@ -1,0 +1,13 @@
+{
+  "alpha": -0.06610793956568871,
+  "beta": 1.555980697834118,
+  "erode_r": 10,
+  "min_gt_std": 0.05,
+  "min_depth": 0.5,
+  "max_depth": 10.0,
+  "fit_space": "depth",
+  "pro_depth_eps": 1.0e-3,
+  "source": "dataset/trunk_stereo_triplet_mvp.py literals at training time. Comment there claimed Baseline_Model/eval/benchmark_summary.json pro.best_config, but that file's current best_config is a different experiment (erode_r=3, alpha≈0.051). These are the constants the loaders actually applied.",
+  "verified_on_full_spur": false,
+  "note": "C1 re-derives the 2x2 normal equations. Re-score alpha/beta with `python -m spur_depth.calib.fit_scale_shift` once Data/full_spur is restored; until then do not pretend these were regenerated."
+}

@@ -22,6 +22,8 @@ from fastapi.responses import Response
 from PIL import Image, UnidentifiedImageError
 
 from spur_depth.serve import metrics
+from spur_depth.serve.drift import DriftMonitor
+from spur_depth.serve.input_stats import request_stats
 from spur_depth.serve.runner import N_VIEWS, build_runner
 from spur_depth.serve.schemas import LatencyMs, ModelRef, PredictResponse
 
@@ -100,6 +102,7 @@ def create_app() -> FastAPI:
     async def lifespan(app: FastAPI):
         app.state.runner = build_runner()
         app.state.gate = InferenceGate(max_admitted=int(os.environ.get("SPUR_MAX_QUEUE", "4")))
+        app.state.drift = DriftMonitor()
         app.state.runner.warmup()
         app.state.ready = True
         yield
@@ -141,6 +144,10 @@ def create_app() -> FastAPI:
         payload, content_type = metrics.render()
         return Response(content=payload, media_type=content_type)
 
+    @app.get("/drift")
+    async def drift_snapshot():
+        return app.state.drift.snapshot()
+
     def _model_ref() -> ModelRef:
         info = app.state.runner.info
         return ModelRef(sha=info.sha, precision=info.precision, backend=info.backend)  # type: ignore[arg-type]
@@ -163,6 +170,8 @@ def create_app() -> FastAPI:
         post = (time.perf_counter() - t2) * 1e3
         lat = _latency(pre, infer, post)
         metrics.observe("/predict", lat.model_dump())
+        snap = app.state.drift.observe(request_stats(images=img, depths=depth))
+        metrics.observe_drift(snap)
         return PredictResponse(
             depth_npy_b64=payload,
             shape=list(depth.shape),
@@ -209,6 +218,8 @@ def create_app() -> FastAPI:
         post = (time.perf_counter() - t2) * 1e3
         lat = _latency(pre, infer, post)
         metrics.observe("/predict/group", lat.model_dump())
+        snap = app.state.drift.observe(request_stats(images=pil, depths=stacked, group_id=group_id))
+        metrics.observe_drift(snap)
         return PredictResponse(
             depth_npy_b64=payload,
             shape=list(stacked.shape),

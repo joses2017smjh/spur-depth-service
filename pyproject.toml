@@ -31,18 +31,24 @@ serve = [
   "prometheus-client>=0.21",
 ]
 dev = ["pytest>=8.0", "ruff>=0.7", "httpx>=0.27"]
+track = ["wandb>=0.16"]
 
 [project.scripts]
 spur-depth-serve = "spur_depth.serve.__main__:main"
 spur-depth-bench = "spur_depth.bench.latency:main"
 spur-depth-eval = "spur_depth.bench.eval_rmse:main"
 spur-depth-export = "spur_depth.export.to_onnx:main"
+spur-depth-aggregate = "spur_depth.bench.aggregate_runs:main"
+spur-depth-fit = "spur_depth.calib.fit_scale_shift:main"
+spur-depth-stack = "spur_depth.pipeline.run:main"
 
 [tool.setuptools.packages.find]
 include = ["spur_depth*"]
 
 [tool.setuptools.package-data]
 "spur_depth.models.dinov2" = ["LICENSE"]
+"spur_depth.calib" = ["pro_best_config.json"]
+"spur_depth.serve" = ["baseline_stats.json"]
 
 [tool.ruff]
 line-length = 100

@@ -27,9 +27,43 @@ from spur_depth.serve.preprocess import (
     REFINER_W,
     load_input_depth,
     load_rgb,
+    postprocess_da2,
+    preprocess_da2,
 )
 
 N_VIEWS = 6
+
+
+def _load_da2(ckpt: str, da2_root: str, device: torch.device):
+    import sys
+
+    sys.path.insert(0, da2_root)
+    from depth_anything_v2.dpt import DepthAnythingV2
+
+    model = DepthAnythingV2(
+        encoder="vitl",
+        features=256,
+        out_channels=[256, 512, 1024, 1024],
+        max_depth=20.0,
+    )
+    blob = torch.load(ckpt, map_location="cpu", weights_only=False)
+    sd = blob["model"] if isinstance(blob, dict) and "model" in blob else blob
+    sd = {k.replace("module.", ""): v for k, v in sd.items()}
+    model.load_state_dict(sd, strict=True)
+    return model.to(device).eval()
+
+
+def _da2_infer(model, image: Image.Image, device: torch.device) -> np.ndarray:
+    import cv2
+
+    rgb = np.asarray(image.convert("RGB"))
+    bgr = cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR)
+    h, w = bgr.shape[:2]
+    x = preprocess_da2(bgr).to(device)
+    with torch.no_grad():
+        depth = model(x)
+        depth = postprocess_da2(depth, h, w)
+    return depth.squeeze().detach().cpu().numpy().astype(np.float32)
 
 
 @dataclass
@@ -121,36 +155,45 @@ class TorchRefinerRunner:
             backend=f"torch-{self.device.type}",
         )
         self._da2 = None
+        da2_ckpt = os.environ.get("SPUR_DA2_CKPT", "")
+        da2_root = os.environ.get(
+            "DA2_ROOT",
+            "/nfs/hpc/share/sanchej7/Computer_Vision/depth-anything-v2/metric_depth",
+        )
+        if da2_ckpt and os.path.isfile(da2_ckpt):
+            self._da2 = _load_da2(da2_ckpt, da2_root, self.device)
 
     def warmup(self) -> None:
         rgb = torch.randn(1, N_VIEWS, 3, REFINER_H, REFINER_W, device=self.device)
         d_pro = torch.rand(1, N_VIEWS, 1, REFINER_H, REFINER_W, device=self.device) + 0.5
         with torch.no_grad():
             self.model(rgb, d_pro)
+        if self._da2 is not None:
+            dummy = torch.randn(1, 3, 518, 924, device=self.device)
+            with torch.no_grad():
+                self._da2(dummy)
         if self.device.type == "cuda":
             torch.cuda.synchronize()
 
     def predict_one(self, image: Image.Image) -> np.ndarray:
-        """Real-time path is DA2-ft, which is not loaded in this slice.
-
-        Returning a 501 from the runner lets the HTTP layer speak 501 with a
-        stable message rather than pretending the refiner is a single-view
-        model.
-        """
-        raise NotImplementedError(
-            "POST /predict is the DA2-ft single-view path (Engine A). "
-            "This runner only has the 6-view refiner; use POST /predict/group "
-            "or load a DA2 checkpoint (P2 Engine A)."
-        )
+        if self._da2 is None:
+            raise NotImplementedError(
+                "POST /predict is the DA2-ft single-view path (Engine A). "
+                "Set SPUR_DA2_CKPT to the fine-tune best.pth, or POST /predict/group "
+                "with six views plus DA2-ft depth maps."
+            )
+        return _da2_infer(self._da2, image, self.device)
 
     def predict_group(
         self, images: list[Image.Image], depths: list[np.ndarray] | None = None
     ) -> np.ndarray:
-        if depths is None or len(depths) != len(images):
-            raise ValueError(
-                "the 6-view refiner needs per-view metric depth "
-                "(DA2-ft .npy, already in metres). Pass `depths` or run Engine A first."
-            )
+        if depths is None:
+            if self._da2 is None:
+                raise ValueError(
+                    "the 6-view refiner needs per-view metric depth "
+                    "(DA2-ft .npy, already in metres). Pass `depths` or set SPUR_DA2_CKPT."
+                )
+            depths = [_da2_infer(self._da2, im, self.device) for im in images]
         rgbs = [load_rgb(im) for im in images]
         dpros = [load_input_depth(d) for d in depths]
         rgb = torch.stack(rgbs, dim=0).unsqueeze(0).to(self.device)

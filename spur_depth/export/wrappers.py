@@ -120,3 +120,23 @@ def split_refiner(
         n_views=model.n_views, fuse_conv=model.fuse_conv, decoder=model.decoder
     )
     return encoder, fuse
+
+
+class DA2ForwardWrapper(nn.Module):
+    """``DepthAnythingV2.forward`` only — no ``infer_image``, no cv2.
+
+    Preprocess (BGR→RGB, cubic resize to a multiple of 14, ImageNet) and the
+    bilinear upsample back to source resolution live in
+    ``spur_depth.serve.preprocess``. Those steps are not ONNX-friendly and
+    are not this graph.
+
+    Input:  ``rgb`` (N, 3, H, W) already ImageNet-normalised, H and W % 14 == 0
+    Output: ``depth`` (N, H, W) metres, already multiplied by ``max_depth``
+    """
+
+    def __init__(self, da2: nn.Module) -> None:
+        super().__init__()
+        self.da2 = da2
+
+    def forward(self, rgb: torch.Tensor) -> torch.Tensor:
+        return self.da2(rgb)

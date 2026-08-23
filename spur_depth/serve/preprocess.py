@@ -42,6 +42,8 @@ import torch.nn.functional as F
 from PIL import Image
 from torchvision.transforms.functional import normalize, to_tensor
 
+from spur_depth.calib import PRO_ALPHA, PRO_BETA, PRO_DEPTH_EPS
+
 # Shipped refiner resolution (run_spur_dino_da2ft_3pair_fusion_dgx2.sh)
 REFINER_H, REFINER_W = 280, 512
 
@@ -51,15 +53,9 @@ IMAGENET_STD = [0.229, 0.224, 0.225]
 # Blender writes background depth as a sentinel rather than an actual distance.
 DEPTH_INF_THRESH = 1e9
 
-# Floor applied after loading input depth, mirroring the loader's clamp.
-PRO_DEPTH_EPS = 1e-3
-
-# PRO depth calibration — from Baseline_Model/eval/benchmark_summary.json
-# pro.best_config: global fit, erode_r=10, min_gt_std=0.05, fit_space=depth.
+# Floor + α/β: loaded from spur_depth/calib/pro_best_config.json (C1).
 # The shipped run passes --no_pro_calib, so these are NOT applied by default;
 # they exist for reproducing the raw-PRO ablations.
-PRO_ALPHA = -0.06610793956568871
-PRO_BETA = 1.555980697834118
 
 
 # ──────────────────────────────────────────────────────────────────────────────

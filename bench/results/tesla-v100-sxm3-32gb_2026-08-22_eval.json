@@ -1,0 +1,34 @@
+{
+  "backend": "torch",
+  "paper_comparable": false,
+  "paper_comparable_reason": "Val trees were re-rendered 2026-08-20 (job val9_chain-20976470). Original Da2Finetune .npy files are gone, so this number is not expected to match the paper's 0.0445 m bit-for-bit. Label it as a re-render.",
+  "paper_rmse_m": 0.0445,
+  "paper_rmse_std_m": 0.0057,
+  "checkpoint_best_rmse_m": 0.04433,
+  "eval_mask": "trunk, 0.5\u201310.0 m",
+  "n_views": 6,
+  "n_samples": 60,
+  "seed": 0,
+  "ckpt": "/nfs/hpc/share/sanchej7/Computer_Vision/checkpoints/dino_da2ft_3pair_fusion_nopose_spur_seed1/exp1/seed_01/best_epoch_0023.pt",
+  "val_manifest": "/nfs/hpc/share/sanchej7/Computer_Vision/manifests/dino_da2ft_3pair_fusion_nopose_spur_seed1/stereo_val_boxfam.csv",
+  "n_batches": 60,
+  "rmse_mean_m": 0.04672356627674567,
+  "rmse_per_view_m": [
+    0.051217300537973645,
+    0.048527133837342265,
+    0.042620757843057314,
+    0.04071551024292906,
+    0.04968385190392534,
+    0.04757684329524636
+  ],
+  "env": {
+    "gpu": "Tesla V100-SXM3-32GB",
+    "driver": "580.126.20",
+    "torch": "2.10.0+cu128",
+    "torch_cuda": "12.8",
+    "cudnn": 91002,
+    "python": "3.10.19",
+    "git_sha": "03aff29",
+    "date": "2026-08-22"
+  }
+}

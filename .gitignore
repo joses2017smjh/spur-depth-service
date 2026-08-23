@@ -28,3 +28,12 @@ outputs/
 logs/
 wandb/
 demo_depth.png
+docs/readme/*.ply
+*.jsonl
+
+# C++ build
+cpp/**/build/
+cpp/scale_shift/*.o
+cpp/scale_shift/src/*.o
+cpp/scale_shift/scale_shift_fit
+cpp/scale_shift/smoke_test

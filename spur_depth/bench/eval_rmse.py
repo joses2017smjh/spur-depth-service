@@ -31,11 +31,18 @@ import os
 import sys
 from pathlib import Path
 
+import numpy as np
 import torch
 from torch.utils.data import DataLoader
 
-from spur_depth.bench.latency import environment
+from spur_depth.bench.latency import environment, gpu_slug
 from spur_depth.models.losses import masked_rmse_nview
+
+_RERENDER_NOTE = (
+    "Val trees were re-rendered 2026-08-20 (job val9_chain-20976470). "
+    "Original Da2Finetune .npy files are gone, so this number is not expected "
+    "to match the paper's 0.0445 m bit-for-bit. Label it as a re-render."
+)
 
 SHIPPED = dict(n_views=6, use_pose=False, no_fusion=False, pred_mode="absolute")
 PAPER_RMSE = 0.0445
@@ -108,6 +115,12 @@ def _score_loader(predict_fn, loader, min_depth: float, max_depth: float) -> dic
         for i, v in enumerate(per_view):
             view_sums[i] += v
         n += 1
+        if n == 1 or n % 5 == 0:
+            print(
+                f"[eval] batch {n}  running_rmse={sum(view_sums)/len(view_sums)/n:.4f} m",
+                file=sys.stderr,
+                flush=True,
+            )
         _ = mean_rmse
     if not n:
         raise RuntimeError("val loader was empty — manifests resolved to zero samples")
@@ -132,6 +145,18 @@ def main(argv=None) -> int:
     p.add_argument("--W", type=int, default=512)
     p.add_argument("--onnx-dir", type=str, default=None)
     p.add_argument(
+        "--seed",
+        type=int,
+        default=0,
+        help="numpy seed for inverse-distance neighbour sampling in the loader",
+    )
+    p.add_argument(
+        "--out",
+        type=str,
+        default=None,
+        help="write JSON here; default bench/results/<gpu-slug>_<date>_eval.json",
+    )
+    p.add_argument(
         "--synthetic",
         type=int,
         default=0,
@@ -139,6 +164,8 @@ def main(argv=None) -> int:
         help="score N random tensors (NOT comparable to the paper; plumbing only)",
     )
     args = p.parse_args(argv)
+    np.random.seed(args.seed)
+    torch.manual_seed(args.seed)
 
     if args.backend == "trt":
         print(
@@ -246,24 +273,40 @@ def main(argv=None) -> int:
             return _predict_onnx(session_enc, session_fuse, rgb, d_pro)
 
     stats = _score_loader(predict, loader, args.min_depth, args.max_depth)
+    env = environment()
     record = {
         "backend": args.backend,
-        "paper_comparable": True,
+        "paper_comparable": False,
+        "paper_comparable_reason": _RERENDER_NOTE,
         "paper_rmse_m": PAPER_RMSE,
         "paper_rmse_std_m": PAPER_RMSE_STD,
+        "checkpoint_best_rmse_m": 0.044330,
         "eval_mask": f"trunk, {args.min_depth}–{args.max_depth} m",
         "n_views": 6,
+        "n_samples": len(ds),
+        "seed": args.seed,
+        "ckpt": args.ckpt,
+        "val_manifest": args.val_manifest,
         **stats,
-        "env": environment(),
+        "env": env,
     }
     print(json.dumps(record, indent=2))
     delta = abs(stats["rmse_mean_m"] - PAPER_RMSE)
     print(
         f"val RMSE {stats['rmse_mean_m']:.4f} m  "
         f"(paper {PAPER_RMSE:.4f} ± {PAPER_RMSE_STD:.4f}, "
-        f"|Δ|={delta:.4f})",
+        f"|Δ|={delta:.4f}; re-rendered val, not a bit-match)",
         file=sys.stderr,
     )
+    out = Path(args.out) if args.out else (
+        Path(__file__).resolve().parents[2]
+        / "bench"
+        / "results"
+        / f"{gpu_slug(env['gpu'])}_{env['date']}_eval.json"
+    )
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(record, indent=2) + "\n")
+    print(f"[eval] wrote {out}", file=sys.stderr)
     return 0
 
 
