@@ -124,6 +124,142 @@ Bilinear on a zeroed background smears the silhouette. Scoring uses nearest. Inp
 - TinyUNet on 100 trees: val IoU **0.930**. DA2 on predicted masks is still **0.112 m** vs **0.031 m** on GT. YOLO-nano val F1@0.5 is 0.035. Box-gated field RMSE is ~2 m. Not a field detector.
 - Long shipping notes: [`docs/README.draft.md`](docs/README.draft.md). Checklist: [`SHIPPING.md`](SHIPPING.md).
 
+---
+
+## Report: trees, textures, cylinders, what we can generate
+
+Generator: `Computer_Vision/Dataloader/generate_tree2.py`  
+`blender -b orchard_template.blend -P Dataloader/generate_tree2.py`
+
+This model has never seen a real orchard. Geometry on the cut is **cylinders**, not the raw PLY. Each organ is a capsule: centroid, unit axis, radius, length, all in metres. Trees are tilted `TREE_TILT_DEG = (-17.143, 0, 0)` so the trunk sits parallel to the orchard posts.
+
+### Tree models
+
+200 L-Py dormant apple trees. Matching PLY + metadata for every ID.
+
+| Architecture | IDs | Assets | In the 6000-frame restore |
+| --- | --- | --- | --- |
+| Envy (`lpy_envy_*`) | `00000`–`00099` | 100 PLY + 100 JSON | **yes** |
+| UFO (`lpy_ufo_*`) | `00000`–`00099` | 100 PLY + 100 JSON | no |
+
+`TREE_ID_FILTER = "envy"` is the default. UFO meshes are on disk; job `21036824` did not render them.
+
+`trees/metadata/{id}_metadata.json`:
+
+| Field | What it is |
+| --- | --- |
+| `seed_value` | L-Py seed (`lpy_envy_00000` = 700116) |
+| `hierarchy` | Parent → children: `trunk_*`, `branch_*`, `spur_*`, `nontrunk_*` |
+| `cylinder_data` | Map of full cylinder records. Example Envy tree: **1798** cylinders (80 trunk / 444 branch / 1034 spur / 240 nontrunk). Example UFO tree: **2960**. |
+| `per_cylinder_label` | `true` |
+| `axiom_pitch` / `axiom_yaw` | L-system axiom pose |
+| `branch_locations`, `color_mapping` | Extra L-Py bookkeeping |
+
+`RENDER_ONLY_PART = True` builds the mesh from those cylinders (`CV_RENDER_BRANCHES` / `CV_RENDER_SPURS`; set both to 0 for trunk-only).
+
+### Cylinder records
+
+**Local** (inside `cylinder_data`; keys are voxel-style ids like `"(0, 0, 0)"`):
+
+```json
+{
+  "part_name": "trunk_1",
+  "centroid": [0.0131, -0.0040, 0.0218],
+  "orientation": [0.825, -0.194, -0.531],
+  "radius": 0.0487,
+  "length": 0.1942
+}
+```
+
+**World sidecar** `cylinders_world/{bark}/{tree}.json`: same fields after Blender `matrix_world` (centroid + unit orientation in orchard metres).
+
+**Per-frame `ann/*.json`**: `cylinders_world` is **centroids only** `[x, y, z]` (backward compatible). Full radius / length / part_name live in the sidecar, not in every frame file.
+
+Each `ann` also has:
+
+```
+tree_id, shot, variant,
+rgb_path, depth_path,
+masks.tree_only,
+camera.location, camera.rotation_euler,
+camera.intrinsics.width / height / K (3×3),
+reference.post0 / post1,
+tree_object, background_objects
+```
+
+Reconstruction: `K` + `location` / `rotation_euler` → `T_wc`.
+
+### Bark textures we can render
+
+`BARK_TEXTURES` in `generate_tree2.py`. 4K PBR: `_diff_4k.jpg` + `_nor_gl_4k.exr` (Non-Color). Displacement and roughness sit on disk; the shader uses diffuse + normal. `bark_brown` files are prefixed `bark_brown_01_*`; the loader falls back to that glob.
+
+| Folder | In `BARK_TEXTURES` | On this restore |
+| --- | --- | --- |
+| `bark_brown` | yes | no |
+| `bark_brown_02` | yes | **yes** (6000 DA2 frames) |
+| `bark_willow` | yes | no |
+| `bark_willow_02` | yes | no |
+
+Also on disk, **not** wired in the generator:
+
+| Folder | Role |
+| --- | --- |
+| `bark_palm_tree`, `palm_tree_bark` | extra bark maps |
+| `sakura_bark`, `japanese_hackberry` | extra bark maps |
+| `brown_mud`, `dirt_floor`, `rock_ground` | ground, not tree bark |
+| `tree_dataset/envy_labelled`, `tree_dataset/ufo_labelled` | older labelled meshes; **not** the L-Py 200 |
+
+Those do not count as orchard barks until they are added to `BARK_TEXTURES`.
+
+### What the generator can write (1920×1080)
+
+```
+Data/full_spur/
+  rgb/{bark}/{tree}/{set}/              {tree}_shot{01-06}.png          (center)
+  Optical_flow/{bark}/{tree}/{set}/     {tree}_shot{01-06}_{l|r}.png    (stereo RGB)
+  depth/{bark}/{tree}/{set}/            metric GT .npy  (center + _l + _r)
+  mask/{bark}/{tree}/{set}/             tree-only PNG
+  box_mask/{bark}/{tree}/{set}/         30 cm camera-rect PNG (box_cam only)
+  ann/{bark}/{tree}/{set}/              K, pose, centroid list
+  cylinders_world/{bark}/{tree}.json    full world cylinders
+  Da2Finetune/{bark}/{tree}/{set}/      Engine A depth .npy (second pass)
+```
+
+`{set}` is the camera rig. 6 Z-shots, X/Y fixed, Z from 0.85 m to 3.73 m. Stereo baseline 0.12 m on camera-right.
+
+| Rig | Default | What it is |
+| --- | --- | --- |
+| `box` | 1 | Front Z-sweep. Camera-rect is **removed** in this pass. |
+| `box_cam1`–`box_cam8` | 8 (`CV_NUM_BOX_CAM_POSES`) | Same 100° arc, **with** the 30 cm camera-rect (`CAMERA_RECT_DEPTH = 0.30`) |
+| `cam1`–`cam10` | 10 | Same arc, no rect. `CV_SKIP_CAM=1` drops these. |
+| `_l` / `_r` | 2 | Stereo pair |
+
+Optional second pass: `infer_monocular_tree.py` (`CV_DEPTH_MODELS=da2ft`, DA3 if requested). Trunk-only: `CV_RENDER_BRANCHES=0 CV_RENDER_SPURS=0`.
+
+The **24k** people quote is four barks of the *eval* camera set, not the default 19-rig sweep:
+
+`4 barks × 100 Envy × 5 rigs (box + box_cam1–4) × 6 Z × 2 stereo = 24 000` DA2 / Optical_flow maps.
+
+Default `generate_tree2.py` (cam1–10 + box_cam1–8 + box) is larger than that. Do not call either number “on disk” until the files exist.
+
+### What is actually on HPC now
+
+Job `21036824` (`orchard91`) + the 9-tree val restore. Envy only, `bark_brown_02`, `CV_SKIP_CAM=1`, `CV_NUM_BOX_CAM_POSES=4`. RGB and `cylinders_world` were **not** copy-backed on the 91-tree job (storage).
+
+| Modality | Files | Note |
+| --- | --- | --- |
+| `depth` / `mask` / `ann` | 9000 | 100 trees × 5 rigs × 6 shots × (center + L + R) |
+| `Optical_flow` / `Da2Finetune` | 6000 | L/R only |
+| `box_mask` | 7200 | `box_cam1`–`box_cam4` only (no `box/` folder) |
+| `rgb` | 279 | leftover from the 9 val trees |
+| `cylinders_world` sidecars | 9 | same 9 val trees; every `ann` still has world centroids |
+
+Paper val trees stay `lpy_envy_00042` and `lpy_envy_00065`. Fit is the other 98 Envy trees. Quote **0.0325 m**. This is one bark, 6000 DA2 frames. It is not 24k.
+
+To grow it: same generator, set `BARK_NAME` / `TREE_ID`, write to Depot not stak. UFO needs `TREE_ID_FILTER` unset. The other three barks are a second array, not a CSV. Sidecar cylinders come back if `cylinders_world/` is in the copy list.
+
+---
+
 MIT. DINOv2 is Apache-2.0.
 
 Jose Sanchez — sanchej7@oregonstate.edu — Oregon State University
