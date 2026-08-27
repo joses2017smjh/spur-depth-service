@@ -45,7 +45,9 @@ from spur_depth.pipeline.sim2real import box_anchor_scale
 HEADLINE_LS_M = 0.034366251874510464
 
 
-def headline_stays_ls(best_method: str | None, rmse_m: float | None, *, ls_m: float = HEADLINE_LS_M) -> bool:
+def headline_stays_ls(
+    best_method: str | None, rmse_m: float | None, *, ls_m: float = HEADLINE_LS_M
+) -> bool:
     """Keep 0.0344 m unless another method beats it by more than 1 mm on n=78."""
     if best_method is None or rmse_m is None or best_method == "ls":
         return True
@@ -259,9 +261,7 @@ def main(argv=None) -> int:
             mask_cands.append((name, rec["rmse_m"], rec.get("n")))
     best_mask = min(mask_cands, key=lambda c: c[1]) if mask_cands else None
     payload["best_holdout_gt_mask"] = (
-        {"method": best_mask[0], "rmse_m": best_mask[1], "n": best_mask[2]}
-        if best_mask
-        else None
+        {"method": best_mask[0], "rmse_m": best_mask[1], "n": best_mask[2]} if best_mask else None
     )
     payload["headline_stays_ls_unless_best_wins"] = headline_stays_ls(
         best_mask[0] if best_mask else None,

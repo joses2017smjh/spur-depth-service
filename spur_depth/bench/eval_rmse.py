@@ -117,7 +117,7 @@ def _score_loader(predict_fn, loader, min_depth: float, max_depth: float) -> dic
         n += 1
         if n == 1 or n % 5 == 0:
             print(
-                f"[eval] batch {n}  running_rmse={sum(view_sums)/len(view_sums)/n:.4f} m",
+                f"[eval] batch {n}  running_rmse={sum(view_sums) / len(view_sums) / n:.4f} m",
                 file=sys.stderr,
                 flush=True,
             )
@@ -298,11 +298,15 @@ def main(argv=None) -> int:
         f"|Δ|={delta:.4f}; re-rendered val, not a bit-match)",
         file=sys.stderr,
     )
-    out = Path(args.out) if args.out else (
-        Path(__file__).resolve().parents[2]
-        / "bench"
-        / "results"
-        / f"{gpu_slug(env['gpu'])}_{env['date']}_eval.json"
+    out = (
+        Path(args.out)
+        if args.out
+        else (
+            Path(__file__).resolve().parents[2]
+            / "bench"
+            / "results"
+            / f"{gpu_slug(env['gpu'])}_{env['date']}_eval.json"
+        )
     )
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(record, indent=2) + "\n")

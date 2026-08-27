@@ -150,7 +150,11 @@ def main(argv=None) -> int:
     ap.add_argument("--stereo-limit", type=int, default=40, help="max L/R pairs for stereo (NFS)")
     ap.add_argument("--flow", choices=["farneback", "raft", "auto"], default="farneback")
     ap.add_argument("--max-per-tree", type=int, default=0, help="0 = all frames (debug cap)")
-    ap.add_argument("--holdout-only", action="store_true", help="load paper val trees only (needs --alpha --beta)")
+    ap.add_argument(
+        "--holdout-only",
+        action="store_true",
+        help="load paper val trees only (needs --alpha --beta)",
+    )
     ap.add_argument("--alpha", type=float, default=None)
     ap.add_argument("--beta", type=float, default=None)
     args = ap.parse_args(argv)
@@ -190,17 +194,26 @@ def main(argv=None) -> int:
         if (i + 1) % 50 == 0:
             print(f"[rigorous] loaded {i + 1}/{len(rows)}", file=sys.stderr, flush=True)
 
-    fit_moms = [p["moments"] for p in per_row if p["row"]["tree"] not in PAPER_VAL and p["moments"] is not None]
+    fit_moms = [
+        p["moments"]
+        for p in per_row
+        if p["row"]["tree"] not in PAPER_VAL and p["moments"] is not None
+    ]
     if args.alpha is not None and args.beta is not None:
         alpha, beta = float(args.alpha), float(args.beta)
-        acc = merge_in_order([m for m in (p["moments"] for p in per_row) if m is not None]) or Moments()
+        acc = (
+            merge_in_order([m for m in (p["moments"] for p in per_row) if m is not None])
+            or Moments()
+        )
         n_fit_images = 0
     else:
         if not fit_moms:
             print("no valid pixels on the fit cohort", file=sys.stderr)
             return 2
         alpha, beta, acc = _fit_from_moments(fit_moms)
-        n_fit_images = sum(1 for p in per_row if p["row"]["tree"] not in PAPER_VAL and p["moments"] is not None)
+        n_fit_images = sum(
+            1 for p in per_row if p["row"]["tree"] not in PAPER_VAL and p["moments"] is not None
+        )
 
     raw_hold = _summarize([p["raw_rmse"] for p in hold_cache if p["raw_rmse"] is not None])
     cal_hold_errs = []
@@ -216,7 +229,11 @@ def main(argv=None) -> int:
             cal_hold_errs.append(err)
     cal_hold = _summarize(cal_hold_errs)
     raw_fit = _summarize(
-        [p["raw_rmse"] for p in per_row if p["row"]["tree"] not in PAPER_VAL and p["raw_rmse"] is not None]
+        [
+            p["raw_rmse"]
+            for p in per_row
+            if p["row"]["tree"] not in PAPER_VAL and p["raw_rmse"] is not None
+        ]
     )
 
     trees = sorted({r["tree"] for r in rows})
@@ -226,7 +243,13 @@ def main(argv=None) -> int:
         for p in per_row:
             by_tree[p["row"]["tree"]].append(p)
         for tree in trees:
-            others = [p["moments"] for t, ps in by_tree.items() if t != tree for p in ps if p["moments"] is not None]
+            others = [
+                p["moments"]
+                for t, ps in by_tree.items()
+                if t != tree
+                for p in ps
+                if p["moments"] is not None
+            ]
             a, b, _ = _fit_from_moments(others)
             errs = []
             for p in by_tree[tree]:
@@ -253,7 +276,9 @@ def main(argv=None) -> int:
                 continue
             n_st += 1
             packed = stereo_depth(r, rr, flow_backend=args.flow)
-            p = next((x for x in hold_cache if x["row"] is r or x["row"]["pred"] == r["pred"]), None)
+            p = next(
+                (x for x in hold_cache if x["row"] is r or x["row"]["pred"] == r["pred"]), None
+            )
             if p is None or "pred" not in p:
                 pred, gt, mask = load_triple(r)
             else:
@@ -265,14 +290,18 @@ def main(argv=None) -> int:
             if z.shape != cal.shape:
                 z = _resize_to(np.nan_to_num(z, nan=0.0), cal.shape[:2], nearest=False)
                 z = np.where(z > 0.3, z, np.nan).astype(np.float32)
-                var_st_map = _resize_to(np.nan_to_num(var_st_map, nan=1.0), cal.shape[:2], nearest=False)
+                var_st_map = _resize_to(
+                    np.nan_to_num(var_st_map, nan=1.0), cal.shape[:2], nearest=False
+                )
             e_s = masked_rmse(z, gt, mask)
             if e_s is not None:
                 st_err.append(e_s)
             var_da2 = np.full_like(cal, float((cal_hold.get("rmse_m") or 0.04) ** 2))
             # Floor stereo variance at 1 m² so a 1.5 m Farneback map cannot
             # outweigh a 3.4 cm DA2 prior. Analytic 0.5 px noise is optimistic.
-            var_st = np.where(np.isfinite(var_st_map), np.maximum(var_st_map, 1.0), 100.0).astype(np.float32)
+            var_st = np.where(np.isfinite(var_st_map), np.maximum(var_st_map, 1.0), 100.0).astype(
+                np.float32
+            )
             fused, _ = fuse_depths(
                 [cal, np.nan_to_num(z, nan=0.0)],
                 variances=[var_da2, var_st],
@@ -282,7 +311,11 @@ def main(argv=None) -> int:
             e_f = masked_rmse(fused, gt, mask)
             if e_f is not None:
                 fused_err.append(e_f)
-            print(f"[stereo] {n_st}/{args.stereo_limit} {r['tree']} {r['shot']}", file=sys.stderr, flush=True)
+            print(
+                f"[stereo] {n_st}/{args.stereo_limit} {r['tree']} {r['shot']}",
+                file=sys.stderr,
+                flush=True,
+            )
         stereo_hold = {
             "n": n_st,
             "rmse_m": float(np.mean(st_err)) if st_err else None,

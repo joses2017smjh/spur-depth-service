@@ -55,9 +55,21 @@ class TinyUNet(nn.Module):
         b = self.e2(self.pool(a))
         c = self.e3(self.pool(b))
         d = self.b(self.pool(c))
-        x = self.u3(torch.cat([F.interpolate(d, scale_factor=2, mode="bilinear", align_corners=False), c], 1))
-        x = self.u2(torch.cat([F.interpolate(x, scale_factor=2, mode="bilinear", align_corners=False), b], 1))
-        x = self.u1(torch.cat([F.interpolate(x, scale_factor=2, mode="bilinear", align_corners=False), a], 1))
+        x = self.u3(
+            torch.cat(
+                [F.interpolate(d, scale_factor=2, mode="bilinear", align_corners=False), c], 1
+            )
+        )
+        x = self.u2(
+            torch.cat(
+                [F.interpolate(x, scale_factor=2, mode="bilinear", align_corners=False), b], 1
+            )
+        )
+        x = self.u1(
+            torch.cat(
+                [F.interpolate(x, scale_factor=2, mode="bilinear", align_corners=False), a], 1
+            )
+        )
         return self.head(x)
 
 
@@ -103,10 +115,16 @@ def _eval(model, loader, device):
 def predict_mask(model, rgb: np.ndarray, device) -> np.ndarray:
     h0, w0 = rgb.shape[:2]
     x = torch.from_numpy(
-        np.asarray(Image.fromarray(rgb).resize((W, H), Image.BILINEAR)).transpose(2, 0, 1).astype(np.float32) / 255.0
+        np.asarray(Image.fromarray(rgb).resize((W, H), Image.BILINEAR))
+        .transpose(2, 0, 1)
+        .astype(np.float32)
+        / 255.0
     )[None].to(device)
-    pred = (torch.sigmoid(model(x))[0, 0].cpu().numpy() > 0.5)
-    return np.asarray(Image.fromarray((pred * 255).astype(np.uint8)).resize((w0, h0), Image.NEAREST)) > 0
+    pred = torch.sigmoid(model(x))[0, 0].cpu().numpy() > 0.5
+    return (
+        np.asarray(Image.fromarray((pred * 255).astype(np.uint8)).resize((w0, h0), Image.NEAREST))
+        > 0
+    )
 
 
 def main(argv=None) -> int:
@@ -115,7 +133,9 @@ def main(argv=None) -> int:
     ap.add_argument("--epochs", type=int, default=8)
     ap.add_argument("--batch", type=int, default=8)
     ap.add_argument("--out", type=Path, default=Path("weights/trunk_unet.pt"))
-    ap.add_argument("--eval-ckpt", type=Path, default=None, help="skip training; score an existing TinyUNet")
+    ap.add_argument(
+        "--eval-ckpt", type=Path, default=None, help="skip training; score an existing TinyUNet"
+    )
     args = ap.parse_args(argv)
 
     rows = discover_da2_triples(args.data_root)
@@ -155,10 +175,23 @@ def main(argv=None) -> int:
                 opt.step()
                 losses.append(float(loss.item()))
             iou, dice = _eval(model, ld_va, device)
-            history.append({"epoch": ep, "train_loss": float(np.mean(losses)), "val_iou": iou, "val_dice": dice})
-            print(f"epoch {ep}  loss {np.mean(losses):.4f}  val IoU {iou:.3f}  Dice {dice:.3f}", flush=True)
+            history.append(
+                {
+                    "epoch": ep,
+                    "train_loss": float(np.mean(losses)),
+                    "val_iou": iou,
+                    "val_dice": dice,
+                }
+            )
+            print(
+                f"epoch {ep}  loss {np.mean(losses):.4f}  val IoU {iou:.3f}  Dice {dice:.3f}",
+                flush=True,
+            )
         args.out.parent.mkdir(parents=True, exist_ok=True)
-        torch.save({"model": model.state_dict(), "history": history, "hold_trees": list(PAPER_VAL)}, args.out)
+        torch.save(
+            {"model": model.state_dict(), "history": history, "hold_trees": list(PAPER_VAL)},
+            args.out,
+        )
 
     model.eval()
     field_gt, field_pred, field_clean, demo = [], [], [], []
@@ -169,9 +202,14 @@ def main(argv=None) -> int:
         pred_m = predict_mask(model, rgb, device)
         da2, gt, gt_m = load_triple(r)
         if pred_m.shape != gt_m.shape:
-            pred_m = np.asarray(
-                Image.fromarray((pred_m.astype(np.uint8) * 255)).resize((gt_m.shape[1], gt_m.shape[0]), Image.NEAREST)
-            ) > 0
+            pred_m = (
+                np.asarray(
+                    Image.fromarray((pred_m.astype(np.uint8) * 255)).resize(
+                        (gt_m.shape[1], gt_m.shape[0]), Image.NEAREST
+                    )
+                )
+                > 0
+            )
         e_gt = masked_rmse(da2, gt, gt_m)
         cleaned = keep_largest_component(pred_m, min_area=2048)
         e_pr = masked_rmse(da2, gt, pred_m)
@@ -207,7 +245,12 @@ def main(argv=None) -> int:
         "note": "Trained on 7 trees, tested on paper val pair. Not a YOLO checkpoint.",
     }
     args.out.with_suffix(".json").write_text(json.dumps(report, indent=2) + "\n")
-    print(json.dumps({k: report[k] for k in ("n_train", "n_val", "best_val_iou", "field_rmse", "weights")}, indent=2))
+    print(
+        json.dumps(
+            {k: report[k] for k in ("n_train", "n_val", "best_val_iou", "field_rmse", "weights")},
+            indent=2,
+        )
+    )
     return 0
 
 

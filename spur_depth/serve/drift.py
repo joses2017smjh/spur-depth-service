@@ -178,7 +178,9 @@ def main(argv=None) -> int:
         type=Path,
         help="restored Data/full_spur root; uses real DA2-ft depths, not the 2.0 m placeholder",
     )
-    ap.add_argument("--holdout-only", action="store_true", help="with --from-data-root, only paper val trees")
+    ap.add_argument(
+        "--holdout-only", action="store_true", help="with --from-data-root, only paper val trees"
+    )
     ap.add_argument("--out", type=Path, default=DEFAULT_BASELINE)
     args = ap.parse_args(argv)
     if args.from_dir is None and args.from_data_root is None:

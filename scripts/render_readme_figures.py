@@ -36,7 +36,14 @@ OUT = REPO / "docs" / "readme"
 DATA = Path("/nfs/hpc/share/sanchej7/Computer_Vision/Data/full_spur")
 BARK, TREE, SET_ID, SHOT = "bark_brown_02", "lpy_envy_00042", "box", "shot01"
 CV = Path("/nfs/hpc/share/sanchej7/Computer_Vision")
-PAIRS = (("box", "L"), ("box", "R"), ("box_cam1", "L"), ("box_cam1", "R"), ("box_cam2", "L"), ("box_cam2", "R"))
+PAIRS = (
+    ("box", "L"),
+    ("box", "R"),
+    ("box_cam1", "L"),
+    ("box_cam1", "R"),
+    ("box_cam2", "L"),
+    ("box_cam2", "R"),
+)
 
 
 def _style() -> None:
@@ -118,7 +125,9 @@ def hero_strip(rgb, da, gt, mask) -> None:
     tint = np.zeros_like(rgb)
     tint[..., 0], tint[..., 1], tint[..., 2] = 33, 150, 243
     alpha = (0.48 * mask).astype(np.float32)[..., None]
-    blend = (overlay.astype(np.float32) * (1 - alpha) + tint.astype(np.float32) * alpha).astype(np.uint8)
+    blend = (overlay.astype(np.float32) * (1 - alpha) + tint.astype(np.float32) * alpha).astype(
+        np.uint8
+    )
     axes[3].imshow(blend)
     axes[3].set_title("Trunk mask  ·  loss support")
     axes[3].set_axis_off()
@@ -139,7 +148,9 @@ def da2_residual(da, gt, mask) -> None:
     fig, ax = plt.subplots(figsize=(6.4, 3.6))
     cmap = plt.get_cmap("Oranges").copy()
     cmap.set_bad(color="#1A1A1A")
-    im = ax.imshow(vis, cmap=cmap, vmin=0, vmax=float(np.percentile(err[mask], 95)), interpolation="nearest")
+    im = ax.imshow(
+        vis, cmap=cmap, vmin=0, vmax=float(np.percentile(err[mask], 95)), interpolation="nearest"
+    )
     ax.set_axis_off()
     trunk_rmse = float(np.sqrt(np.mean(err[mask] ** 2)))
     ax.set_title(f"|DA2-ft − GT| on trunk  ·  this frame RMSE {trunk_rmse:.3f} m")
@@ -217,7 +228,9 @@ def accuracy_seeds() -> None:
             fontsize=8.5,
             fontweight="bold",
         )
-    ax.axhline(mean, color=ORANGE, linewidth=1.6, linestyle="--", zorder=3, label=f"mean  {mean:.4f} m")
+    ax.axhline(
+        mean, color=ORANGE, linewidth=1.6, linestyle="--", zorder=3, label=f"mean  {mean:.4f} m"
+    )
     ax.fill_between([-0.55, 4.55], mean - std, mean + std, color=ORANGE, alpha=0.12, zorder=1)
     ax.scatter(
         [0],
@@ -239,7 +252,13 @@ def accuracy_seeds() -> None:
     ax.spines[["top", "right"]].set_visible(False)
     ax.set_title("DINO RGB+D, 3 stereo pairs, trunk mask 0.5–10.0 m")
     seed_dot = plt.Line2D(
-        [0], [0], marker="o", color="w", markerfacecolor=INK, markersize=7, label="checkpoint best_rmse"
+        [0],
+        [0],
+        marker="o",
+        color="w",
+        markerfacecolor=INK,
+        markersize=7,
+        label="checkpoint best_rmse",
     )
     ax.legend(
         handles=[
@@ -293,7 +312,7 @@ def da2_vs_dino() -> None:
     for bar, s, lab in zip(
         bars,
         stds,
-        ["5.98 cm", f"{means[1]*100:.2f}±{stds[1]*100:.2f} cm"],
+        ["5.98 cm", f"{means[1] * 100:.2f}±{stds[1] * 100:.2f} cm"],
     ):
         ax.text(
             bar.get_x() + bar.get_width() / 2,
@@ -312,7 +331,9 @@ def da2_vs_dino() -> None:
     ax.set_axisbelow(True)
     ax.spines[["top", "right"]].set_visible(False)
     ax.set_title("Same trees, same mask. Refinement is the 1.5 cm.")
-    seed_dot = plt.Line2D([0], [0], marker="o", color="w", markerfacecolor=INK, markersize=6, label="Individual seed")
+    seed_dot = plt.Line2D(
+        [0], [0], marker="o", color="w", markerfacecolor=INK, markersize=6, label="Individual seed"
+    )
     fig.legend(
         handles=[
             mpatches.Patch(color=ORANGE, alpha=0.75, label="DA2-ft  (real-time cut)"),
@@ -329,7 +350,11 @@ def da2_vs_dino() -> None:
 
 def orchard_affine() -> None:
     """DA2-ft vs GT trunk mask after hold-out affine. Not the DINO 0.0445 m number."""
-    labels = ["9-tree restore\nLS affine", "100 trees, 1 bark\nLS affine", "DINO 3-pair\n(different model)"]
+    labels = [
+        "9-tree restore\nLS affine",
+        "100 trees, 1 bark\nLS affine",
+        "DINO 3-pair\n(different model)",
+    ]
     vals = [0.034366, 0.032517, 0.04452]
     colors = [ORANGE, BLUE, MUTED]
     fig, ax = plt.subplots(figsize=(6.6, 4.0))
@@ -421,18 +446,38 @@ def onnx_split() -> None:
     ax.axis("off")
 
     def box(x, y, w, h, color, title, body):
-        rect = plt.Rectangle((x, y), w, h, facecolor=color, alpha=0.14, edgecolor=color, linewidth=2)
+        rect = plt.Rectangle(
+            (x, y), w, h, facecolor=color, alpha=0.14, edgecolor=color, linewidth=2
+        )
         ax.add_patch(rect)
-        ax.text(x + 0.18, y + h - 0.32, title, fontsize=10, fontweight="bold", color=color, fontfamily="monospace")
+        ax.text(
+            x + 0.18,
+            y + h - 0.32,
+            title,
+            fontsize=10,
+            fontweight="bold",
+            color=color,
+            fontfamily="monospace",
+        )
         ax.text(x + 0.18, y + 0.28, body, fontsize=9, color=INK, va="bottom")
 
     box(0.2, 1.55, 2.5, 1.55, INK, "RGB + D", "6 × 280×512\nImageNet RGB\nbilinear depth")
     box(3.3, 1.55, 3.1, 1.55, BLUE, "encoder.onnx", "ViT-L per view\n1.2 GB graph\nmax |Δ| 1.53e-5")
     box(7.1, 1.55, 2.7, 1.55, ORANGE, "fuse_decode.onnx", "26 MB graph\nmax |Δ| 9.5e-7\nmetres out")
     box(10.4, 1.55, 1.55, 1.55, BLUE, "depth", "float32\n.npy")
-    box(0.2, 0.15, 5.2, 1.15, ORANGE, "da2.onnx  (Engine A)", "single RGB  ·  518×924  ·  ~0.060 m  ·  POST /predict")
+    box(
+        0.2,
+        0.15,
+        5.2,
+        1.15,
+        ORANGE,
+        "da2.onnx  (Engine A)",
+        "single RGB  ·  518×924  ·  ~0.060 m  ·  POST /predict",
+    )
     for x0, x1 in ((2.7, 3.3), (6.4, 7.1), (9.8, 10.4)):
-        ax.annotate("", xy=(x1, 2.3), xytext=(x0, 2.3), arrowprops=dict(arrowstyle="->", color=INK, lw=1.3))
+        ax.annotate(
+            "", xy=(x1, 2.3), xytext=(x0, 2.3), arrowprops=dict(arrowstyle="->", color=INK, lw=1.3)
+        )
     ax.set_title("The Python loop over 6 views would unroll 144 ViT-L blocks. We split instead.")
     _save(fig, "onnx_split.png")
 

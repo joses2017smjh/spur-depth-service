@@ -1,6 +1,6 @@
 """Run the perception stack on one val tree and write README demos.
 
-    python -m spur_depth.pipeline.run --out docs/readme
+python -m spur_depth.pipeline.run --out docs/readme
 """
 
 from __future__ import annotations
@@ -49,7 +49,9 @@ def _ann(set_id: str, side: str) -> dict:
 
 def _gif(frames: list[np.ndarray], path: Path, duration: int = 400) -> None:
     ims = [Image.fromarray(f).convert("P", palette=Image.ADAPTIVE, colors=128) for f in frames]
-    ims[0].save(path, save_all=True, append_images=ims[1:], duration=duration, loop=0, optimize=True)
+    ims[0].save(
+        path, save_all=True, append_images=ims[1:], duration=duration, loop=0, optimize=True
+    )
 
 
 def _orbit_png(pts: np.ndarray, path: Path) -> None:
@@ -134,7 +136,11 @@ def main(argv=None) -> int:
     _orbit_png(cloud, out / "reconstruct.png")
     _orbit_gif(cloud, out / "reconstruct.gif")
 
-    fused, _ = fuse_depths([da0, gt0], variances=[np.full_like(da0, 0.01), np.full_like(gt0, 1e-4)], valid=[mask0, mask0])
+    fused, _ = fuse_depths(
+        [da0, gt0],
+        variances=[np.full_like(da0, 0.01), np.full_like(gt0, 1e-4)],
+        valid=[mask0, mask0],
+    )
     appear = appearance_gap(rgb0)
     box_scale = box_anchor_scale(da0, mask0, K=load_pose(_ann("box", "l"))[0])
     (out / "pipeline_report.json").write_text(

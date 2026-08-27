@@ -213,7 +213,9 @@ def export_da2(
 
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    p.add_argument("--graph", choices=["fuse_decode", "encoder", "da2", "both"], default="fuse_decode")
+    p.add_argument(
+        "--graph", choices=["fuse_decode", "encoder", "da2", "both"], default="fuse_decode"
+    )
     p.add_argument("--ckpt", type=str, default=None)
     p.add_argument("--da2-ckpt", type=str, default=os.environ.get("SPUR_DA2_CKPT"))
     p.add_argument(
@@ -225,7 +227,9 @@ def main(argv=None) -> int:
         ),
     )
     p.add_argument("--da2-h", type=int, default=518)
-    p.add_argument("--da2-w", type=int, default=924, help="518×924 is 1080×1920 after DA2's 14-multiple resize")
+    p.add_argument(
+        "--da2-w", type=int, default=924, help="518×924 is 1080×1920 after DA2's 14-multiple resize"
+    )
     p.add_argument("--max-depth", type=float, default=20.0)
     p.add_argument("--out", type=str, default="engines")
     args = p.parse_args(argv)
@@ -237,7 +241,11 @@ def main(argv=None) -> int:
     if args.graph in ("encoder", "both"):
         reports.append(export_encoder(out_dir, args.ckpt))
     if args.graph == "da2":
-        reports.append(export_da2(out_dir, args.da2_ckpt, args.da2_root, args.da2_h, args.da2_w, args.max_depth))
+        reports.append(
+            export_da2(
+                out_dir, args.da2_ckpt, args.da2_root, args.da2_h, args.da2_w, args.max_depth
+            )
+        )
     print(json.dumps(reports, indent=2))
     return 0
 

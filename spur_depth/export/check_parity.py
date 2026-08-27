@@ -26,9 +26,7 @@ def _ort_session(path: Path):
     opts = ort.SessionOptions()
     opts.intra_op_num_threads = 8
     opts.inter_op_num_threads = 1
-    return ort.InferenceSession(
-        str(path), sess_options=opts, providers=["CPUExecutionProvider"]
-    )
+    return ort.InferenceSession(str(path), sess_options=opts, providers=["CPUExecutionProvider"])
 
 
 def fuse_decode_parity(onnx_path: Path, ckpt: str | None, seed: int = 0) -> dict:
