@@ -136,7 +136,6 @@ def main(argv=None) -> int:
 
     fused, _ = fuse_depths([da0, gt0], variances=[np.full_like(da0, 0.01), np.full_like(gt0, 1e-4)], valid=[mask0, mask0])
     appear = appearance_gap(rgb0)
-    box_p = DATA / "mask" / BARK / TREE / "box" / f"{TREE}_{SHOT}_l.png"
     box_scale = box_anchor_scale(da0, mask0, K=load_pose(_ann("box", "l"))[0])
     (out / "pipeline_report.json").write_text(
         json.dumps(

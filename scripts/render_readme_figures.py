@@ -20,8 +20,8 @@ os.environ.setdefault("CUDA_VISIBLE_DEVICES", "")
 import matplotlib
 
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
+import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
 
@@ -196,7 +196,7 @@ def accuracy_seeds() -> None:
 
     fig, ax = plt.subplots(figsize=(7.4, 4.0))
     x = np.arange(len(seeds))
-    bars = ax.bar(
+    ax.bar(
         x,
         vals,
         color=BLUE,

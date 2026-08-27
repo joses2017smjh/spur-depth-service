@@ -13,7 +13,7 @@ Lineage the modules implement, not slogans:
 
 from spur_depth.pipeline.detect import box_to_mask, boxes_from_mask
 from spur_depth.pipeline.flow import dense_flow, flow_to_rgb
-from spur_depth.pipeline.reconstruct import Frame, unproject, merge_clouds
+from spur_depth.pipeline.reconstruct import Frame, merge_clouds, unproject
 from spur_depth.pipeline.sensors import fuse_depths
 from spur_depth.pipeline.sim2real import appearance_gap, box_anchor_scale
 
