@@ -1,0 +1,35 @@
+Bootstrap: docker
+From: pytorch/pytorch:2.4.1-cuda12.1-cudnn9-runtime
+
+# Apptainer cannot parse Dockerfile.gpu (Docker syntax). Build this on node
+# scratch only — do not copy the SIF to hpc-share or stak.
+#
+#   source scripts/scratch_env.sh && spur_export_scratch
+#   cd $SPUR_ROOT && apptainer build $SPUR_SCRATCH/spur-depth-gpu.sif apptainer/gpu.def
+
+%environment
+    export PYTHONDONTWRITEBYTECODE=1
+    export PYTHONUNBUFFERED=1
+    export PIP_DISABLE_PIP_VERSION_CHECK=1
+    export SPUR_SKIP_WEIGHTS=1
+    export SPUR_HOST=0.0.0.0
+    export SPUR_PORT=8000
+    export XFORMERS_DISABLED=1
+
+%files
+    pyproject.toml /app/pyproject.toml
+    README.md /app/README.md
+    model_card.json /app/model_card.json
+    weights.lock /app/weights.lock
+    spur_depth /app/spur_depth
+    scripts /app/scripts
+
+%post
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get update && apt-get install -y --no-install-recommends \
+        libgl1 libglib2.0-0 \
+        && rm -rf /var/lib/apt/lists/*
+    cd /app && pip install --no-cache-dir -e ".[serve]"
+
+%runscript
+    python -m spur_depth.serve

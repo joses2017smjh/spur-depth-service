@@ -122,10 +122,11 @@ def build_with_python_api(onnx: Path, plan: Path, fp16: bool, workspace_mib: int
             "Load a TensorRT module or use an nvcr.io/nvidia/tensorrt image."
         ) from exc
 
+    from spur_depth.export.trt_runtime import enable_fp16, network_creation_flags
+
     logger = trt.Logger(trt.Logger.WARNING)
     builder = trt.Builder(logger)
-    flags = 1 << int(trt.NetworkDefinitionCreationFlag.EXPLICIT_BATCH)
-    network = builder.create_network(flags)
+    network = builder.create_network(network_creation_flags(trt))
     parser = trt.OnnxParser(network, logger)
     with onnx.open("rb") as fh:
         if not parser.parse(fh.read()):
@@ -134,7 +135,7 @@ def build_with_python_api(onnx: Path, plan: Path, fp16: bool, workspace_mib: int
     config = builder.create_builder_config()
     config.set_memory_pool_limit(trt.MemoryPoolType.WORKSPACE, workspace_mib << 20)
     if fp16:
-        config.set_flag(trt.BuilderFlag.FP16)
+        enable_fp16(trt, config)
     serialized = builder.build_serialized_network(network, config)
     if serialized is None:
         raise RuntimeError("tensorrt build_serialized_network returned None")
@@ -143,9 +144,14 @@ def build_with_python_api(onnx: Path, plan: Path, fp16: bool, workspace_mib: int
 
 
 def main(argv=None) -> int:
+    from spur_depth.export.trt_runtime import bootstrap_tensorrt
+    from spur_depth.paths import engine_dir
+
+    bootstrap_tensorrt()
+
     p = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     p.add_argument("--onnx", type=str, required=True)
-    p.add_argument("--out-dir", type=str, default="engines")
+    p.add_argument("--out-dir", type=str, default=str(engine_dir()))
     p.add_argument("--fp16", action="store_true")
     p.add_argument("--min", dest="min_shapes", default=None)
     p.add_argument("--opt", dest="opt_shapes", default=None)

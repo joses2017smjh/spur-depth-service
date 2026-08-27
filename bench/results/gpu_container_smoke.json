@@ -1,0 +1,13 @@
+{
+  "ok": true,
+  "reconstructed_from_log": true,
+  "job": "21015984",
+  "node": "dgx2-5.hpc.engr.oregonstate.edu",
+  "gpu": "Tesla V100-SXM3-32GB",
+  "sif": "/tmp/spur_21015984/spur-depth-gpu.sif",
+  "sif_bytes": null,
+  "cuda_probe": "cuda True",
+  "dockerfile_apptainer": "failed (Dockerfile.gpu is Docker syntax, not a .def)",
+  "fallback": "apptainer pull docker://pytorch/pytorch:2.4.1-cuda12.1-cudnn9-runtime",
+  "note": "Apptainer --nv smoke on node /tmp. SIF was not copied to hpc-share. Not a TensorRT millisecond. Original JSON stayed on the node and was not copied because run_scratch_ship.sh copied artifacts before this step; that order is now fixed."
+}

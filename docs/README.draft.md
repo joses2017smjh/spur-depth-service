@@ -46,7 +46,7 @@ Re-score seed-1 on the 2026-08-20 re-render, Tesla V100, torch fp32: **0.0467 m*
 | PyTorch fp32 exclusive | Tesla V100-SXM3-32GB | **393.5** | **397.2** | **397.8** | 65.6 | 0.0467 m re-render |
 | PyTorch fp16 exclusive | Tesla V100-SXM3-32GB | **156.0** | **156.2** | **156.3** | 26.0 | not re-scored |
 | ONNX Runtime CPU | encoder + fuse | — | — | — | — | max abs 1.53e-5 / 9.5e-7 |
-| TensorRT | — | — | — | — | — | no `.plan`, no number |
+| TensorRT fuse/decode FP32 | Quadro RTX 8000 | 327 | 328 | — | — | max abs 1.2e-6 vs ORT CPU. **Not** end-to-end. |
 
 Dirty V100 tails from the morning (concurrent ONNX) stay in the JSON as the first two rows. Quote the exclusive pair (p50 393.5 / 156.0). 20 warmup + 200 timed, CUDA events.
 
@@ -63,7 +63,7 @@ Dirty V100 tails from the morning (concurrent ONNX) stay in the JSON as the firs
 
 ## ONNX
 
-Split so 6 views do not unroll 144 ViT-L blocks: `encoder.onnx` (1.2 GB) + `fuse_decode.onnx` (26 MB). DA2 Engine A traces only after DA2's own xFormers flag is forced off (CUDA-only kernels). `XFORMERS_DISABLED=1` for the vendored refiner DINOv2. No TensorRT on the HPC dgx2 nodes.
+Split so 6 views do not unroll 144 ViT-L blocks: `encoder.onnx` (1.2 GB) + `fuse_decode.onnx` (26 MB). DA2 Engine A traces only after DA2's own xFormers flag is forced off (CUDA-only kernels). `XFORMERS_DISABLED=1` for the vendored refiner DINOv2. Fuse-only TensorRT `.plan` on RTX 8000 (FP32). No encoder/DA2 engine (would clone 1.2 GB).
 
 ## Drift, calib, restore
 
@@ -71,4 +71,4 @@ PSI/KS vs fixture `baseline_stats.json`. PRO α/β in `pro_best_config.json`. C+
 
 ## Limitations
 
-Synthetic only. 24k train set missing. No TRT number. `/predict` needs `SPUR_DA2_CKPT`.
+Synthetic only. 100 trees × 1 bark (`bark_brown_02`) = 6000 DA2 frames. Not 4-bark 24k. Fuse-only TensorRT `.plan` exists; do not quote 327 ms as refiner latency. `/predict` needs `SPUR_DA2_CKPT`.

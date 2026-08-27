@@ -1,0 +1,14 @@
+{
+  "onnx": "/nfs/hpc/share/sanchej7/spur-depth-service/engines/fuse_decode.onnx",
+  "plan": "/scratch/sanchej7/spur/21018095/engines/fuse_decode_fp16_quadro-rtx-8000.plan",
+  "plan_bytes": 60335756,
+  "fp16": false,
+  "tensorrt": "11.2.1.2",
+  "workspace_mib": 2048,
+  "graph": "fuse_decode",
+  "n": 50,
+  "p50_ms": 327.47274986468256,
+  "p95_ms": 328.35731701925397,
+  "max_abs_vs_ort_cpu": 1.1920928955078125e-06,
+  "note": "fuse_decode only. Not end-to-end refiner latency."
+}

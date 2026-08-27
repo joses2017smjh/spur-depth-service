@@ -12,10 +12,13 @@ show YOLO well ahead of SSD (91% vs 47% mAP on a small orchard set). 2025–26
 pruning systems detect trunks with YOLOv5n+SENet or YOLOv9c, then segment
 uprights (YOLOv8n-seg + DSConv) and read length/angle off the mask.
 
-This repo does not ship a trained YOLO. It ships the **labels those heads
-train on**: connected-component boxes from the Blender trunk / box masks
-(`detect.boxes_from_mask`). Same output tensor a SSD/YOLO head would emit:
-`(x1,y1,x2,y2,score,cls)`.
+Labels are still connected-component boxes from the Blender trunk mask
+(`detect.boxes_from_mask`): `(x1,y1,x2,y2,score,cls)`. `pipeline.train_yolo`
+fits an in-repo YOLO-nano (1 class, stride 16, 3 k-means anchors) on those
+boxes without copying the 1080p frames. That is not Ultralytics YOLOv8n.
+Checkpoint `weights/yolo_nano.pt` exists; val F1@IoU0.5 is **0.035** — not a
+field detector. TinyUNet on 100 trees reaches val IoU 0.930; DA2 on predicted
+masks is still 0.112 m vs 0.031 m on GT.
 
 ## Flow (FlowNet → RAFT)
 
@@ -72,6 +75,8 @@ The box is.
 
 ## What this is not
 
-A trained YOLO, a TensorRT millisecond, or a real-orchard RMSE. Those are
-the next weights, the next container, and a field campaign — not a sentence
-in this file.
+A COCO YOLOv8n, a TensorRT *end-to-end* millisecond, a GPU-docker number
+from a clean machine, or a 4-bark 24k-frame orchard. One bark is on disk:
+100 trees, 6000 DA2 frames, hold-out affine **0.0325 m** on `00042`+`00065`.
+Field RMSE on predicted boxes is still ~2 m — that is a detector problem,
+not a missing-CSV problem.

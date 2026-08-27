@@ -4,10 +4,32 @@ from __future__ import annotations
 
 import numpy as np
 
-from spur_depth.pipeline.detect import CLS_TRUNK, boxes_from_mask
+from spur_depth.pipeline.detect import (
+    CLS_TRUNK,
+    box_to_mask,
+    boxes_from_mask,
+    keep_largest_component,
+)
 from spur_depth.pipeline.flow import dense_flow
 from spur_depth.pipeline.sensors import fuse_depths
 from spur_depth.pipeline.sim2real import box_anchor_scale
+
+
+def test_keep_largest_component_drops_speckles():
+    m = np.zeros((64, 80), dtype=np.uint8)
+    m[5:45, 10:50] = 1  # 40*40 = 1600
+    m[0:2, 0:2] = 1
+    m[60:64, 76:80] = 1
+    out = keep_largest_component(m, min_area=500, close_k=0)
+    assert int(out.sum()) >= 1500
+    assert not bool(out[0, 0])
+    assert not bool(out[62, 78])
+
+
+def test_box_to_mask_is_the_rectangle_interior():
+    d = boxes_from_mask(np.pad(np.ones((10, 12), dtype=np.uint8), 4), CLS_TRUNK, min_area=4)[0]
+    m = box_to_mask((32, 40), d, erode_px=0)
+    assert int(m.sum()) == 10 * 12
 
 
 def test_boxes_from_mask_finds_the_blob():

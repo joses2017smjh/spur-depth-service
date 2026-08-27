@@ -173,23 +173,49 @@ def baseline_from_stats(rows: Iterable[Mapping[str, Any]], source: str) -> dict[
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--from-dir", type=Path, help="directory of RGB PNGs (writes baseline JSON)")
+    ap.add_argument(
+        "--from-data-root",
+        type=Path,
+        help="restored Data/full_spur root; uses real DA2-ft depths, not the 2.0 m placeholder",
+    )
+    ap.add_argument("--holdout-only", action="store_true", help="with --from-data-root, only paper val trees")
     ap.add_argument("--out", type=Path, default=DEFAULT_BASELINE)
     args = ap.parse_args(argv)
-    if args.from_dir is None:
+    if args.from_dir is None and args.from_data_root is None:
         print(json.dumps(load_baseline(), indent=2))
         return 0
     from PIL import Image
 
     rows = []
-    pngs = sorted(args.from_dir.glob("view_*.png")) or sorted(
-        p for p in args.from_dir.glob("*.png") if "mask" not in p.name.lower()
-    )
-    for p in pngs:
-        img = Image.open(p)
-        # Placeholder depth at the training mid-range so oor_frac is defined.
-        depth = np.full((img.size[1], img.size[0]), 2.0, dtype=np.float32)
-        rows.append(request_stats(images=img, depths=depth))
-    payload = baseline_from_stats(rows, source=str(args.from_dir))
+    source = ""
+    if args.from_data_root is not None:
+        from spur_depth.data.restore_index import PAPER_VAL, discover_da2_triples, split_holdout
+
+        discovered = discover_da2_triples(args.from_data_root)
+        if args.holdout_only:
+            _, discovered = split_holdout(discovered)
+        for rec in discovered:
+            if rec["rgb"] is None:
+                continue
+            img = Image.open(rec["rgb"])
+            depth = np.load(rec["pred"]).astype(np.float32)
+            depth[depth >= 1e9] = 0.0
+            rows.append(request_stats(images=img, depths=depth))
+        source = f"full_spur restore n={len(rows)} real DA2-ft"
+        if args.holdout_only:
+            source += f" holdout {PAPER_VAL}"
+    else:
+        pngs = sorted(args.from_dir.glob("view_*.png")) or sorted(
+            p for p in args.from_dir.glob("*.png") if "mask" not in p.name.lower()
+        )
+        for p in pngs:
+            img = Image.open(p)
+            # Placeholder depth at the training mid-range so oor_frac is defined.
+            depth = np.full((img.size[1], img.size[0]), 2.0, dtype=np.float32)
+            rows.append(request_stats(images=img, depths=depth))
+        source = str(args.from_dir)
+    payload = baseline_from_stats(rows, source=source)
+    args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(payload, indent=2) + "\n")
     print(f"wrote {args.out} n_frames={payload['n_frames']}")
     return 0

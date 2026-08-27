@@ -13,8 +13,12 @@ from __future__ import annotations
 import numpy as np
 
 
-def dense_flow(prev_rgb: np.ndarray, next_rgb: np.ndarray) -> np.ndarray:
+def dense_flow(prev_rgb: np.ndarray, next_rgb: np.ndarray, backend: str = "auto") -> np.ndarray:
     """Return (H, W, 2) float32 flow in pixels (dx, dy)."""
+    if backend == "farneback":
+        return _farneback(prev_rgb, next_rgb)
+    if backend == "raft":
+        return _raft(prev_rgb, next_rgb)
     try:
         return _raft(prev_rgb, next_rgb)
     except Exception:

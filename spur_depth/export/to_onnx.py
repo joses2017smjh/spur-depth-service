@@ -136,6 +136,26 @@ def export_encoder(out_dir: Path, ckpt: str | None) -> dict:
     return _maybe_check(path)
 
 
+def _disable_da2_xformers() -> None:
+    """Make DA2's MemEffAttention use the ONNX-safe matmul path on CPU."""
+    import depth_anything_v2.dinov2_layers.attention as attn  # noqa: E402
+
+    attn.XFORMERS_AVAILABLE = False
+
+    def _plain(self, x, attn_bias=None):
+        if attn_bias is not None:
+            raise AssertionError("xFormers attn_bias is not supported in the ONNX path")
+        return attn.Attention.forward(self, x)
+
+    attn.MemEffAttention.forward = _plain
+    try:
+        import depth_anything_v2.dinov2_layers.block as blk  # noqa: E402
+
+        blk.XFORMERS_AVAILABLE = False
+    except Exception:
+        pass
+
+
 def export_da2(
     out_dir: Path,
     ckpt: str | None,
@@ -156,10 +176,9 @@ def export_da2(
     sys.path.insert(0, da2_root)
     # DA2 vendors its own DINOv2. It does not honour XFORMERS_DISABLED; its
     # MemEffAttention calls CUDA-only xFormers kernels and ONNX tracing dies
-    # on CPU (job 21004172). Force the SDPA fallback before constructing.
-    import depth_anything_v2.dinov2_layers.attention as _da2_attn  # noqa: E402
-
-    _da2_attn.XFORMERS_AVAILABLE = False
+    # on CPU (job 21004172). Force the plain Attention.forward path *and*
+    # replace MemEffAttention.forward so a later re-import cannot flip it.
+    _disable_da2_xformers()
     from depth_anything_v2.dpt import DepthAnythingV2  # noqa: E402
 
     from spur_depth.export.wrappers import DA2ForwardWrapper

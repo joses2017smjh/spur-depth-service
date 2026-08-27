@@ -11,13 +11,14 @@ Lineage the modules implement, not slogans:
 * sim2real — appearance PSI + 30 cm box-anchor implied scale
 """
 
-from spur_depth.pipeline.detect import boxes_from_mask
+from spur_depth.pipeline.detect import box_to_mask, boxes_from_mask
 from spur_depth.pipeline.flow import dense_flow, flow_to_rgb
 from spur_depth.pipeline.reconstruct import Frame, unproject, merge_clouds
 from spur_depth.pipeline.sensors import fuse_depths
 from spur_depth.pipeline.sim2real import appearance_gap, box_anchor_scale
 
 __all__ = [
+    "box_to_mask",
     "boxes_from_mask",
     "dense_flow",
     "flow_to_rgb",

@@ -1,0 +1,210 @@
+{
+  "n_train": 5880,
+  "n_val": 120,
+  "device": "cuda",
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.4647874225057712,
+      "val_iou": 0.8983635188879725,
+      "val_dice": 0.9131601134936015
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.07556238213465327,
+      "val_iou": 0.9073491633842131,
+      "val_dice": 0.9415094256401062
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.06304821290937411,
+      "val_iou": 0.9127023289505837,
+      "val_dice": 0.9485603531201681
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.05862865749062324,
+      "val_iou": 0.9106286946768236,
+      "val_dice": 0.9484083890914917
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.05621816219419849,
+      "val_iou": 0.9122284676981695,
+      "val_dice": 0.9500490228335062
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.05449336778854026,
+      "val_iou": 0.9172053354436993,
+      "val_dice": 0.9532034397125244
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.05304339927982311,
+      "val_iou": 0.9207824166398061,
+      "val_dice": 0.9549861431121827
+    },
+    {
+      "epoch": 8,
+      "train_loss": 0.052207234567728175,
+      "val_iou": 0.9177740179601239,
+      "val_dice": 0.9534326275189717
+    },
+    {
+      "epoch": 9,
+      "train_loss": 0.05105284745899998,
+      "val_iou": 0.9205914634114462,
+      "val_dice": 0.9550475756327311
+    },
+    {
+      "epoch": 10,
+      "train_loss": 0.04983471508841125,
+      "val_iou": 0.9260847834677723,
+      "val_dice": 0.9579491019248962
+    },
+    {
+      "epoch": 11,
+      "train_loss": 0.04861887402477719,
+      "val_iou": 0.9218295388536456,
+      "val_dice": 0.9558837453524271
+    },
+    {
+      "epoch": 12,
+      "train_loss": 0.04743293035699397,
+      "val_iou": 0.9295345633728888,
+      "val_dice": 0.9599888682365417
+    }
+  ],
+  "best_val_iou": 0.9295345633728888,
+  "weights": "/scratch/sanchej7/spur/21059880/out/trunk_unet_100tree.pt",
+  "field_rmse": {
+    "n": 24,
+    "da2_on_gt_mask_m": 0.030690462685198157,
+    "da2_on_pred_mask_m": 0.11196869983194875,
+    "da2_on_cleaned_pred_mask_m": 0.11675940262391538
+  },
+  "demo_boxes": [
+    {
+      "path": "/nfs/hpc/share/sanchej7/Computer_Vision/Data/full_spur/Optical_flow/bark_brown_02/lpy_envy_00065/box_cam4/lpy_envy_00065_shot01_l.png",
+      "n_boxes_raw": 66,
+      "n_boxes_cleaned": 1
+    },
+    {
+      "path": "/nfs/hpc/share/sanchej7/Computer_Vision/Data/full_spur/Optical_flow/bark_brown_02/lpy_envy_00042/box_cam4/lpy_envy_00042_shot01_r.png",
+      "n_boxes_raw": 45,
+      "n_boxes_cleaned": 1
+    },
+    {
+      "path": "/nfs/hpc/share/sanchej7/Computer_Vision/Data/full_spur/Optical_flow/bark_brown_02/lpy_envy_00065/box_cam3/lpy_envy_00065_shot01_r.png",
+      "n_boxes_raw": 85,
+      "n_boxes_cleaned": 1
+    },
+    {
+      "path": "/nfs/hpc/share/sanchej7/Computer_Vision/Data/full_spur/Optical_flow/bark_brown_02/lpy_envy_00065/box_cam4/lpy_envy_00065_shot03_r.png",
+      "n_boxes_raw": 92,
+      "n_boxes_cleaned": 1
+    },
+    {
+      "path": "/nfs/hpc/share/sanchej7/Computer_Vision/Data/full_spur/Optical_flow/bark_brown_02/lpy_envy_00042/box_cam4/lpy_envy_00042_shot03_r.png",
+      "n_boxes_raw": 96,
+      "n_boxes_cleaned": 1
+    },
+    {
+      "path": "/nfs/hpc/share/sanchej7/Computer_Vision/Data/full_spur/Optical_flow/bark_brown_02/lpy_envy_00042/box/lpy_envy_00042_shot03_r.png",
+      "n_boxes_raw": 108,
+      "n_boxes_cleaned": 1
+    },
+    {
+      "path": "/nfs/hpc/share/sanchej7/Computer_Vision/Data/full_spur/Optical_flow/bark_brown_02/lpy_envy_00042/box_cam2/lpy_envy_00042_shot05_r.png",
+      "n_boxes_raw": 42,
+      "n_boxes_cleaned": 1
+    },
+    {
+      "path": "/nfs/hpc/share/sanchej7/Computer_Vision/Data/full_spur/Optical_flow/bark_brown_02/lpy_envy_00065/box/lpy_envy_00065_shot03_r.png",
+      "n_boxes_raw": 105,
+      "n_boxes_cleaned": 1
+    },
+    {
+      "path": "/nfs/hpc/share/sanchej7/Computer_Vision/Data/full_spur/Optical_flow/bark_brown_02/lpy_envy_00065/box/lpy_envy_00065_shot02_l.png",
+      "n_boxes_raw": 100,
+      "n_boxes_cleaned": 1
+    },
+    {
+      "path": "/nfs/hpc/share/sanchej7/Computer_Vision/Data/full_spur/Optical_flow/bark_brown_02/lpy_envy_00042/box_cam4/lpy_envy_00042_shot02_r.png",
+      "n_boxes_raw": 83,
+      "n_boxes_cleaned": 1
+    },
+    {
+      "path": "/nfs/hpc/share/sanchej7/Computer_Vision/Data/full_spur/Optical_flow/bark_brown_02/lpy_envy_00065/box_cam3/lpy_envy_00065_shot03_l.png",
+      "n_boxes_raw": 84,
+      "n_boxes_cleaned": 1
+    },
+    {
+      "path": "/nfs/hpc/share/sanchej7/Computer_Vision/Data/full_spur/Optical_flow/bark_brown_02/lpy_envy_00065/box_cam3/lpy_envy_00065_shot06_l.png",
+      "n_boxes_raw": 11,
+      "n_boxes_cleaned": 1
+    },
+    {
+      "path": "/nfs/hpc/share/sanchej7/Computer_Vision/Data/full_spur/Optical_flow/bark_brown_02/lpy_envy_00042/box_cam3/lpy_envy_00042_shot02_l.png",
+      "n_boxes_raw": 113,
+      "n_boxes_cleaned": 1
+    },
+    {
+      "path": "/nfs/hpc/share/sanchej7/Computer_Vision/Data/full_spur/Optical_flow/bark_brown_02/lpy_envy_00065/box/lpy_envy_00065_shot01_r.png",
+      "n_boxes_raw": 88,
+      "n_boxes_cleaned": 1
+    },
+    {
+      "path": "/nfs/hpc/share/sanchej7/Computer_Vision/Data/full_spur/Optical_flow/bark_brown_02/lpy_envy_00042/box_cam3/lpy_envy_00042_shot05_r.png",
+      "n_boxes_raw": 35,
+      "n_boxes_cleaned": 1
+    },
+    {
+      "path": "/nfs/hpc/share/sanchej7/Computer_Vision/Data/full_spur/Optical_flow/bark_brown_02/lpy_envy_00065/box_cam1/lpy_envy_00065_shot02_l.png",
+      "n_boxes_raw": 76,
+      "n_boxes_cleaned": 1
+    },
+    {
+      "path": "/nfs/hpc/share/sanchej7/Computer_Vision/Data/full_spur/Optical_flow/bark_brown_02/lpy_envy_00042/box_cam2/lpy_envy_00042_shot02_r.png",
+      "n_boxes_raw": 116,
+      "n_boxes_cleaned": 1
+    },
+    {
+      "path": "/nfs/hpc/share/sanchej7/Computer_Vision/Data/full_spur/Optical_flow/bark_brown_02/lpy_envy_00065/box/lpy_envy_00065_shot03_l.png",
+      "n_boxes_raw": 106,
+      "n_boxes_cleaned": 1
+    },
+    {
+      "path": "/nfs/hpc/share/sanchej7/Computer_Vision/Data/full_spur/Optical_flow/bark_brown_02/lpy_envy_00042/box_cam1/lpy_envy_00042_shot03_r.png",
+      "n_boxes_raw": 105,
+      "n_boxes_cleaned": 1
+    },
+    {
+      "path": "/nfs/hpc/share/sanchej7/Computer_Vision/Data/full_spur/Optical_flow/bark_brown_02/lpy_envy_00042/box_cam3/lpy_envy_00042_shot01_l.png",
+      "n_boxes_raw": 86,
+      "n_boxes_cleaned": 1
+    },
+    {
+      "path": "/nfs/hpc/share/sanchej7/Computer_Vision/Data/full_spur/Optical_flow/bark_brown_02/lpy_envy_00065/box_cam3/lpy_envy_00065_shot03_r.png",
+      "n_boxes_raw": 83,
+      "n_boxes_cleaned": 1
+    },
+    {
+      "path": "/nfs/hpc/share/sanchej7/Computer_Vision/Data/full_spur/Optical_flow/bark_brown_02/lpy_envy_00065/box_cam3/lpy_envy_00065_shot01_l.png",
+      "n_boxes_raw": 93,
+      "n_boxes_cleaned": 1
+    },
+    {
+      "path": "/nfs/hpc/share/sanchej7/Computer_Vision/Data/full_spur/Optical_flow/bark_brown_02/lpy_envy_00042/box_cam1/lpy_envy_00042_shot01_l.png",
+      "n_boxes_raw": 73,
+      "n_boxes_cleaned": 1
+    },
+    {
+      "path": "/nfs/hpc/share/sanchej7/Computer_Vision/Data/full_spur/Optical_flow/bark_brown_02/lpy_envy_00065/box_cam1/lpy_envy_00065_shot04_r.png",
+      "n_boxes_raw": 68,
+      "n_boxes_cleaned": 1
+    }
+  ],
+  "note": "Trained on 7 trees, tested on paper val pair. Not a YOLO checkpoint."
+}

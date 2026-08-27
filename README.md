@@ -13,7 +13,8 @@ One bark, one camera sweep, dormant Envy/UFO, Blender. This model has never seen
 ## The cut is 4.5 cm. The plan is 1.5 cm closer.
 
 <p align="center">
-  <img src="docs/readme/da2_vs_dino.png" alt="DA2-ft 5.98 cm versus DINO 3-pair 4.45 plus or minus 0.57 cm" width="560">
+  <img src="docs/readme/da2_vs_dino.png" alt="DA2-ft 5.98 cm versus DINO 3-pair 4.45 plus or minus 0.57 cm" width="48%">
+  <img src="docs/readme/orchard_affine.png" alt="DA2 hold-out affine 3.44 cm on 9 trees versus 3.25 cm on 100 trees, one bark" width="48%">
 </p>
 
 | | Real-time | Offline |
@@ -95,7 +96,7 @@ Re-scored seed-1 on the 2026-08-20 re-render: **0.0467 m** (paper 0.0445 ± 0.00
 | Tesla V100-SXM3-32GB | fp32 | **393.5** | 397.2 | 397.8 |
 | Tesla V100-SXM3-32GB | fp16 | **156.0** | 156.2 | 156.3 |
 
-TensorRT is a builder in this repo. There is no `.plan` on disk. There is no TRT millisecond.
+TensorRT fuse/decode exists (`engines/fuse_decode_fp16_quadro-rtx-8000.plan`, 58 MB, **FP32**, RTX 8000). Fuse-only p50 327 ms. That is not end-to-end refiner latency. There is no encoder/DA2 `.plan`.
 
 ONNX is split (`encoder.onnx` 1.2 GB, `fuse_decode.onnx` 26 MB) so six views do not unroll 144 ViT-L blocks. Torch vs ORT max abs 1.53e-5 / 9.5e-7.
 
@@ -114,8 +115,13 @@ Bilinear on a zeroed background smears the silhouette. Scoring uses nearest. Inp
 ## Honest
 
 - Synthetic only. `pipeline.sim2real` reports appearance stats and the 30 cm box scale. It does not invent a field RMSE.
-- 9 val trees are on disk. The 24k train set is not.
-- Drift is PSI/KS against the fixture baseline, not 24k frames.
+- 100 trees, one bark (`bark_brown_02`), 6000 DA2 frames are on disk
+  (job `21036824`). That is not the paper 4-bark 24k set.
+- DA2 hold-out affine, fit on 98 trees, score `00042`+`00065`: **0.0325 m**
+  on the GT trunk mask (n=78). JSON: `bench/results/orchard_bark02_affine.json`.
+  The older 9-tree number was 0.0344 m. Do not call this 24k.
+- Drift fixture is still the 6-view baseline, not 6000 frames.
+- TinyUNet on 100 trees: val IoU **0.930**. DA2 on predicted masks is still **0.112 m** vs **0.031 m** on GT. YOLO-nano val F1@0.5 is 0.035. Box-gated field RMSE is ~2 m. Not a field detector.
 - Long shipping notes: [`docs/README.draft.md`](docs/README.draft.md). Checklist: [`SHIPPING.md`](SHIPPING.md).
 
 MIT. DINOv2 is Apache-2.0.

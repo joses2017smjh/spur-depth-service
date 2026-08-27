@@ -1,4 +1,4 @@
-.PHONY: test lint demo export-fuse export-both cpp aggregate stack
+.PHONY: test lint demo export-fuse export-both cpp aggregate stack yolo improve
 
 PYTHON ?= python
 
@@ -26,3 +26,9 @@ aggregate:
 
 stack:
 	$(PYTHON) -m spur_depth.pipeline.run --out docs/readme
+
+yolo:
+	$(PYTHON) -m spur_depth.pipeline.train_yolo
+
+improve:
+	$(PYTHON) -m spur_depth.bench.improve

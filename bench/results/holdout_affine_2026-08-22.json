@@ -1,0 +1,127 @@
+{
+  "n_frames_total": 540,
+  "n_fit_frames": 420,
+  "n_hold_frames": 120,
+  "fit_trees": [
+    "lpy_envy_00001",
+    "lpy_envy_00009",
+    "lpy_envy_00015",
+    "lpy_envy_00041",
+    "lpy_envy_00048",
+    "lpy_envy_00073",
+    "lpy_envy_00092"
+  ],
+  "hold_trees": [
+    "lpy_envy_00042",
+    "lpy_envy_00065"
+  ],
+  "note": "24k train set is still missing. Fit is 7 restored trees; headline RMSE is the 2 paper val trees. DA2-only \u2014 not the DINO refiner.",
+  "alpha_beta_holdout_fit": {
+    "alpha": 1.006307781659046,
+    "beta": -0.03462304140524036,
+    "n_pixels": 429706.0,
+    "n_images": 217,
+    "source": "least-squares on 7 non-paper trees, trunk mask, erode_r=10, GT 0.5\u201310 m"
+  },
+  "holdout_rmse": {
+    "da2_raw_m": {
+      "n": 78,
+      "rmse_m": 0.037664056332776065,
+      "rmse_std_m": 0.03866355694415802
+    },
+    "da2_holdout_affine_m": {
+      "n": 78,
+      "rmse_m": 0.034366251874510464,
+      "rmse_std_m": 0.041282569641688305
+    },
+    "fit_cohort_raw_m": {
+      "n": 246,
+      "rmse_m": 0.04128989892237944,
+      "rmse_std_m": 0.030352094403708507
+    }
+  },
+  "loo_per_tree": [
+    {
+      "tree": "lpy_envy_00001",
+      "alpha": 1.010392225530413,
+      "beta": -0.038785761072723454,
+      "n": 41,
+      "rmse_m": 0.025977326854976588,
+      "rmse_std_m": 0.017387290287077608
+    },
+    {
+      "tree": "lpy_envy_00009",
+      "alpha": 1.0124893614666652,
+      "beta": -0.04071762453544696,
+      "n": 35,
+      "rmse_m": 0.02141512304176489,
+      "rmse_std_m": 0.01608781981878392
+    },
+    {
+      "tree": "lpy_envy_00015",
+      "alpha": 1.0085392007542395,
+      "beta": -0.038064344775696674,
+      "n": 38,
+      "rmse_m": 0.05010421998502231,
+      "rmse_std_m": 0.05355792854219571
+    },
+    {
+      "tree": "lpy_envy_00041",
+      "alpha": 1.0103335384505945,
+      "beta": -0.038446862981221124,
+      "n": 25,
+      "rmse_m": 0.027677198815022296,
+      "rmse_std_m": 0.02197479749089429
+    },
+    {
+      "tree": "lpy_envy_00042",
+      "alpha": 1.0073720182772636,
+      "beta": -0.03613147162393966,
+      "n": 43,
+      "rmse_m": 0.043152597745010186,
+      "rmse_std_m": 0.05267710111052813
+    },
+    {
+      "tree": "lpy_envy_00048",
+      "alpha": 1.0140921050060243,
+      "beta": -0.042751661253778904,
+      "n": 15,
+      "rmse_m": 0.029997451225133243,
+      "rmse_std_m": 0.024262888392286838
+    },
+    {
+      "tree": "lpy_envy_00065",
+      "alpha": 1.0123879646408194,
+      "beta": -0.040815587299127126,
+      "n": 35,
+      "rmse_m": 0.02267180447640029,
+      "rmse_std_m": 0.01385778494261859
+    },
+    {
+      "tree": "lpy_envy_00073",
+      "alpha": 1.0197043718119165,
+      "beta": -0.050614197870585464,
+      "n": 48,
+      "rmse_m": 0.03881074152257772,
+      "rmse_std_m": 0.030280246838984677
+    },
+    {
+      "tree": "lpy_envy_00092",
+      "alpha": 1.0203180255646465,
+      "beta": -0.049514861890686095,
+      "n": 44,
+      "rmse_m": 0.044826429533246046,
+      "rmse_std_m": 0.029870217795962408
+    }
+  ],
+  "stereo_on_holdout": {
+    "n": 40,
+    "rmse_m": 1.5492940654663954,
+    "fused_rmse_m": 0.048922605652035045,
+    "flow": "farneback"
+  },
+  "drift_baseline": {
+    "n_frames": 120,
+    "source": "holdout ('lpy_envy_00042', 'lpy_envy_00065') n=120 calibrated DA2"
+  }
+}

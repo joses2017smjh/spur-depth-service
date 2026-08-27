@@ -45,6 +45,40 @@ def boxes_from_mask(mask: np.ndarray, cls: int = CLS_TRUNK, min_area: int = 64) 
     return out
 
 
+def box_to_mask(shape: tuple[int, ...], det: Det, erode_px: int = 10) -> np.ndarray:
+    """Rectangle interior of a box. Field scoring uses this, not a speckled mask."""
+    h, w = int(shape[0]), int(shape[1])
+    m = np.zeros((h, w), dtype=bool)
+    x1 = max(0, int(np.floor(det.x1)))
+    y1 = max(0, int(np.floor(det.y1)))
+    x2 = min(w, int(np.ceil(det.x2)))
+    y2 = min(h, int(np.ceil(det.y2)))
+    if x2 <= x1 or y2 <= y1:
+        return m
+    m[y1:y2, x1:x2] = True
+    if erode_px > 0:
+        from spur_depth.calib.fit_scale_shift import erode_binary
+
+        m = erode_binary(m, erode_px)
+    return m
+
+
+def keep_largest_component(mask: np.ndarray, min_area: int = 2048, close_k: int = 5) -> np.ndarray:
+    """Drop speckles. Field RMSE on a speckled UNet mask is not a trunk metric."""
+    m = (np.asarray(mask) > 0).astype(np.uint8)
+    if close_k > 0:
+        k = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (close_k, close_k))
+        m = cv2.morphologyEx(m, cv2.MORPH_CLOSE, k)
+    n, labels, stats, _ = cv2.connectedComponentsWithStats(m, connectivity=8)
+    if n <= 1:
+        return m.astype(bool)
+    areas = stats[1:, cv2.CC_STAT_AREA]
+    idx = 1 + int(np.argmax(areas))
+    if int(stats[idx, cv2.CC_STAT_AREA]) < min_area:
+        return np.zeros_like(m, dtype=bool)
+    return labels == idx
+
+
 def draw_boxes(rgb: np.ndarray, dets: list[Det], color=(33, 150, 243)) -> np.ndarray:
     vis = rgb.copy()
     for d in dets:

@@ -327,6 +327,35 @@ def da2_vs_dino() -> None:
     _save(fig, "da2_vs_dino.png")
 
 
+def orchard_affine() -> None:
+    """DA2-ft vs GT trunk mask after hold-out affine. Not the DINO 0.0445 m number."""
+    labels = ["9-tree restore\nLS affine", "100 trees, 1 bark\nLS affine", "DINO 3-pair\n(different model)"]
+    vals = [0.034366, 0.032517, 0.04452]
+    colors = [ORANGE, BLUE, MUTED]
+    fig, ax = plt.subplots(figsize=(6.6, 4.0))
+    x = np.arange(3)
+    bars = ax.bar(x, vals, width=0.55, color=colors, alpha=0.8, zorder=2)
+    for bar, v, lab in zip(bars, vals, ["3.44 cm", "3.25 cm", "4.45 cm"]):
+        ax.text(
+            bar.get_x() + bar.get_width() / 2,
+            bar.get_height() + 0.0012,
+            lab,
+            ha="center",
+            va="bottom",
+            fontsize=9,
+            fontweight="bold",
+        )
+    ax.set_xticks(x)
+    ax.set_xticklabels(labels)
+    ax.set_ylabel("Hold-out RMSE (m)")
+    ax.set_ylim(0, 0.058)
+    ax.yaxis.grid(True, linestyle="--", color=GRID, zorder=0)
+    ax.set_axisbelow(True)
+    ax.spines[["top", "right"]].set_visible(False)
+    ax.set_title("Same val trees (00042 + 00065). One bark is not 24k.")
+    _save(fig, "orchard_affine.png")
+
+
 def latency_quadro() -> None:
     path = REPO / "bench" / "results" / "quadro-rtx-8000_2026-08-18.json"
     rows = json.loads(path.read_text())
@@ -339,11 +368,10 @@ def latency_quadro() -> None:
         p50.append(row["p50_ms"])
         p95.append(row["p95_ms"])
         p99.append(row["p99_ms"])
-    # V100 p50 only — tails were dirty.
-    labels += ["V100\nfp32 p50", "V100\nfp16 p50"]
-    p50 += [396.4, 275.2]
-    p95 += [np.nan, np.nan]
-    p99 += [np.nan, np.nan]
+    labels += ["V100\nfp32", "V100\nfp16"]
+    p50 += [393.5, 156.0]
+    p95 += [397.2, 156.2]
+    p99 += [397.8, 156.3]
 
     fig, ax = plt.subplots(figsize=(7.8, 4.0))
     x = np.arange(len(labels))
@@ -441,6 +469,7 @@ def main() -> int:
     nearest_vs_bilinear(gt, mask)
     accuracy_seeds()
     da2_vs_dino()
+    orchard_affine()
     latency_quadro()
     six_views()
     onnx_split()

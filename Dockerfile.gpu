@@ -1,0 +1,35 @@
+# GPU serve image. Weights stay on a mount — do not COPY the 1.3 GB ckpt.
+# CoE DGX has Apptainer, not a user Docker daemon. Build the SIF on
+# /scratch (see scripts/run_gpu_container.sh). Do not pull this onto hpc-share.
+#
+#   docker build -f Dockerfile.gpu -t spur-depth:gpu .
+#   docker run --gpus all -p 8000:8000 \
+#     -v /path/to/best_epoch_0023.pt:/weights/refiner.pt:ro \
+#     -e SPUR_CKPT=/weights/refiner.pt \
+#     -e SPUR_SKIP_WEIGHTS=0 \
+#     spur-depth:gpu
+
+FROM pytorch/pytorch:2.4.1-cuda12.1-cudnn9-runtime
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    SPUR_SKIP_WEIGHTS=1 \
+    SPUR_HOST=0.0.0.0 \
+    SPUR_PORT=8000 \
+    XFORMERS_DISABLED=1
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        libgl1 libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+COPY pyproject.toml README.md model_card.json weights.lock ./
+COPY spur_depth ./spur_depth
+COPY samples ./samples
+COPY scripts ./scripts
+
+RUN pip install --no-cache-dir -e ".[serve]"
+
+EXPOSE 8000
+CMD ["python", "-m", "spur_depth.serve"]

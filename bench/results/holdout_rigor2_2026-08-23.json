@@ -1,0 +1,119 @@
+{
+  "n_frames_total": 540,
+  "n_fit_frames": 420,
+  "n_hold_frames": 120,
+  "orchard_scale": false,
+  "note": "24k train set is still missing.",
+  "methods": {
+    "ls": {
+      "alpha": 1.0063139725807375,
+      "beta": -0.03463050862992245,
+      "n_pixels": 429412.0,
+      "holdout": {
+        "n": 55,
+        "rmse_m": 0.033718913977163145,
+        "rmse_std_m": 0.04625277128803067
+      },
+      "holdout_gt_mask": {
+        "n": 78,
+        "rmse_m": 0.03436509677851707,
+        "rmse_std_m": 0.04128210086657007
+      }
+    },
+    "huber_irls": {
+      "alpha": 1.0094289813325255,
+      "beta": -0.03776868874324209,
+      "delta_m": 0.05,
+      "n_pixels": 421096.289385224,
+      "holdout": {
+        "n": 55,
+        "rmse_m": 0.03324235208952734,
+        "rmse_std_m": 0.04598553760029355
+      },
+      "holdout_gt_mask": {
+        "n": 78,
+        "rmse_m": 0.03369626951072034,
+        "rmse_std_m": 0.040961844897201075
+      }
+    },
+    "median_of_trees": {
+      "alpha": 1.0091519893281062,
+      "beta": -0.04387706170061286,
+      "per_tree": {
+        "lpy_envy_00001": {
+          "alpha": 1.0360863838953562,
+          "beta": -0.06746531556014539
+        },
+        "lpy_envy_00009": {
+          "alpha": 1.0091519893281062,
+          "beta": -0.04387706170061286
+        },
+        "lpy_envy_00015": {
+          "alpha": 1.033459427378493,
+          "beta": -0.05865608488510118
+        },
+        "lpy_envy_00041": {
+          "alpha": 1.0603625483429842,
+          "beta": -0.09995005874853923
+        },
+        "lpy_envy_00048": {
+          "alpha": 0.9969917846350307,
+          "beta": -0.029758549326513634
+        },
+        "lpy_envy_00073": {
+          "alpha": 0.9878027426893428,
+          "beta": -0.01103975579111861
+        },
+        "lpy_envy_00092": {
+          "alpha": 0.9644917269890895,
+          "beta": 0.010447299370699508
+        }
+      },
+      "holdout": {
+        "n": 55,
+        "rmse_m": 0.034347531589858045,
+        "rmse_std_m": 0.046545757878158976
+      },
+      "holdout_gt_mask": {
+        "n": 78,
+        "rmse_m": 0.0355118023978012,
+        "rmse_std_m": 0.041819506690891795
+      }
+    },
+    "box_anchor_scale": {
+      "alpha": 1.1996005011084403,
+      "beta": 0.0,
+      "n_fit_boxes": 336,
+      "holdout": {
+        "n": 55,
+        "rmse_m": 0.3210387558441762,
+        "rmse_std_m": 0.0545707138540379
+      },
+      "holdout_gt_mask": {
+        "n": 78,
+        "rmse_m": 0.3230503673147415,
+        "rmse_std_m": 0.05646880032870267
+      },
+      "note": "Scale only from the 30 cm box on the fit trees. No GT depth."
+    }
+  },
+  "best_holdout": {
+    "method": "huber_irls",
+    "alpha": 1.0094289813325255,
+    "beta": -0.03776868874324209,
+    "n": 55,
+    "rmse_m": 0.03324235208952734,
+    "rmse_std_m": 0.04598553760029355
+  },
+  "best_holdout_gt_mask": {
+    "method": "huber_irls",
+    "rmse_m": 0.03369626951072034,
+    "n": 78
+  },
+  "headline_stays_ls_unless_best_wins": true,
+  "headline_ls_rmse_m": 0.034366251874510464,
+  "field_box_gated": {
+    "skipped": true,
+    "note": "Detector-gated RMSE left to the GPU job. This run is \u03b1/\u03b2 only."
+  }
+}
