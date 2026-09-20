@@ -1,8 +1,8 @@
 # SPUR
 
-Metric depth for a pruning cut. Metres, not a pretty PNG.
+Metric-depth inference and 3D reconstruction for robotic pruning experiments.
 
-One bark, one camera sweep, dormant Envy/UFO, Blender. This model has never seen a real orchard. Training lives in [`spur-da2ft-depth-experiments`](https://github.com/joses2017smjh/spur-da2ft-depth-experiments).
+One bark, one camera sweep, dormant Envy/UFO, Blender. This model has never seen a real orchard. Training lives in [the depth research repository](https://github.com/joses2017smjh/Vision-Based-Metric-Depth-Estimation-for-Robotic-Pruning).
 
 <p align="center">
   <img src="docs/readme/hero_strip.png" alt="RGB, DA2-ft depth, Blender GT, trunk mask on lpy_envy_00042" width="100%">
@@ -10,7 +10,16 @@ One bark, one camera sweep, dormant Envy/UFO, Blender. This model has never seen
 
 ---
 
-## The cut is 4.5 cm. The plan is 1.5 cm closer.
+## Engineering overview
+
+- **Problem:** turn predicted depth into a callable, testable service with explicit units and model identity.
+- **Contribution:** FastAPI endpoints, checkpoint contracts, multi-view preprocessing, split ONNX export, and reconstruction from calibrated cameras.
+- **Evidence:** the published synthetic three-pair refiner reports 0.0445 ± 0.0057 m RMSE. Hardware-specific inference timings and parity checks are below.
+- **Limit:** synthetic data only. A successful API response in dummy mode does not run the trained model or establish field accuracy.
+
+[Visual case study](https://jose-sanchez-portfolio-com.vercel.app/projects/depth-estimation-robotic-pruning/) · [API contract tests](tests/test_api.py) · [Training experiments](https://github.com/joses2017smjh/Vision-Based-Metric-Depth-Estimation-for-Robotic-Pruning)
+
+## Single-view and multi-view inference
 
 <p align="center">
   <img src="docs/readme/da2_vs_dino.png" alt="DA2-ft 5.98 cm versus DINO 3-pair 4.45 plus or minus 0.57 cm" width="48%">
@@ -61,12 +70,19 @@ Same tree, four cameras, DA2-ft metres, Blender `K` and `T_wc`. No second networ
 
 ---
 
-## 30 seconds
+## Run the CPU API smoke test
+
+Python 3.10 or newer. The following uses a **dummy runner** with no weights or GPU.
+It checks the HTTP contract, not depth-model accuracy.
 
 ```bash
+git clone https://github.com/joses2017smjh/spur-depth-service.git
+cd spur-depth-service
 export SPUR_SKIP_WEIGHTS=1
 pip install -e ".[serve,dev]"
 python -m spur_depth.serve
+# In another terminal:
+curl http://localhost:8000/readyz  # backend: dummy
 curl -F "image=@samples/view_01.png" localhost:8000/predict
 ```
 
@@ -74,6 +90,8 @@ curl -F "image=@samples/view_01.png" localhost:8000/predict
 docker build -t spur-depth:cpu .
 docker run --rm -p 8000:8000 -e SPUR_SKIP_WEIGHTS=1 spur-depth:cpu
 ```
+
+Run `python -m pytest tests/test_api.py -q` to check requests, validation errors, readiness, and queue limits with the dummy backend.
 
 Real weights: mount `best_epoch_0023.pt` (SHA in `weights.lock`), set `SPUR_CKPT`.
 `/predict` needs `SPUR_DA2_CKPT` or it is 501. Wrong view count is 422. Queue full is 503. One GPU, one worker.
