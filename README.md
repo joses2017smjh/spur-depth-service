@@ -1,8 +1,8 @@
 # SPUR
 
-Metric-depth inference and 3D reconstruction for robotic pruning experiments.
+Serve metric-depth predictions with FastAPI, export a multi-view refiner to ONNX, and reconstruct calibrated 3D point clouds for robotic pruning experiments.
 
-One bark, one camera sweep, dormant Envy/UFO, Blender. This model has never seen a real orchard. Training lives in [the depth research repository](https://github.com/joses2017smjh/Vision-Based-Metric-Depth-Estimation-for-Robotic-Pruning).
+The experiments use synthetic dormant apple trees rendered in Blender. Real-orchard accuracy has not been established. Training lives in [the depth research repository](https://github.com/joses2017smjh/Vision-Based-Metric-Depth-Estimation-for-Robotic-Pruning).
 
 <p align="center">
   <img src="docs/readme/hero_strip.png" alt="RGB, DA2-ft depth, Blender GT, trunk mask on lpy_envy_00042" width="100%">
@@ -14,7 +14,7 @@ One bark, one camera sweep, dormant Envy/UFO, Blender. This model has never seen
 
 - **Problem:** turn predicted depth into a callable, testable service with explicit units and model identity.
 - **Contribution:** FastAPI endpoints, checkpoint contracts, multi-view preprocessing, split ONNX export, and reconstruction from calibrated cameras.
-- **Evidence:** the published synthetic three-pair refiner reports 0.0445 ± 0.0057 m RMSE. Hardware-specific inference timings and parity checks are below.
+- **Evidence:** five recorded checkpoint validation scores for the synthetic three-pair refiner average 0.0445 ± 0.0057 m RMSE. These are saved best-validation scores, not a fresh test-set rescore; see the [seed records](bench/results/seed_rmse.json). Hardware-specific inference timings and parity checks are below.
 - **Limit:** synthetic data only. A successful API response in dummy mode does not run the trained model or establish field accuracy.
 
 [Visual case study](https://jose-sanchez-portfolio-com.vercel.app/projects/depth-estimation-robotic-pruning/) · [API contract tests](tests/test_api.py) · [Training experiments](https://github.com/joses2017smjh/Vision-Based-Metric-Depth-Estimation-for-Robotic-Pruning)
@@ -26,7 +26,7 @@ One bark, one camera sweep, dormant Envy/UFO, Blender. This model has never seen
   <img src="docs/readme/orchard_affine.png" alt="DA2 hold-out affine 3.44 cm on 9 trees versus 3.25 cm on 100 trees, one bark" width="48%">
 </p>
 
-| | Real-time | Offline |
+| | Single-view | Multi-view |
 | --- | --- | --- |
 | Call | `POST /predict` | `POST /predict/group` |
 | Input | 1 RGB | 6 views, same shot, 3 rigs |
@@ -45,11 +45,11 @@ One bark, one camera sweep, dormant Envy/UFO, Blender. This model has never seen
 
 ## What the stack actually does
 
-SSD made single-shot boxes the default. Orchard papers moved to YOLO.
-RAFT is still the flow a 2025 pruning policy trusts more than a depth camera.
-DA2-ft plus a frozen ViT-L is the metric step. Reconstruction is back-projection
-of those metres with the cameras we already logged. Sensors add; they do not vote.
-A 30 cm box is the only sim-to-real check that comes back in metres.
+Fine-tuned Depth Anything V2 predicts metric depth from RGB. The optional
+DINOv2 RGB-D refiner fuses six views from three stereo pairs. Reconstruction
+back-projects the predicted metres using camera intrinsics `K` and poses `T_wc`.
+The service makes model identity, readiness, input validation and queue limits
+explicit so the same inference path can be exercised from an HTTP client.
 
 Code: `spur_depth/pipeline/`. Notes: [`docs/RESEARCH.md`](docs/RESEARCH.md).
 
@@ -78,8 +78,10 @@ It checks the HTTP contract, not depth-model accuracy.
 ```bash
 git clone https://github.com/joses2017smjh/spur-depth-service.git
 cd spur-depth-service
+python3 -m venv .venv
+source .venv/bin/activate
 export SPUR_SKIP_WEIGHTS=1
-pip install -e ".[serve,dev]"
+python -m pip install -e ".[serve,dev]"
 python -m spur_depth.serve
 # In another terminal:
 curl http://localhost:8000/readyz  # backend: dummy
@@ -107,7 +109,14 @@ Real weights: mount `best_epoch_0023.pt` (SHA in `weights.lock`), set `SPUR_CKPT
 
 Re-scored seed-1 on the 2026-08-20 re-render: **0.0467 m** (paper 0.0445 ± 0.0057).
 
-| GPU | precision | p50 | p95 | p99 |
+Refiner timings below are **milliseconds per six-view group**, batch size 1,
+280×512 pixels, after 20 warmup calls and over 200 timed calls. They exclude
+DA2 inference and HTTP overhead. The V100 rows quote the later repeated runs;
+the [full V100 artifact](bench/results/tesla-v100-sxm3-32gb_2026-08-22.json)
+also preserves earlier runs with larger tail latencies.
+[RTX 8000 artifact](bench/results/quadro-rtx-8000_2026-08-18.json).
+
+| GPU | precision | p50 (ms) | p95 (ms) | p99 (ms) |
 | --- | --- | --- | --- | --- |
 | Quadro RTX 8000 | fp32 | 489.2 | 492.0 | 492.6 |
 | Quadro RTX 8000 | fp16 | 185.5 | 185.6 | 189.7 |
@@ -116,7 +125,7 @@ Re-scored seed-1 on the 2026-08-20 re-render: **0.0467 m** (paper 0.0445 ± 0.00
 
 TensorRT fuse/decode exists (`engines/fuse_decode_fp16_quadro-rtx-8000.plan`, 58 MB, **FP32**, RTX 8000). Fuse-only p50 327 ms. That is not end-to-end refiner latency. There is no encoder/DA2 `.plan`.
 
-ONNX is split (`encoder.onnx` 1.2 GB, `fuse_decode.onnx` 26 MB) so six views do not unroll 144 ViT-L blocks. Torch vs ORT max abs 1.53e-5 / 9.5e-7.
+ONNX is split (`encoder.onnx` 1.2 GB, `fuse_decode.onnx` 26 MB) so six views do not unroll 144 ViT-L blocks. Torch vs ORT max abs 1.53e-5 / 9.5e-7. These are [numerical parity checks](bench/results/onnx_parity_2026-08-22.json), separate from prediction accuracy and latency.
 
 <p align="center">
   <img src="docs/readme/arch_dino.jpg" alt="DINOv2 plus depth side-branch" width="100%">
