@@ -1,10 +1,11 @@
 """Simulated stereo RGB-D sensor depth, so "RGB-D" is not read as "perfect depth".
 
 Profile ``d435`` follows the active-stereo error model Intel documents for the
-D400 series: RMS depth error = z^2 * subpixel / (f_px * baseline). With the
-D435's 50 mm baseline, ~640 px focal length at 848x480 and 0.08 subpixel,
-sigma_z ~= 0.0025 * z^2 m (1 cm at 2 m). Matching runs at ~1/2.26 of our
-1920 px width, so the error field is spatially correlated at that scale.
+D400 series: RMS depth error = z^2 * subpixel / (f_px * baseline). At 848x480
+(f ~= 424 px for the 90 deg HFOV), 50 mm baseline and 0.08 px subpixel,
+sigma_z ~= 0.0038 * z^2 m, i.e. 1.5 cm at 2 m, which matches the ~0.75 %
+standard deviation measured at 2 m (Rustler et al., 2025). Matching runs at
+~1/2.26 of our 1920 px width, so the error field is correlated at that scale.
 
 Thin wood is where stereo fails first (Jain et al., ICRA 2025, and the
 RRT-Connect point clouds there missing tertiary branches): any tree pixel
@@ -25,7 +26,7 @@ import cv2
 import numpy as np
 
 D435 = {
-    "sigma_coef": 0.0025,  # m^-1: sigma_z = sigma_coef * z^2
+    "sigma_coef": 0.0038,  # m^-1: sigma_z = sigma_coef * z^2
     "subsample": 1920.0 / 848.0,  # our pixels per sensor pixel
     "thin_px": 3.0,  # sensor pixels; narrower wood fails to match
     "thin_drop": 0.7,  # fraction of thin blocks lost
