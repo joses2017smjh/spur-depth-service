@@ -207,7 +207,8 @@ def depth_png(f: dict, out: Path, cfg: AssembleConfig) -> dict:
     lo = np.percentile(gpts[:, 2], 1) - 0.4
     axes[0].set_ylim(lo, np.percentile(gpts[:, 2], 99) + 0.8)
     fig.suptitle(
-        "Same predicted classes, four depth sources, seen from above (grey: GT axes)",
+        f"{ {'oracle': 'Ground-truth', 'tinyunet': 'TinyUNet', 'branchnet': 'BranchNet'}[f['method']] } "
+        "classes, four depth sources, seen from above (grey: GT axes)",
         color=INK,
         fontsize=10,
     )
