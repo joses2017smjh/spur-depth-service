@@ -227,3 +227,40 @@ def test_fragment_chain_is_not_worse_than_star():
     chain = aggregate([evaluate_frame(graph([0, 10, 11]), gt)])["summary"]
     star = aggregate([evaluate_frame(graph([0, 0, 0]), gt)])["summary"]
     assert chain["edge_precision"] >= star["edge_precision"]
+
+
+def test_small_hole_does_not_split_a_trunk():
+    cls = np.zeros((H, W), np.uint8)
+    depth = np.full((H, W), 6.0, np.float32)
+    cv2.line(cls, (320, 330), (320, 30), int(TRUNK), 21)
+    depth[cls > 0] = Z
+    cls[180, 320] = 0  # one background pixel inside the trunk
+    pred = assemble(cls, depth, K, cfg=AssembleConfig(min_component_px=10))
+    trunks = [p for p in pred.parts.values() if p.cls == TRUNK]
+    assert len(trunks) == 1
+
+
+def test_self_loop_is_not_dissolved_as_degree_two():
+    from spur_depth.branches.skeleton import Segment, SkeletonGraph, _dissolve_degree2
+
+    g = SkeletonGraph()
+    g.nodes = {0: np.array([[0, 0]]), 1: np.array([[0, 5]])}
+    g.kind = {0: "junction", 1: "tip"}
+    loop = Segment(0, 0, np.array([[0, 0], [1, 1], [2, 0], [1, -1], [0, 0]]))
+    tail = Segment(0, 1, np.array([[0, 0], [0, 1], [0, 2], [0, 3], [0, 4], [0, 5]]))
+    g.segments = [loop, tail]
+    out = _dissolve_degree2(g)
+    assert len(out.segments) == 2 and out.kind[0] == "junction"
+
+
+def test_millimetre_depth_is_rejected():
+    cls, depth = _render(_scene())
+    with pytest.raises(ValueError):
+        assemble(cls, depth * 1000.0, K)
+
+
+def test_diagonal_two_pixel_band_keeps_its_skeleton():
+    m = np.zeros((160, 160), bool)
+    for i in range(10, 140):
+        m[i, i] = m[i, i + 1] = True
+    assert thin(m).sum() > 100

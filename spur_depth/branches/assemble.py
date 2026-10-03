@@ -81,6 +81,7 @@ class AssembleConfig:
     min_thick_len_m: float = 0.05  # a childless trunk/branch piece shorter than this is a stub
     tangent_len_m: float = 0.03
     geometric_classes: bool = False  # baseline only: classes from radius/length
+    hole_max_px: int = 64  # enclosed background holes up to this area are wood
 
 
 @dataclass
@@ -118,21 +119,33 @@ def _end_dir(pts: np.ndarray, at_start: bool, length: float, skip: float = 0.0) 
     return v if np.any(v) else _unit(p[-1] - p[0])
 
 
-def _robust_z(z: np.ndarray, k: int = 9) -> np.ndarray:
-    """Median-filter a depth profile, mark outliers and fill them by interpolation."""
+def _robust_z(z: np.ndarray, k: int = 9, max_gap: int = 3) -> np.ndarray:
+    """Median-filter a depth profile, reject outliers, bridge only short gaps (0 = no depth).
+
+    Reflect padding lets an outlier at either end be rejected (edge padding
+    would repeat it into its own window); gaps longer than ``max_gap``
+    vertices and anything beyond the last valid sample stay 0.
+    """
     ok = z > 0
     if ok.sum() < 2:
         return np.where(ok, z, 0.0)
     idx = np.arange(len(z))
     zi = np.interp(idx, idx[ok], z[ok])
     k = min(k, len(z) if len(z) % 2 else len(z) - 1) if len(z) > 2 else 1
-    pad = np.pad(zi, k // 2, mode="edge")
+    pad = np.pad(zi, k // 2, mode="reflect") if len(z) > k // 2 else np.pad(zi, k // 2, mode="edge")
     med = np.median(np.lib.stride_tricks.sliding_window_view(pad, k), axis=1)
     mad = np.median(np.abs(zi[ok] - med[ok])) + 1e-6
     good = ok & (np.abs(z - med) < np.maximum(0.03, 4.0 * 1.4826 * mad))
     if good.sum() < 2:
         return np.where(good, z, 0.0)
-    return np.interp(idx, idx[good], z[good])
+    gi = idx[good]
+    out = np.interp(idx, gi, z[good])
+    nxt = np.searchsorted(gi, idx)  # first good index at or after each vertex
+    prev_gap = idx - gi[np.clip(nxt - 1, 0, len(gi) - 1)]
+    next_gap = gi[np.clip(nxt, 0, len(gi) - 1)] - idx
+    inside = (idx >= gi[0]) & (idx <= gi[-1])
+    short = (prev_gap + next_gap) <= max_gap + 1
+    return np.where(good | (inside & short), out, 0.0)
 
 
 def _lift(cls_map, depth, dt, K, path, cls, cfg: AssembleConfig):
@@ -283,6 +296,12 @@ def assemble(
     cls_map = np.asarray(cls_map)
     depth = np.asarray(depth, dtype=np.float64)
     fg = (cls_map > 0) & (cls_map != 0)
+    valid_z = depth[fg & np.isfinite(depth) & (depth > 0)]
+    if np.issubdtype(np.asarray(depth).dtype, np.integer) or (
+        valid_z.size and float(np.median(valid_z)) > 100.0
+    ):
+        raise ValueError("depth must be float metres (got integer or millimetre-scale values)")
+    cls_map, fg = _fill_holes(cls_map, fg, cfg.hole_max_px)
     n_cc, cc, stats, _ = cv2.connectedComponentsWithStats(fg.astype(np.uint8), connectivity=8)
     small = np.nonzero(stats[:, cv2.CC_STAT_AREA] < cfg.min_component_px)[0]
     fg &= ~np.isin(cc, small[small > 0])
@@ -290,7 +309,9 @@ def assemble(
     if not fg.any():
         return graph
     # The image border counts as background, so radii stay finite on a full mask.
-    dt = cv2.distanceTransform(np.pad(fg, 1).astype(np.uint8), cv2.DIST_L2, 3)[1:-1, 1:-1]
+    dt = cv2.distanceTransform(np.pad(fg, 1).astype(np.uint8), cv2.DIST_L2, cv2.DIST_MASK_PRECISE)[
+        1:-1, 1:-1
+    ]
     sk = skeleton_graph(thin(fg))
 
     def whisker_len(s) -> float:
@@ -337,6 +358,18 @@ def assemble(
     def end_pt(i: int, e: int) -> np.ndarray:
         return segs[i].pts[0] if e == 0 else segs[i].pts[-1]
 
+    def end_z(i: int, e: int) -> float:
+        """Depth just outside the junction disk: the end vertex itself can read the occluder."""
+        sg = segs[i]
+        pix = sg.pix if e == 0 else sg.pix[::-1]
+        z = sg.pts[:, 2] if e == 0 else sg.pts[::-1, 2]
+        y0, x0 = pix[0]
+        disk = float(dt[y0, x0]) + 2.0
+        far = np.nonzero(np.hypot(pix[:, 0] - y0, pix[:, 1] - x0) > disk)[0]
+        if len(far) == 0:
+            return float(z[-1])
+        return float(np.median(z[far[0] : far[0] + 3]))
+
     def end_dir(i: int, e: int) -> np.ndarray:
         r = float(segs[i].rad[0 if e == 0 else -1])
         return _end_dir(segs[i].pts, e == 0, cfg.tangent_len_m, cfg.skip_radii * r)
@@ -354,10 +387,10 @@ def assemble(
             for y in range(x + 1, m):
                 (i, e), (j, f) = ends[x], ends[y]
                 r = segs[i].rad[0 if e == 0 else -1] + segs[j].rad[0 if f == 0 else -1]
-                pi, pj = end_pt(i, e), end_pt(j, f)
+                zi, zj = end_z(i, e), end_z(j, f)
                 # A crossing in the image is a jump in depth, not a lateral offset.
-                tol = cfg.glue_gap_m + 2.0 * r + cfg.attach_depth_frac * float(pi[2])
-                if abs(float(pi[2] - pj[2])) < tol:
+                tol = cfg.glue_gap_m + 2.0 * r + cfg.attach_depth_frac * zi
+                if abs(zi - zj) < tol:
                     cl.union(x, y)
         groups: dict[int, list[int]] = {}
         for x in range(m):
@@ -413,8 +446,14 @@ def assemble(
         par, base_end = parents.get(k, (None, None))
         pts, rad = p["pts"], p["rad"]
         if par is None:
-            # Roots: base at the end lower in the image (larger camera y).
-            if pts[-1, 1] > pts[0, 1]:
+            if p["cls"] == TRUNK:
+                # The trunk's base is its end lower in the image (larger camera y).
+                flip = pts[-1, 1] > pts[0, 1]
+            else:
+                # An orphan's base is the end nearer other wood (its likely parent).
+                d0, d1 = _nearest_other(parts, k, pts[0]), _nearest_other(parts, k, pts[-1])
+                flip = d1 < d0
+            if flip:
                 pts, rad = pts[::-1], rad[::-1]
             attach = None
         else:
@@ -459,6 +498,40 @@ def _finish(part: dict, cfg: AssembleConfig) -> dict:
     part["r_med"] = float(np.median(rad))
     part["arc"] = np.r_[0.0, np.cumsum(np.linalg.norm(np.diff(pts, axis=0), axis=1))]
     return part
+
+
+def _nearest_other(parts: list[dict], k: int, q: np.ndarray) -> float:
+    best = np.inf
+    for j, p in enumerate(parts):
+        if j != k and len(p["pts"]):
+            best = min(best, float(np.min(np.linalg.norm(p["pts"] - q, axis=1))))
+    return best
+
+
+def _fill_holes(cls_map: np.ndarray, fg: np.ndarray, max_px: int):
+    """Fill small background holes enclosed by wood with the nearest wood class.
+
+    Holes (from texture, thresholding or class boundaries) make thinning loop
+    around them and collapse the local radius, which splits one limb in two.
+    """
+    if max_px <= 0 or not fg.any():
+        return cls_map, fg
+    n, lab, stats, _ = cv2.connectedComponentsWithStats((~fg).astype(np.uint8), connectivity=4)
+    h, w = fg.shape
+    small = np.zeros(n, dtype=bool)
+    for i in range(1, n):
+        x, y, bw, bh, area = stats[i]
+        touches = x == 0 or y == 0 or x + bw >= w or y + bh >= h
+        small[i] = area <= max_px and not touches
+    if not small[1:].any():
+        return cls_map, fg
+    holes = small[lab]
+    from scipy.ndimage import distance_transform_edt
+
+    _, (iy, ix) = distance_transform_edt(~fg, return_indices=True)
+    out = cls_map.copy()
+    out[holes] = cls_map[iy[holes], ix[holes]]
+    return out, fg | holes
 
 
 def _bridge(parts: list[dict], cfg: AssembleConfig) -> list[dict]:

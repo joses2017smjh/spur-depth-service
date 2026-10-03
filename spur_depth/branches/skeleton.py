@@ -9,6 +9,7 @@ junctions.
 
 from __future__ import annotations
 
+import warnings
 from dataclasses import dataclass, field
 
 import numpy as np
@@ -24,7 +25,8 @@ def _luts() -> tuple[np.ndarray, np.ndarray]:
         p = [(code >> i) & 1 for i in range(8)]  # p[0]=P2 ... p[7]=P9
         b = sum(p)
         a = sum(1 for i in range(8) if p[i] == 0 and p[(i + 1) % 8] == 1)
-        if not (2 <= b <= 6 and a == 1):
+        # Lu & Wang (1986): b >= 3 keeps 2-px diagonal bands that Zhang-Suen erases.
+        if not (3 <= b <= 6 and a == 1):
             continue
         p2, p4, p6, p8 = p[0], p[2], p[4], p[6]
         lut1[code] = p2 * p4 * p6 == 0 and p4 * p6 * p8 == 0
@@ -62,6 +64,8 @@ def thin(mask: np.ndarray, max_iter: int = 500) -> np.ndarray:
                 changed = True
         if not changed:
             break
+    else:
+        warnings.warn(f"thin(): stopped at max_iter={max_iter}, skeleton not thin", RuntimeWarning)
     out[y0:y1, x0:x1] = img.astype(bool)
     return out
 
@@ -250,9 +254,9 @@ def _dissolve_degree2(g: SkeletonGraph) -> SkeletonGraph:
     while True:
         incident: dict[int, list[int]] = {}
         for k, s in enumerate(g.segments):
+            # A self-loop meets its node twice: such a node is never degree 2.
             incident.setdefault(s.a, []).append(k)
-            if s.b != s.a:
-                incident.setdefault(s.b, []).append(k)
+            incident.setdefault(s.b, []).append(k)
         target = None
         for node, segs in incident.items():
             if g.kind.get(node) == "junction" and len(segs) == 2 and segs[0] != segs[1]:
