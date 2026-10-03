@@ -3,7 +3,7 @@
 One panel per depth source; bars compare the existing stack (TinyUNet, muted)
 with BranchNet (blue) on the primary metrics; the oracle-class ceiling is a tick.
 
-python scripts/render_branch_results.py SUMMARY.json --out docs/readme/branch_results.png
+python scripts/render_branch_results.py SUMMARY.json [MORE.json ...] --out docs/readme/branch_results.png
 """
 
 from __future__ import annotations
@@ -149,12 +149,30 @@ def table(summary: dict) -> str:
     return "\n".join(rows)
 
 
+def merge(paths: list[Path]) -> dict:
+    """One view over several summaries of the same split and frame set (e.g. a later method)."""
+    parts = [json.loads(p.read_text()) for p in paths]
+    base = dict(parts[0])
+    base["results"] = dict(base["results"])
+    for other in parts[1:]:
+        for key in ("split", "trees", "frames_expected", "frame_list_sha256", "protocol"):
+            if other.get(key) != base.get(key):
+                raise ValueError(f"cannot merge summaries: {key} differs")
+        if not other.get("complete", False):
+            raise ValueError("cannot merge an incomplete summary")
+        clash = set(other["results"]) & set(base["results"])
+        if clash:
+            raise ValueError(f"duplicate groups across summaries: {sorted(clash)}")
+        base["results"].update(other["results"])
+    return base
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("summary", type=Path)
+    ap.add_argument("summary", type=Path, nargs="+")
     ap.add_argument("--out", type=Path, default=Path("docs/readme/branch_results.png"))
     args = ap.parse_args(argv)
-    summary = json.loads(args.summary.read_text())
+    summary = merge(args.summary)
     chart(summary, args.out)
     print(table(summary))
     return 0
