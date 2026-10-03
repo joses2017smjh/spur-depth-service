@@ -16,7 +16,7 @@ Thin branches require depth in metres, explicit camera geometry, and a traceable
 - **Re-render check:** seed 1 scores **0.0467 m** over 60 six-view groups; changed renders make this a separate evaluation. [Artifact](bench/results/tesla-v100-sxm3-32gb_2026-08-22_eval.json).
 - **Inference:** Tesla V100 fp16 refiner-only p50 **156 ms** for six 280×512 views, batch 1, 20 warmups and 200 timed calls. DA2 inference and HTTP overhead are excluded; the artifact retains earlier runs with larger tails. [Timing runs](bench/results/tesla-v100-sxm3-32gb_2026-08-22.json).
 - **Export parity:** Torch versus ONNX Runtime maximum absolute differences of **1.53e-5** for the encoder and **9.54e-7** for fuse/decode. This checks numerical agreement, not accuracy. [Artifact](bench/results/onnx_parity_2026-08-22.json).
-- **Branch perception:** on two held-out trees (120 frames), the new tree-graph assembly reaches skeleton F1 @2 cm **0.93** and Jain-criterion cut recall **0.69** with ground-truth classes and rendered depth; the existing 256-px detector cuts that recall to **0.35**. [Section](#branch-perception-detect-localize-connect) · [Evidence](bench/results/branches_test_2026-10-02.json)
+- **Branch perception:** on two held-out trees (120 frames) with fused D435 + DA2-ft depth, the new full-resolution BranchNet plus tree-graph assembly reaches skeleton F1 @2 cm **0.60** and Jain-criterion cut recall **0.40**, against **0.50** and **0.25** with the existing detector. [Section](#branch-perception-detect-localize-connect) · [Evidence](bench/results/branches_test_branchnet_2026-10-02.json)
 
 All model accuracy above is synthetic. Real-orchard accuracy is unverified. Predicted-mask depth remains **0.112 m** versus **0.031 m** with ground-truth masks; detection and segmentation remain deployment constraints. [Research notes](docs/RESEARCH.md).
 
@@ -28,16 +28,15 @@ The `K` stored in every annotation, `[[2667, 0, 960], [0, 1500, 540]]`, is a har
 
 ## Branch perception: detect, localize, connect
 
-[![Camera sweep on held-out tree 00065: RGB, existing TinyUNet plus graph, ground-truth classes plus graph, ground truth](docs/readme/branch_sweep.gif)](docs/readme/branch_figures.json)
+[![Camera sweep on held-out tree 00065: RGB, existing TinyUNet plus graph, BranchNet plus graph, ground truth](docs/readme/branch_sweep.gif)](docs/readme/branch_figures.json)
 
-One RGB-D frame becomes a tree graph: every trunk, scaffold branch, shoot and spur as a metric 3D axis with radius, its parent and junction, and a **cut point with the cut axis**, which is what a cutter needs to close perpendicular to the wood (Jain, Grimm, Lee, ICRA 2025). Per-pixel classes are skeletonized and lifted with depth plus the radius, because the camera sees bark, not the axis. A depth-jump test keeps image crossings from becoming junctions, and every part's parent is chosen jointly by a minimum-cost arborescence with a botanical prior. `POST /branches` will serve it once a BranchNet checkpoint exists (it returns 501 until then), and `spur_depth.branches.export.cut_targets` writes Isaac-ready world-frame cut records.
+One RGB-D frame becomes a tree graph: every trunk, scaffold branch, shoot and spur as a metric 3D axis with radius, its parent and junction, and a **cut point with the cut axis**, which is what a cutter needs to close perpendicular to the wood (Jain, Grimm, Lee, ICRA 2025). BranchNet labels every pixel at full resolution; the classes are skeletonized and lifted with depth plus the radius, because the camera sees bark, not the axis. A depth-jump test keeps image crossings from becoming junctions, and every part's parent is chosen jointly by a minimum-cost arborescence with a botanical prior. `POST /branches` serves it when `SPUR_BRANCH_CKPT` points at a BranchNet checkpoint (501 otherwise), and `spur_depth.branches.export.cut_targets` writes Isaac-ready world-frame cut records.
 
-- **Thin wood is the detector's job, not the graph's:** with rendered depth, the same assembly scores skeleton F1 @2 cm **0.93** on ground-truth classes vs **0.54** on the existing 256-px TinyUNet mask, and Jain-criterion cut recall **0.69** vs **0.35**.
-- **RGB-D needs fusion on thin wood:** with ground-truth classes, simulated D435 depth gives skeleton F1 @2 cm **0.08**; fusing it with DA2-ft gives **0.61** (DA2-ft alone **0.47**).
-- **Cut points sit next to the parent:** fusion fixes geometry and edges but not cuts. With ground-truth classes, raw D435 depth gives Jain cut recall **0.47** and fused **0.43**, because the sensor still reads the thick parent beside each junction.
-- **Connect:** edge F1 **0.78** with rendered depth and **0.45** with fused depth on ground-truth classes; floating parts **0.12**; strict one-to-one edge F1 **0.45**.
+- **Detect:** through the same graph, BranchNet vs the existing 256-px TinyUNet gives skeleton F1 @2 cm **0.60** vs **0.50**, edge F1 **0.42** vs **0.28** and Jain cut recall **0.40** vs **0.25** with fused D435 + DA2-ft depth; with rendered depth **0.89** / **0.69** / **0.63** vs **0.54** / **0.42** / **0.35**. BranchNet's test spur IoU is **0.78** and tree-class mIoU **0.78** (sensor-depth input).
+- **Ceiling:** the same assembly on ground-truth classes and rendered depth scores **0.93** / **0.78** / **0.69**, so the gap left is detection and depth, not the graph.
+- **RGB-D needs fusion on thin wood:** BranchNet with raw simulated D435 depth reaches skeleton F1 @2 cm **0.09**; fusing the same depth with DA2-ft gives **0.60** (DA2-ft alone **0.47**). Cut recall moves less (**0.43** raw vs **0.40** fused): cut points sit beside the thick parent, where the sensor still reads.
 
-Test trees `00042` + `00065`, 120 frames, assembly config chosen on val:
+Test trees `00042` + `00065`, 120 frames, assembly config chosen on val and frozen for every method:
 
 | Classes | Depth | Skeleton F1 @2 cm | Edge F1 | Cut recall 5 cm/30° | Cut F1 5 cm/30° | Cut recall 2 cm/15° | Spur IoU | mIoU (4 classes) |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -45,12 +44,16 @@ Test trees `00042` + `00065`, 120 frames, assembly config chosen on val:
 | TinyUNet (existing) | D435 + DA2-ft fused | 0.50 | 0.28 | 0.25 | 0.23 | 0.07 | n/a | n/a |
 | TinyUNet (existing) | DA2-ft (RGB only) | 0.45 | 0.25 | 0.26 | 0.25 | 0.05 | n/a | n/a |
 | TinyUNet (existing) | rendered depth | 0.54 | 0.42 | 0.35 | 0.35 | 0.12 | n/a | n/a |
+| BranchNet | simulated D435 | 0.09 | 0.28 | 0.43 | 0.39 | 0.13 | 0.78 | 0.78 |
+| BranchNet | D435 + DA2-ft fused | 0.60 | 0.42 | 0.40 | 0.34 | 0.12 | 0.78 | 0.78 |
+| BranchNet | DA2-ft (RGB only) | 0.47 | 0.33 | 0.40 | 0.35 | 0.08 | 0.78 | 0.77 |
+| BranchNet | rendered depth | 0.89 | 0.69 | 0.63 | 0.59 | 0.26 | 0.78 | 0.78 |
 | GT (ceiling) | simulated D435 | 0.08 | 0.33 | 0.47 | 0.43 | 0.15 | 1.00 | 1.00 |
 | GT (ceiling) | D435 + DA2-ft fused | 0.61 | 0.45 | 0.43 | 0.37 | 0.13 | 1.00 | 1.00 |
 | GT (ceiling) | DA2-ft (RGB only) | 0.47 | 0.34 | 0.43 | 0.36 | 0.08 | 1.00 | 1.00 |
 | GT (ceiling) | rendered depth | 0.93 | 0.78 | 0.69 | 0.66 | 0.30 | 1.00 | 1.00 |
 
-[![Primary metrics by depth source on the two test trees](docs/readme/branch_results.png)](bench/results/branches_test_2026-10-02.json)
+[![Primary metrics by depth source on the two test trees](docs/readme/branch_results.png)](bench/results/branches_test_branchnet_2026-10-02.json)
 
 [![One frame lifted with rendered, simulated D435, DA2-ft and fused depth, seen from above](docs/readme/branch_depth.png)](docs/readme/branch_figures.json)
 
@@ -58,10 +61,10 @@ A D435-class camera at 1-4 m cannot measure 6 mm wood: lost thin-wood pixels rea
 
 [![Six camera heights of one rig placed in the world frame with their logged poses](docs/readme/branch_orbit.gif)](docs/readme/branch_figures.json)
 
+- **Learned detector:** BranchNet is a full-resolution RGB-D U-Net on a ResNet-34 with Skeleton Recall loss, whose depth input is drawn per crop from clean, simulated D435, DA2-ft or no depth. It trained for 60 min on one H100 MIG 4g.40gb slice (Slurm 21523238, commit `3fa8420`, 21 epochs, best val tree-class mIoU 0.78 at epoch 20) and was scored once on the test trees with the already-frozen config. A first run (21520501) hung after one epoch on a data-loader fork deadlock and was cancelled. [Training log](bench/results/branchnet_train_2026-10-02.json)
 - **Ground truth:** exact, from the L-Py metadata the renderer used and the corrected `K`: 127,910 of 127,911 tree pixels labelled at 0.06 mm median surface residual, with every part's parent, junction and visibility. [Code](spur_depth/branches/gt.py)
-- **Protocol:** splits, metrics, thresholds and the config-selection rule were committed before test scoring, after three blind reviews of the scorer, harness and assembly; one test frame's figure metrics were seen before scoring and are disclosed in the protocol. [Protocol](docs/BRANCH_PROTOCOL.md) · [Selection](bench/results/branches_val_selection_2026-10-02.json) · [Evidence](bench/results/branches_test_2026-10-02.json)
-- **Learned detector, not yet scored:** BranchNet (full-resolution RGB-D U-Net, Skeleton Recall loss, depth input drawn from clean, simulated D435, DA2-ft or none) is committed with its launcher. Its first H100 run (Slurm 21520501, `e23b40f`) reached val tree-class mIoU 0.61 after one epoch, then hung on a data-loader fork deadlock and was cancelled; the fix is `3fa8420` and the rerun (Slurm 21523238) is queued. Once it finishes, it is scored into its own directory from the same frozen clone and config: `sbatch --export=NONE --array=0-11 scripts/run_eval_branches.sh 776c36a… test …/run_C_branchnet C.json RUN/pred branchnet gt,sensor,da2,fused`.
-- **Scope:** synthetic Envy trees, one bark, 2 test trees and 120 correlated frames. The existing stack's part classes come from L-Py radii (10 mm vs 3 mm) that will not transfer to real trees. TinyUNet's published 0.930 IoU was measured at 256 px; at full resolution its wood IoU here is 0.72.
+- **Protocol:** splits, metrics, thresholds and the config-selection rule were committed before test scoring, after three blind reviews of the scorer, harness and assembly; one test frame's figure metrics were seen before scoring and are disclosed in the protocol. [Protocol](docs/BRANCH_PROTOCOL.md) · [Selection](bench/results/branches_val_selection_2026-10-02.json) · [Evidence](bench/results/branches_test_2026-10-02.json) · [BranchNet evidence](bench/results/branches_test_branchnet_2026-10-02.json)
+- **Scope:** synthetic Envy trees, one bark, 2 test trees and 120 correlated frames. The existing stack's part classes come from L-Py radii (10 mm vs 3 mm) that will not transfer to real trees, and BranchNet has never seen a real orchard. TinyUNet's published 0.930 IoU was measured at 256 px; at full resolution its wood IoU here is 0.72.
 
 ## Architecture and decisions
 

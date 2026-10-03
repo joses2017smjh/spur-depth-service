@@ -105,13 +105,12 @@ test scoring is a disclosed bug fix, never a retuned threshold.
   blind reviewer's val-only findings, were checked by an old/new A/B on 12 val
   frames, and the config selection was re-run on val afterwards (C again).
   No other test output was read before `run_C/summary.json` at 21:25.
-- BranchNet (comparison 1) has not been scored. Its first run (Slurm
-  21520501, `e23b40f`) started at 22:30 PDT, after the oracle and TinyUNet
-  test rows had been read (21:25), finished one epoch (val tree-class mIoU
-  0.61 on 48 val frames) and hung at the start of epoch 2 (data-loader fork
-  deadlock); it was cancelled with the user's approval at 23:35 after 65.7
-  min. The fix is `3fa8420`; the rerun (Slurm 21523238) trains on the train
-  trees only and picks its checkpoint by val mIoU. It is to be scored once,
-  from the frozen clone `776c36a` with config C (fixed at 20:58, before any
-  test row existed), into its own directory, so the rows above stay as they
-  are.
+- BranchNet (comparison 1) was trained and scored after the oracle and TinyUNet
+  test rows had been read (21:25 PDT). Its first run (Slurm 21520501, `e23b40f`)
+  hung at the start of epoch 2 (data-loader fork deadlock) and was cancelled
+  with the user's approval after 65.7 min. The rerun (Slurm 21523238, `3fa8420`)
+  trained on the train trees only and picked its checkpoint by val mIoU; it was
+  scored once (rows 00:39-00:51, summary 01:01 PDT, 2026-10-03) from the frozen
+  clone `776c36a` with config C
+  (fixed at 20:58, before any test row existed), into its own directory, so
+  the earlier rows are unchanged.

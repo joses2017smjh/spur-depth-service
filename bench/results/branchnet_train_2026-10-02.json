@@ -1,0 +1,450 @@
+{
+  "job": 21523238,
+  "first_attempt": {
+    "job": 21520501,
+    "commit": "e23b40fa0fc7a8db42a2119c1a1cb7669a2eaa98",
+    "outcome": "hung at the start of epoch 2 (data-loader fork deadlock), cancelled with the user approval after 65.7 min"
+  },
+  "commit": "3fa842085e797f1767711c92b1589715809f1d5e",
+  "gpu": "NVIDIA H100 80GB HBM3, MIG 4g.40gb slice (dgxh-1), bf16 autocast",
+  "frames": {
+    "train": 5640,
+    "val": 240,
+    "test": 120
+  },
+  "val_subset_frames_per_epoch": 48,
+  "val_depth_input": "simulated D435 (frame-seeded)",
+  "minutes": 59.56,
+  "epochs": 21,
+  "best": {
+    "epoch": 20,
+    "miou_tree": 0.7838979766070174,
+    "iou": {
+      "background": 0.9983652731109471,
+      "trunk": 0.9094081574667543,
+      "branch": 0.9346682150489456,
+      "shoot": 0.502644896035363,
+      "spur": 0.788870637877007
+    },
+    "ctr_f1": 0.9628953181174628
+  },
+  "checkpoint_sha256": "2b8dc48978eb8075ed9b34f35af5141cb286bf3c687bb9db0f8508a6372901b0",
+  "predict_summary": {
+    "ckpt": "/nfs/hpc/share/sanchej7/spur-branch-runs/21523238/best.pt",
+    "trees": [
+      "lpy_envy_00001",
+      "lpy_envy_00009",
+      "lpy_envy_00015",
+      "lpy_envy_00041",
+      "lpy_envy_00042",
+      "lpy_envy_00065"
+    ],
+    "sources": [
+      "gt",
+      "sensor",
+      "da2"
+    ],
+    "failed_frames": []
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "elapsed_min": 3.58,
+      "train_total": 1.5508546456377557,
+      "val_miou_tree": 0.6072052746027292,
+      "val_iou": {
+        "background": 0.9956566191889282,
+        "trunk": 0.714696119011516,
+        "branch": 0.827868714190888,
+        "shoot": 0.273245391734196,
+        "spur": 0.613010873474317
+      },
+      "depth_sources": {
+        "gt": 829,
+        "sensor": 2514,
+        "da2": 1694,
+        "none": 603
+      }
+    },
+    {
+      "epoch": 2,
+      "elapsed_min": 6.36,
+      "train_total": 0.6234084931459832,
+      "val_miou_tree": 0.6770370067994602,
+      "val_iou": {
+        "background": 0.997823539647564,
+        "trunk": 0.8234429367996818,
+        "branch": 0.8831917012242166,
+        "shoot": 0.326969999721372,
+        "spur": 0.6745433894525704
+      },
+      "depth_sources": {
+        "gt": 856,
+        "sensor": 2546,
+        "da2": 1634,
+        "none": 604
+      }
+    },
+    {
+      "epoch": 3,
+      "elapsed_min": 9.14,
+      "train_total": 0.522981917287441,
+      "val_miou_tree": 0.6948000149734161,
+      "val_iou": {
+        "background": 0.9982257611496932,
+        "trunk": 0.811849145528872,
+        "branch": 0.8882432847426514,
+        "shoot": 0.3529454223639325,
+        "spur": 0.7261622072582087
+      },
+      "depth_sources": {
+        "gt": 859,
+        "sensor": 2488,
+        "da2": 1719,
+        "none": 574
+      }
+    },
+    {
+      "epoch": 4,
+      "elapsed_min": 11.91,
+      "train_total": 0.4793111615358515,
+      "val_miou_tree": 0.7034028288569228,
+      "val_iou": {
+        "background": 0.9985938500768607,
+        "trunk": 0.8370710531217856,
+        "branch": 0.9006792604397231,
+        "shoot": 0.3621235051312812,
+        "spur": 0.7137374967349012
+      },
+      "depth_sources": {
+        "gt": 858,
+        "sensor": 2579,
+        "da2": 1638,
+        "none": 565
+      }
+    },
+    {
+      "epoch": 5,
+      "elapsed_min": 14.68,
+      "train_total": 0.4523840640453582,
+      "val_miou_tree": 0.7212217885480102,
+      "val_iou": {
+        "background": 0.9984678853866716,
+        "trunk": 0.8448194596140843,
+        "branch": 0.906733535478045,
+        "shoot": 0.4021457462223443,
+        "spur": 0.7311884128775672
+      },
+      "depth_sources": {
+        "gt": 813,
+        "sensor": 2611,
+        "da2": 1709,
+        "none": 507
+      }
+    },
+    {
+      "epoch": 6,
+      "elapsed_min": 17.44,
+      "train_total": 0.43145355493464366,
+      "val_miou_tree": 0.7345218305272301,
+      "val_iou": {
+        "background": 0.99852911387159,
+        "trunk": 0.8726462538887979,
+        "branch": 0.9156285491006533,
+        "shoot": 0.40929469559107573,
+        "spur": 0.7405178235283932
+      },
+      "depth_sources": {
+        "gt": 854,
+        "sensor": 2575,
+        "da2": 1682,
+        "none": 529
+      }
+    },
+    {
+      "epoch": 7,
+      "elapsed_min": 20.21,
+      "train_total": 0.4187511163189056,
+      "val_miou_tree": 0.743725467058792,
+      "val_iou": {
+        "background": 0.9983984563063338,
+        "trunk": 0.877442679892457,
+        "branch": 0.9205322685085258,
+        "shoot": 0.425631500413335,
+        "spur": 0.7512954194208502
+      },
+      "depth_sources": {
+        "gt": 858,
+        "sensor": 2492,
+        "da2": 1694,
+        "none": 596
+      }
+    },
+    {
+      "epoch": 8,
+      "elapsed_min": 23.06,
+      "train_total": 0.4019759587785031,
+      "val_miou_tree": 0.7388527931474663,
+      "val_iou": {
+        "background": 0.9981612672651744,
+        "trunk": 0.8807197602386727,
+        "branch": 0.9183068466120834,
+        "shoot": 0.43011793626492556,
+        "spur": 0.7262666294741839
+      },
+      "depth_sources": {
+        "gt": 830,
+        "sensor": 2536,
+        "da2": 1684,
+        "none": 590
+      }
+    },
+    {
+      "epoch": 9,
+      "elapsed_min": 25.82,
+      "train_total": 0.3888490593179743,
+      "val_miou_tree": 0.7466585031123615,
+      "val_iou": {
+        "background": 0.9985353781668354,
+        "trunk": 0.8393343244136109,
+        "branch": 0.9093402408096956,
+        "shoot": 0.46685005958413617,
+        "spur": 0.7711093876420033
+      },
+      "depth_sources": {
+        "gt": 842,
+        "sensor": 2538,
+        "da2": 1668,
+        "none": 592
+      }
+    },
+    {
+      "epoch": 10,
+      "elapsed_min": 28.6,
+      "train_total": 0.37972012010026485,
+      "val_miou_tree": 0.7475552457590553,
+      "val_iou": {
+        "background": 0.9985094180063883,
+        "trunk": 0.8758479720230268,
+        "branch": 0.9196447598718571,
+        "shoot": 0.44562163886355116,
+        "spur": 0.7491066122777862
+      },
+      "depth_sources": {
+        "gt": 851,
+        "sensor": 2513,
+        "da2": 1716,
+        "none": 560
+      }
+    },
+    {
+      "epoch": 11,
+      "elapsed_min": 31.42,
+      "train_total": 0.36806155684146474,
+      "val_miou_tree": 0.7594616203302045,
+      "val_iou": {
+        "background": 0.9981613038036418,
+        "trunk": 0.8906391314883262,
+        "branch": 0.9259891588279673,
+        "shoot": 0.45772208994087504,
+        "spur": 0.7634961010636496
+      },
+      "depth_sources": {
+        "gt": 854,
+        "sensor": 2560,
+        "da2": 1690,
+        "none": 536
+      }
+    },
+    {
+      "epoch": 12,
+      "elapsed_min": 34.24,
+      "train_total": 0.3583323913051727,
+      "val_miou_tree": 0.7659633120877121,
+      "val_iou": {
+        "background": 0.998362275578925,
+        "trunk": 0.8993234090901336,
+        "branch": 0.9288080281584138,
+        "shoot": 0.46870436355035366,
+        "spur": 0.767017447551947
+      },
+      "depth_sources": {
+        "gt": 837,
+        "sensor": 2551,
+        "da2": 1738,
+        "none": 514
+      }
+    },
+    {
+      "epoch": 13,
+      "elapsed_min": 37.05,
+      "train_total": 0.350031124023681,
+      "val_miou_tree": 0.7655015082683039,
+      "val_iou": {
+        "background": 0.9981476565745795,
+        "trunk": 0.9029523093836541,
+        "branch": 0.9296525795871858,
+        "shoot": 0.46809295250387495,
+        "spur": 0.7613081915985006
+      },
+      "depth_sources": {
+        "gt": 880,
+        "sensor": 2584,
+        "da2": 1625,
+        "none": 551
+      }
+    },
+    {
+      "epoch": 14,
+      "elapsed_min": 39.86,
+      "train_total": 0.3433040967647065,
+      "val_miou_tree": 0.7691668307413939,
+      "val_iou": {
+        "background": 0.9982274773493078,
+        "trunk": 0.9005791372613947,
+        "branch": 0.9314928416451891,
+        "shoot": 0.4734735663586773,
+        "spur": 0.7711217777003146
+      },
+      "depth_sources": {
+        "gt": 818,
+        "sensor": 2554,
+        "da2": 1681,
+        "none": 587
+      }
+    },
+    {
+      "epoch": 15,
+      "elapsed_min": 42.69,
+      "train_total": 0.33248938230123926,
+      "val_miou_tree": 0.7759934200579596,
+      "val_iou": {
+        "background": 0.9982992743244092,
+        "trunk": 0.9087356764798294,
+        "branch": 0.933763688176544,
+        "shoot": 0.4884384377581549,
+        "spur": 0.7730358778173102
+      },
+      "depth_sources": {
+        "gt": 817,
+        "sensor": 2506,
+        "da2": 1734,
+        "none": 583
+      }
+    },
+    {
+      "epoch": 16,
+      "elapsed_min": 45.5,
+      "train_total": 0.3284440908977326,
+      "val_miou_tree": 0.7791781962552934,
+      "val_iou": {
+        "background": 0.9983702905221445,
+        "trunk": 0.9020566398868666,
+        "branch": 0.9315133280336496,
+        "shoot": 0.5002314417441205,
+        "spur": 0.7829113753565368
+      },
+      "depth_sources": {
+        "gt": 848,
+        "sensor": 2479,
+        "da2": 1740,
+        "none": 573
+      }
+    },
+    {
+      "epoch": 17,
+      "elapsed_min": 48.32,
+      "train_total": 0.3252554951196021,
+      "val_miou_tree": 0.7829276556623658,
+      "val_iou": {
+        "background": 0.9983290925733719,
+        "trunk": 0.9109711947111601,
+        "branch": 0.9348883266830208,
+        "shoot": 0.5002617473971555,
+        "spur": 0.7855893538581268
+      },
+      "depth_sources": {
+        "gt": 872,
+        "sensor": 2549,
+        "da2": 1667,
+        "none": 552
+      }
+    },
+    {
+      "epoch": 18,
+      "elapsed_min": 51.14,
+      "train_total": 0.32187503677733403,
+      "val_miou_tree": 0.7834530339214496,
+      "val_iou": {
+        "background": 0.9983069798362761,
+        "trunk": 0.9087616470510389,
+        "branch": 0.9344013211932376,
+        "shoot": 0.5037935011732888,
+        "spur": 0.7868556662682333
+      },
+      "depth_sources": {
+        "gt": 870,
+        "sensor": 2535,
+        "da2": 1689,
+        "none": 546
+      }
+    },
+    {
+      "epoch": 19,
+      "elapsed_min": 53.95,
+      "train_total": 0.319591992586217,
+      "val_miou_tree": 0.7817864879352618,
+      "val_iou": {
+        "background": 0.9983206582037796,
+        "trunk": 0.9072267749340006,
+        "branch": 0.9335899878472891,
+        "shoot": 0.49975429587201264,
+        "spur": 0.7865748930877449
+      },
+      "depth_sources": {
+        "gt": 853,
+        "sensor": 2495,
+        "da2": 1705,
+        "none": 587
+      }
+    },
+    {
+      "epoch": 20,
+      "elapsed_min": 56.76,
+      "train_total": 0.32147872673070177,
+      "val_miou_tree": 0.7838979766070174,
+      "val_iou": {
+        "background": 0.9983652731109471,
+        "trunk": 0.9094081574667543,
+        "branch": 0.9346682150489456,
+        "shoot": 0.502644896035363,
+        "spur": 0.788870637877007
+      },
+      "depth_sources": {
+        "gt": 867,
+        "sensor": 2502,
+        "da2": 1714,
+        "none": 557
+      }
+    },
+    {
+      "epoch": 21,
+      "elapsed_min": 59.56,
+      "train_total": 0.3200071212398795,
+      "val_miou_tree": 0.7825060560363595,
+      "val_iou": {
+        "background": 0.9983100978483881,
+        "trunk": 0.9061953359100187,
+        "branch": 0.9337196623500729,
+        "shoot": 0.5029782428525335,
+        "spur": 0.7871309830328127
+      },
+      "depth_sources": {
+        "gt": 836,
+        "sensor": 2431,
+        "da2": 1622,
+        "none": 535
+      }
+    }
+  ]
+}
