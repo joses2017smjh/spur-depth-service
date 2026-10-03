@@ -137,3 +137,26 @@ def test_concurrency_returns_200_or_503_never_500(client, monkeypatch):
     assert 500 not in codes, [r.text for r in responses if r.status_code == 500]
     assert codes <= {200, 503}
     assert 200 in codes
+
+
+def _branch_form():
+    return {"fx": "498.0", "fy": "498.0", "cx": "47.5", "cy": "31.5"}
+
+
+def test_branches_without_checkpoint_is_501(client, monkeypatch):
+    monkeypatch.delenv("SPUR_BRANCH_CKPT", raising=False)
+    files = {
+        "image": ("rgb.png", _png(96, 64), "image/png"),
+        "depth": ("depth.npy", _npy(np.full((64, 96), 1.5)), "application/octet-stream"),
+    }
+    r = client.post("/branches", files=files, data=_branch_form())
+    assert r.status_code == 501
+
+
+def test_branches_depth_shape_mismatch_is_422(client):
+    files = {
+        "image": ("rgb.png", _png(96, 64), "image/png"),
+        "depth": ("depth.npy", _npy(np.full((32, 96), 1.5)), "application/octet-stream"),
+    }
+    r = client.post("/branches", files=files, data=_branch_form())
+    assert r.status_code == 422

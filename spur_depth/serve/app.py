@@ -228,6 +228,35 @@ def create_app() -> FastAPI:
             group_id=group_id,
         )
 
+    @app.post("/branches")
+    async def branches(
+        image: UploadFile = File(...),
+        depth: UploadFile = File(...),
+        fx: float = Form(...),
+        fy: float = Form(...),
+        cx: float = Form(...),
+        cy: float = Form(...),
+        mono_depth: UploadFile | None = File(None),
+    ):
+        """One RGB-D frame -> tree graph (parts, parents, junctions, cut points), metres."""
+        from spur_depth.branches.service import BranchService
+
+        if not hasattr(app.state, "branches"):
+            app.state.branches = BranchService.from_env()
+        rgb = np.asarray(_read_image(await image.read(), image.filename or "image"))
+        z = _read_depth(await depth.read(), depth.filename or "depth")
+        mono = None
+        if mono_depth is not None:
+            mono = _read_depth(await mono_depth.read(), mono_depth.filename or "mono_depth")
+        K = np.array([[fx, 0.0, cx], [0.0, fy, cy], [0.0, 0.0, 1.0]])
+        async with app.state.gate:
+            try:
+                return app.state.branches.run(rgb, z, K, mono)
+            except NotImplementedError as exc:
+                raise HTTPException(status_code=501, detail=str(exc)) from exc
+            except ValueError as exc:
+                raise HTTPException(status_code=422, detail=str(exc)) from exc
+
     return app
 
 
