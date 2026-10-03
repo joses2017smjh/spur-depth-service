@@ -35,6 +35,7 @@ from spur_depth.branches.viz import (
     label,
     legend_strip,
     orbit_frames,
+    project,
     save_gif,
 )
 from spur_depth.pipeline.reconstruct import load_pose
@@ -98,14 +99,42 @@ def _frame(ref: G.FrameRef, pred_dir: Path, cfg: AssembleConfig, model=None, met
     }
 
 
-def sweep_gif(frames: list[dict], out: Path) -> None:
+def _tree_box(frames: list[dict], pad: float = 0.04) -> tuple[int, int, int, int]:
+    """Union bounding box (x0, y0, x1, y1) of the visible tree across frames, full-res px."""
+    us, vs = [], []
+    for f in frames:
+        for p in f["gt"].parts.values():
+            q = p.points[p.visible] if p.visible is not None else p.points
+            if len(q):
+                uv, ok = project(q, f["K"])
+                us.append(uv[ok, 0])
+                vs.append(uv[ok, 1])
+    h, w = frames[0]["rgb"].shape[:2]
+    u, v = np.concatenate(us), np.concatenate(vs)
+    x0, x1 = np.percentile(u, 0.5), np.percentile(u, 99.5)
+    y0, y1 = np.percentile(v, 0.5), np.percentile(v, 99.5)
+    px, py = pad * w, pad * h
+    return (
+        int(max(0, x0 - px)),
+        int(max(0, y0 - py)),
+        int(min(w, x1 + px)),
+        int(min(h, y1 + py)),
+    )
+
+
+def sweep_gif(frames: list[dict], out: Path, panel_h: int = 420) -> None:
+    """RGB | predicted graph | ground truth, cropped to the tree, one tile per height."""
+    x0, y0, x1, y1 = _tree_box(frames)
+    s = panel_h / float(y1 - y0)
     tiles = []
     for k, f in enumerate(frames):
-        a = label(
-            cv2.resize(f["rgb"], None, fx=1 / 3, fy=1 / 3, interpolation=cv2.INTER_AREA), "RGB"
-        )
-        b = label(draw_graph_2d(f["rgb"], f["pred"], f["K"], scale=1 / 3), "predicted graph")
-        c = label(draw_graph_2d(f["rgb"], _visible(f["gt"]), f["K"], scale=1 / 3), "ground truth")
+        rgb = f["rgb"][y0:y1, x0:x1]
+        K = f["K"].copy()
+        K[0, 2] -= x0
+        K[1, 2] -= y0
+        a = label(cv2.resize(rgb, None, fx=s, fy=s, interpolation=cv2.INTER_AREA), "RGB")
+        b = label(draw_graph_2d(rgb, f["pred"], K, scale=s), "predicted graph")
+        c = label(draw_graph_2d(rgb, _visible(f["gt"]), K, scale=s), "ground truth")
         row = np.concatenate([a, b, c], 1)
         row = label(row, f"camera height {k + 1}/6", y=row.shape[0] - 10, x=row.shape[1] - 210)
         tiles.append(np.concatenate([row, legend_strip(row.shape[1])], 0))
@@ -207,7 +236,16 @@ def main(argv=None) -> int:
     rep = depth_png(frames[2], args.out / "branch_depth.png", cfg)
     (args.out / "branch_figures.json").write_text(
         json.dumps(
-            {"tree": args.tree, "rig": args.rig, "depth_png_frame": refs[2].key, **rep}, indent=2
+            {
+                "tree": args.tree,
+                "rig": args.rig,
+                "side": args.side,
+                "method": args.method,
+                "assemble_config": json.loads(args.cfg),
+                "depth_png_frame": refs[2].key,
+                "depth_png_metrics": rep,
+            },
+            indent=2,
         )
         + "\n"
     )
