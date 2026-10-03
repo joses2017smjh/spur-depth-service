@@ -1,0 +1,37 @@
+{
+  "tree": "lpy_envy_00065",
+  "rig": "box_cam1",
+  "side": "l",
+  "method": "oracle",
+  "compare": [
+    "tinyunet"
+  ],
+  "assemble_config": {
+    "orphan_cost": 1.2,
+    "junction_bonus": 0.0,
+    "depth_percentile": 50.0
+  },
+  "depth_png_frame": "lpy_envy_00065/box_cam1/lpy_envy_00065_shot03_l",
+  "depth_png_metrics": {
+    "gt": {
+      "skeleton_f1_2cm": 0.9113687357109674,
+      "edge_f1": 0.6934860612751863,
+      "cut_recall_jain": 0.5825242718446602
+    },
+    "sensor": {
+      "skeleton_f1_2cm": 0.06987589438315785,
+      "edge_f1": 0.2474340175953079,
+      "cut_recall_jain": 0.34951456310679613
+    },
+    "da2": {
+      "skeleton_f1_2cm": 0.2943336241772387,
+      "edge_f1": 0.10453216374269005,
+      "cut_recall_jain": 0.17475728155339806
+    },
+    "fused": {
+      "skeleton_f1_2cm": 0.424694240897087,
+      "edge_f1": 0.28603477285473916,
+      "cut_recall_jain": 0.2524271844660194
+    }
+  }
+}

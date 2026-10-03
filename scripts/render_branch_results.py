@@ -57,13 +57,18 @@ def chart(summary: dict, out: Path) -> None:
     w = 0.36
     for ax, (dk, title) in zip(axes, depths):
         ax.set_facecolor(SURFACE)
-        for k, (method, col, label) in enumerate(
-            (("tinyunet", MUTED, "existing stack (TinyUNet)"), ("branchnet", BLUE, "BranchNet"))
-        ):
-            if f"{method}/{dk}" not in res:
-                continue
+        shown = [
+            m
+            for m in (
+                ("tinyunet", MUTED, "existing stack (TinyUNet)"),
+                ("branchnet", BLUE, "BranchNet"),
+            )
+            if f"{m[0]}/{dk}" in res
+        ]
+        for k, (method, col, label) in enumerate(shown):
             vals = [(_get(res, method, dk, m) or 0.0) for m, _ in METRICS]
-            bars = ax.bar(x + (k - 0.5) * w, vals, w * 0.92, color=col, label=label, zorder=2)
+            off = (k - (len(shown) - 1) / 2) * w
+            bars = ax.bar(x + off, vals, w * 0.92, color=col, label=label, zorder=2)
             for b, v in zip(bars, vals):
                 ax.text(
                     b.get_x() + b.get_width() / 2,
