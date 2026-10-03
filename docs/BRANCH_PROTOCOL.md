@@ -90,3 +90,22 @@ scorer files and any frame subsetting.
 Two test trees and 120 correlated frames: results are reported per tree as
 well as pooled, with no significance claims. Anything changed after the first
 test scoring is a disclosed bug fix, never a retuned threshold.
+
+## Disclosures (2026-10-02 run)
+
+- Geometry checks only, no branch metric: the intrinsics fix and the GT
+  labelling were validated on test-tree frames (`lpy_envy_00042` box_cam1
+  shot03_l, box and box_cam1 shot01 l/r) before the protocol existed.
+- Test-frame metrics seen before test scoring: figure dry runs on
+  `lpy_envy_00065` box_cam1 (6 heights, left camera) between 20:18 and 20:45
+  PDT printed and plotted per-frame skeleton F1, edge F1 and cut recall for
+  frame shot03_l (four depth sources, ground-truth and TinyUNet classes), first
+  with the assembly at `3060ef8` (seen 20:29), then at `8c1f54f` (depth panel,
+  seen about 20:45). The assembly changes in `8c1f54f` came from the third
+  blind reviewer's val-only findings, were checked by an old/new A/B on 12 val
+  frames, and the config selection was re-run on val afterwards (C again).
+  No other test output was read before `run_C/summary.json` at 21:25.
+- BranchNet (comparison 1) was not run: its GPU job was still queued at
+  scoring time. It is to be scored into a separate directory from the same
+  frozen clone (`776c36a`) with config C, so the scored rows above stay as
+  they are.
