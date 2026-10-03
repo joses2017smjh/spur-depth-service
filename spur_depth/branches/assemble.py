@@ -82,6 +82,12 @@ class AssembleConfig:
     tangent_len_m: float = 0.03
     geometric_classes: bool = False  # baseline only: classes from radius/length
     hole_max_px: int = 64  # enclosed background holes up to this area are wood
+    # Cut direction: "tangent" = the axis tangent at the cut point (+-1.5 cm, Part.cut);
+    # "fit" = principal direction of the axis between these arc lengths from the base,
+    # past the junction where thinning bends the skeleton (fit_cut_axes).
+    cut_axis: str = "tangent"
+    cut_fit_lo_m: float = 0.03
+    cut_fit_hi_m: float = 0.08
 
 
 @dataclass
@@ -482,6 +488,34 @@ def assemble(
     for p in graph.parts.values():
         if p.parent is not None and p.parent not in graph.parts:
             p.parent, p.attach = None, None
+    if cfg.cut_axis == "fit":
+        fit_cut_axes(graph, cfg.cut_fit_lo_m, cfg.cut_fit_hi_m)
+    elif cfg.cut_axis != "tangent":
+        raise ValueError(f"unknown cut_axis {cfg.cut_axis!r}")
+    return graph
+
+
+def fitted_axis(points: np.ndarray, lo: float, hi: float) -> np.ndarray | None:
+    """Unit principal direction (base -> tip) of the axis between arc lengths ``lo`` and ``hi``.
+
+    Parts shorter than ``hi`` use their outer 70% at most; None when fewer than three
+    vertices fall in the window.
+    """
+    if len(points) < 3:
+        return None
+    s = np.r_[0.0, np.cumsum(np.linalg.norm(np.diff(points, axis=0), axis=1))]
+    m = (s >= min(lo, 0.3 * s[-1])) & (s <= hi)
+    if m.sum() < 3:
+        return None
+    q = points[m]
+    d = np.linalg.svd(q - q.mean(0), full_matrices=False)[2][0]
+    return -d if d @ (q[-1] - q[0]) < 0 else d
+
+
+def fit_cut_axes(graph: TreeGraph, lo: float, hi: float) -> TreeGraph:
+    """Set ``Part.cut_axis`` on every non-trunk part from ``fitted_axis`` (in place)."""
+    for p in graph.parts.values():
+        p.cut_axis = None if p.cls == TRUNK else fitted_axis(p.points, lo, hi)
     return graph
 
 

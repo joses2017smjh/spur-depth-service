@@ -264,3 +264,42 @@ def test_diagonal_two_pixel_band_keeps_its_skeleton():
     for i in range(10, 140):
         m[i, i] = m[i, i + 1] = True
     assert thin(m).sum() > 100
+
+
+def _deg(a, b):
+    c = abs(float(np.dot(a, b))) / (np.linalg.norm(a) * np.linalg.norm(b))
+    return float(np.degrees(np.arccos(min(c, 1.0))))
+
+
+def test_fitted_cut_axis_skips_the_junction_bend_and_leaves_gt_untouched():
+    from spur_depth.branches.assemble import fit_cut_axes, fitted_axis
+
+    # A spur whose first 2 cm bend toward the parent, as thinning bends a skeleton at a junction.
+    s = np.linspace(0.0, 0.12, 121)[:, None]
+    d = np.array([0.3, -1.0, 0.2]) / np.linalg.norm([0.3, -1.0, 0.2])
+    pts = s * d + np.clip(0.02 - s, 0.0, None) * np.array([1.0, 0.0, 0.0]) + [0.1, 0.0, Z]
+    part = Part(0, SPUR, pts, np.full(len(pts), 0.004), parent=1, attach=pts[0])
+    point, tangent = part.cut()
+    assert _deg(tangent, d) > 10.0 and _deg(fitted_axis(pts, 0.03, 0.08), d) < 0.5
+    g = TreeGraph()
+    g.add(part)
+    fit_cut_axes(g, 0.03, 0.08)
+    point2, axis2 = part.cut()
+    assert np.array_equal(point, point2) and _deg(axis2, d) < 0.5
+    # The axis follows a rigid transform; ground truth never carries one.
+    R = np.array([[0.0, -1.0, 0.0], [1.0, 0.0, 0.0], [0.0, 0.0, 1.0]])
+    moved = g.transformed(R, np.zeros(3), "world").parts[0]
+    assert _deg(moved.cut()[1], R @ d) < 0.5
+    assert all(p.cut_axis is None for p in _gt_graph(_scene()).parts.values())
+
+
+def test_assemble_cut_axis_option():
+    cls, depth = _render(_scene())
+    base = assemble(cls, depth, K, cfg=AssembleConfig(min_component_px=10))
+    fit = assemble(cls, depth, K, cfg=AssembleConfig(min_component_px=10, cut_axis="fit"))
+    assert all(p.cut_axis is None for p in base.parts.values())
+    assert any(p.cut_axis is not None for p in fit.parts.values() if p.cls != TRUNK)
+    for pid, p in base.parts.items():
+        assert np.array_equal(p.points, fit.parts[pid].points)
+    with pytest.raises(ValueError):
+        assemble(cls, depth, K, cfg=AssembleConfig(min_component_px=10, cut_axis="nope"))

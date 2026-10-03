@@ -109,6 +109,9 @@ class Part:
     score: float = 1.0
     name: str = ""
     visible: np.ndarray | None = None  # (N,) bool; ground truth only
+    # Predictions only: a cut direction fitted away from the junction (assemble.fit_cut_axes);
+    # ground truth never sets it, so GT cuts keep the local tangent.
+    cut_axis: np.ndarray | None = None
 
     @property
     def length(self) -> float:
@@ -116,7 +119,8 @@ class Part:
 
     def cut(self, offset: float = CUT_OFFSET_M) -> tuple[np.ndarray, np.ndarray]:
         """Cut point ``offset`` metres above the base and the axis direction there."""
-        return point_at_arclength(self.points, min(offset, 0.5 * self.length))
+        point, tangent = point_at_arclength(self.points, min(offset, 0.5 * self.length))
+        return point, (tangent if self.cut_axis is None else self.cut_axis.copy())
 
     def to_json(self) -> dict:
         out = {
@@ -175,6 +179,7 @@ class TreeGraph:
                     score=p.score,
                     name=p.name,
                     visible=None if p.visible is None else p.visible.copy(),
+                    cut_axis=None if p.cut_axis is None else R @ p.cut_axis,
                 )
             )
         return out
