@@ -10,12 +10,12 @@
       "config": {},
       "complete": true,
       "n_frames": 240,
-      "skeleton_f1_2cm": 0.5936810892374019,
-      "edge_f1": 0.3988827718615502,
-      "cut_f1_jain": 0.3470526315789473,
-      "selection_score": 0.4465388308926331,
+      "skeleton_f1_2cm": 0.6143620272008479,
+      "edge_f1": 0.43540658953022415,
+      "cut_f1_jain": 0.36542998866739745,
+      "selection_score": 0.47173286846615653,
       "git": {
-        "commit": "3060ef8e973d17bb25c3a1687f9c68a83de3b544",
+        "commit": "8c1f54f22b7aa88727d2f4e245e82f51ce1c4b40",
         "scorer_files_status": "",
         "dirty": false
       },
@@ -28,12 +28,12 @@
       },
       "complete": true,
       "n_frames": 240,
-      "skeleton_f1_2cm": 0.5936248937938697,
-      "edge_f1": 0.4221522134069615,
-      "cut_f1_jain": 0.3729228415718519,
-      "selection_score": 0.46289998292422774,
+      "skeleton_f1_2cm": 0.6142892115541903,
+      "edge_f1": 0.46344697547359787,
+      "cut_f1_jain": 0.3981350257769014,
+      "selection_score": 0.49195707093489655,
       "git": {
-        "commit": "3060ef8e973d17bb25c3a1687f9c68a83de3b544",
+        "commit": "8c1f54f22b7aa88727d2f4e245e82f51ce1c4b40",
         "scorer_files_status": "",
         "dirty": false
       },
@@ -47,12 +47,12 @@
       },
       "complete": true,
       "n_frames": 240,
-      "skeleton_f1_2cm": 0.5923860431569546,
-      "edge_f1": 0.419584156679804,
-      "cut_f1_jain": 0.38162613033988146,
-      "selection_score": 0.46453211005887995,
+      "skeleton_f1_2cm": 0.6157322481442483,
+      "edge_f1": 0.4608307632157699,
+      "cut_f1_jain": 0.4023776484476938,
+      "selection_score": 0.49298021993590396,
       "git": {
-        "commit": "3060ef8e973d17bb25c3a1687f9c68a83de3b544",
+        "commit": "8c1f54f22b7aa88727d2f4e245e82f51ce1c4b40",
         "scorer_files_status": "",
         "dirty": false
       },
@@ -67,12 +67,12 @@
       },
       "complete": true,
       "n_frames": 240,
-      "skeleton_f1_2cm": 0.5924232770837761,
-      "edge_f1": 0.411473715493983,
-      "cut_f1_jain": 0.3667524523516467,
-      "selection_score": 0.4568831483098019,
+      "skeleton_f1_2cm": 0.6157487025678992,
+      "edge_f1": 0.4488763852593372,
+      "cut_f1_jain": 0.3824937225360954,
+      "selection_score": 0.4823729367877772,
       "git": {
-        "commit": "3060ef8e973d17bb25c3a1687f9c68a83de3b544",
+        "commit": "8c1f54f22b7aa88727d2f4e245e82f51ce1c4b40",
         "scorer_files_status": "",
         "dirty": false
       },
@@ -85,5 +85,6 @@
     "junction_bonus": 0.0,
     "depth_percentile": 50.0
   },
-  "selected_at": "2026-10-02T20:15:48-07:00"
+  "selected_at": "2026-10-02T20:59:42-07:00",
+  "supersedes": "eb92a5b selection (C) made on the assembly before the third blind review; re-run unchanged on 8c1f54f, still before any test scoring"
 }
