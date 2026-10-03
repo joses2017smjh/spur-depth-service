@@ -114,3 +114,62 @@ test scoring is a disclosed bug fix, never a retuned threshold.
   clone `776c36a` with config C
   (fixed at 20:58, before any test row existed), into its own directory, so
   the earlier rows are unchanged.
+
+# v2 additions (2026-10-03, fixed before any v2 test row)
+
+The splits, ground truth, scorer and assembly config C are unchanged from v1:
+`git diff 776c36a -- spur_depth/branches/metrics.py` is empty, and the new
+assembly option defaults to the v1 behaviour (GT and default predicted cuts
+checked byte-for-byte on four val frames). Every v2 comparison is chosen on
+the val trees, then scored once on the test trees from a frozen clone, into
+its own directory, with the v1 fingerprinted rows and integrity checks.
+
+## New methods and their val selection rules
+
+| item | candidates | val rule (ties to the earlier candidate) |
+| --- | --- | --- |
+| fitted cut axis (`cut_axis="fit"`): a predicted part's cut direction is the principal direction of its axis between arc lengths lo and hi above the junction, past the bend that thinning puts into a skeleton at a junction; GT cuts keep the local tangent | tangent (v1); fit 3-8 cm; fit 2-10 cm; fit 3-15 cm | highest strict cut recall (2 cm, 15 deg), `branchnet` + `fused`, all 240 val frames |
+| `cdm` depth: Camera Depth Model refinement (arXiv 2509.02530, ICLR 2026) of the same simulated D435 frame, by `scripts/refine_depth_cdm.py`; lift only, as for `fused` (the classifier sees raw sensor depth); weights CC-BY-NC-4.0, trained indoors | checkpoint (d435, l515, base) x input size (518, 1036), after the channel order and fp16 were checked | largest share of GT wood pixels within 2 cm of GT depth, every 5th val frame; no accuracy is computed on test frames |
+| BranchNet fine-tune (`branchnet` with the new run's predictions): warm start from run 21523238's best.pt (epoch 20, val mIoU 0.784), decoder lr 2e-4 (encoder x0.33), 100 warm-up iterations, seed 1, 80 min (Slurm 21532184, commit `eabe197`) | one run | checkpoint by val tree-class mIoU, as in v1. Its test rows are scored whatever its val mIoU. The v1 curve had flattened with the learning rate fully decayed, so a small change is expected |
+| multi-view fusion (`<method>_mv`, `scripts/eval_branches_multiview.py`, `spur_depth/branches/multiview.py`): one group is one rig of one tree, 6 heights x 2 eyes = 12 frames; each frame's graph (config C + the chosen cut axis) is moved to the world frame with its logged pose, parts are associated across frames by 3D overlap, merged (per-cm median along the longest member) and connected by parent votes and a maximum spanning arborescence; each frame is scored on its view of the fused graph, culled by that frame's own predicted wood mask (never GT) | association tolerance 3 or 5 cm x minimum views 1 or 2 x view `anchored` (only parts the frame itself detected) or `seen` (any fused part on the frame's wood) x axis smoothing 0 or 2 cm (16 configs, base extension on) | highest mean of skeleton F1 @ 2 cm, edge F1 and cut F1 (Jain), `branchnet_mv` + `fused`, all 20 val groups, with the cut axis chosen above. Multi-view is scored on test only if that config beats single-frame on the same mean on val (same frames, same assembly); otherwise it is reported as a val-only result |
+
+## Real images and a robot-geometry proxy (no test-tree tuning either)
+
+- **MFO cherry UFO "Labelled Data"** (MFO dataset, CVPRW 2025; real
+  640x480 RGB, labelme polygons), zero-shot BranchNet with no depth input
+  (valid = 0, seen in 10% of training crops). Classes: `leader` to trunk,
+  `sidebranch` to branch (BranchNet's branch and shoot merged), `spur` to spur,
+  `other` ignored (wood for the binary score), wires and unlabelled to
+  background. The resize factor (x1, x1.6, x2.4) is chosen on the MFO val split
+  (videos 164-173) by 3-class mIoU, then reported on the MFO test (174-184) and
+  train (89-163) splits. No MFO image is committed: the data carry no licence.
+- **Isaac cut proxy** (`scripts/isaac_cut_proxy.py`, CPU only): each predicted cut
+  paired with a GT cut (the scorer's Jain-tier assignment) drives the UR5e
+  pruner geometry from a frozen clone of isaac-sim-pruning-workflow, posed by a
+  fixed rule (approach along the camera ray made perpendicular to the perceived
+  axis, closing axis = approach x axis). Success is judged against the true
+  branch and the other true wood. The truth-segment length and the pose rule are
+  fixed on val with a perfect-perception control. It is a geometric proxy, not
+  an Isaac result.
+
+## Comparisons claimed (v2)
+
+1. Fitted vs tangent cut axis, every method and depth source.
+2. `cdm` vs `fused` vs `sensor` depth, `branchnet` and `oracle`.
+3. Fine-tuned vs v1 BranchNet.
+4. Multi-view vs single-frame (`branchnet` with `sensor` and `fused`, `oracle` with `fused`).
+5. MFO zero-shot pixel scores, reported as absolute numbers. The paper's
+   adapted models (MIC 47.6, SGDR 56.2 mIoU, trained on unlabelled real images)
+   are context, not a baseline under the same protocol.
+6. Proxy cut success with tangent and fitted axes, plus the perfect-perception ceiling.
+
+## Disclosures (v2, before any v2 test row)
+
+- Val only: the cut-error diagnostic that motivated the fitted axis (every 6th
+  val frame); a partial read (62 of 240 frames) of the cut-axis selection run
+  while it was still running; and four multi-view smoke runs on group
+  `lpy_envy_00001/box_cam1` that led to the `anchored` view, the smoothing
+  option and an `extend_base` switch (left on: switching it off did not help).
+- The MFO scoping agent looked at GT overlays of four labelled frames (MFO test
+  174_15, 177_34, 184_20 and one RozaCloudyAfternoon frame) and measured label
+  widths on the 15 MFO test frames; nothing was tuned on them.

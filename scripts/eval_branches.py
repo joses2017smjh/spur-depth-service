@@ -11,6 +11,9 @@ BranchNet's prediction step read them:
   da2       DA2-ft monocular metric depth, i.e. RGB only
   fused     sensor depth where it agrees with affine-aligned DA2-ft, DA2-ft elsewhere
             (spur_depth.branches.depth_fusion); the classifier still sees raw sensor depth
+  cdm       Camera Depth Model (CDM-D435, ICLR 2026) refinement of the same simulated
+            sensor frame, precomputed by scripts/refine_depth_cdm.py into --cdm-dir;
+            lift only, the classifier still sees raw sensor depth
 
 Every row carries a fingerprint of the scorer code, assembly config, inputs and
 method; a row is reused only when its fingerprint matches, and the summary
@@ -38,13 +41,14 @@ import numpy as np
 
 from spur_depth.branches import gt as G
 from spur_depth.branches.assemble import AssembleConfig, assemble
-from spur_depth.branches.dataset import frame_depth, load_cached_frame
+from spur_depth.branches.dataset import frame_depth, load_cached_frame, read_depth_m
 from spur_depth.branches.depth_fusion import fuse_sensor_mono
 from spur_depth.branches.metrics import aggregate, evaluate_frame, segmentation_counts
 from spur_depth.branches.tree import CLASSES, IGNORE, TreeGraph
 
 REPO = Path(__file__).resolve().parents[1]
 CACHE = Path("/nfs/hpc/share/sanchej7/spur-branch-cache/v1")
+CDM_DIR = Path("/nfs/hpc/share/sanchej7/spur-branch-eval/depth/cdm")
 TINYUNET = REPO / "weights" / "trunk_unet_100tree.pt"
 SCORER_FILES = (
     *sorted(str(p.relative_to(REPO)) for p in (REPO / "spur_depth" / "branches").glob("*.py")),
@@ -52,7 +56,8 @@ SCORER_FILES = (
     "docs/BRANCH_PROTOCOL.md",
 )
 METHODS = ("oracle", "tinyunet", "branchnet")
-DEPTHS = ("gt", "sensor", "da2", "fused")
+DEPTHS = ("gt", "sensor", "da2", "fused", "cdm")
+LIFT_ONLY = ("fused", "cdm")  # depth sources the classifier never sees: it gets raw sensor
 
 
 def _sha(path: Path) -> str | None:
@@ -140,6 +145,16 @@ def provenance(args, cfg: AssembleConfig) -> dict:
         "pred": pred,
         "cache": str(args.cache),
         "assemble_config": asdict(cfg),
+        **(
+            {
+                "cdm": {
+                    "dir": str(args.cdm_dir),
+                    "manifest_sha256": _sha(args.cdm_dir / "manifest.json"),
+                }
+            }
+            if "cdm" in args.depths
+            else {}
+        ),
     }
 
 
@@ -170,6 +185,7 @@ def main(argv=None) -> int:
     ap.add_argument("--depths", nargs="+", default=["gt"], choices=DEPTHS)
     ap.add_argument("--cache", type=Path, default=CACHE)
     ap.add_argument("--pred-dir", type=Path, default=None)
+    ap.add_argument("--cdm-dir", type=Path, default=CDM_DIR, help="refined depth for 'cdm'")
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--limit", type=int, default=0, help="first N frames per tree (val only)")
     ap.add_argument("--every", type=int, default=1, help="every Nth frame per tree (val only)")
@@ -227,13 +243,15 @@ def main(argv=None) -> int:
             return depths[src]
 
         for method, source, row_p in todo:
-            net_source = "sensor" if source == "fused" else source
+            net_source = "sensor" if source in LIFT_ONLY else source
             cls, conf, tweak, per_class = predicted_classes(
                 method, ref, net_source, gt_cls, frame, args.pred_dir, tiny
             )
             if source == "fused":
                 wood = (cls > 0) & (cls != IGNORE) if method != "oracle" else gt_cls > 0
                 depth, _ = fuse_sensor_mono(get_depth("sensor"), get_depth("da2"), wood)
+            elif source == "cdm":
+                depth = read_depth_m(args.cdm_dir / ref.tree / ref.rig / f"{ref.stem}.depth.png")
             else:
                 depth = get_depth(source)
             ts = time.time()
@@ -275,7 +293,7 @@ def summarize_dir(args, prov: dict) -> dict:
             continue
         groups[key][m["key"]] = r
     result = {
-        "protocol": "docs/BRANCH_PROTOCOL.md v1",
+        "protocol": "docs/BRANCH_PROTOCOL.md v2",
         "split": args.split,
         "trees": list(G.PAPER_TEST if args.split == "test" else G.VAL_TREES),
         "frames_expected": len(expected),

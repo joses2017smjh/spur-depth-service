@@ -303,3 +303,40 @@ def test_assemble_cut_axis_option():
         assert np.array_equal(p.points, fit.parts[pid].points)
     with pytest.raises(ValueError):
         assemble(cls, depth, K, cfg=AssembleConfig(min_component_px=10, cut_axis="nope"))
+
+
+def test_multiview_fusion_merges_views_votes_parents_and_averages_noise():
+    from spur_depth.branches.multiview import FuseConfig, fuse, to_world, view_graph
+
+    gt = _gt_graph(_scene())  # world frame = camera 0
+    rng = np.random.default_rng(0)
+    views, poses = [], []
+    for k in range(6):
+        T = np.eye(4)
+        T[:3, 3] = [0.0, 0.04 * k - 0.1, 0.0]  # a vertical sweep
+        cam = gt.transformed(T[:3, :3], T[:3, 3], "camera")
+        noisy = TreeGraph()
+        for p in cam.parts.values():
+            q = p.points + rng.normal(0.0, 0.006, p.points.shape) * [0.0, 0.0, 1.0]
+            noisy.add(Part(p.pid, p.cls, q, p.radius.copy(), p.parent, p.attach))
+        views.append(to_world(noisy, T))
+        poses.append(T)
+    fused = fuse(views, FuseConfig(smooth_m=0.02))
+    assert sorted(p.cls for p in fused.parts.values()) == [TRUNK, BRANCH, SPUR]
+    by_cls = {p.cls: p for p in fused.parts.values()}
+    assert by_cls[TRUNK].parent is None
+    assert fused.parts[by_cls[BRANCH].parent].cls == TRUNK
+    assert fused.parts[by_cls[SPUR].parent].cls == BRANCH
+    # Depth noise averages out: the fused spur axis is closer to the truth than one view.
+    true_spur = gt.parts[2].points
+    err_fused = np.abs(by_cls[SPUR].points[:, 2] - Z).mean()
+    err_view = np.abs(views[0].parts[2].points[:, 2] - true_spur[:, 2]).mean()
+    assert err_fused < 0.6 * err_view
+    # Views: everything on wood is kept; anchored keeps only the frame's own parts.
+    wood = np.ones((H, W), bool)
+    assert len(view_graph(fused, poses[0], K, wood, FuseConfig()).parts) == 3
+    assert len(view_graph(fused, poses[0], K, np.zeros((H, W), bool), FuseConfig()).parts) == 0
+    anchored = view_graph(fused, poses[0], K, wood, FuseConfig(view_mode="anchored"), frame=0)
+    assert len(anchored.parts) == 3
+    with pytest.raises(ValueError):
+        view_graph(fused, poses[0], K, wood, FuseConfig(view_mode="anchored"))
