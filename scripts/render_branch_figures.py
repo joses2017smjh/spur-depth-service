@@ -96,6 +96,7 @@ def _frame(ref: G.FrameRef, pred_dir: Path, cfg: AssembleConfig, model=None, met
         "depths": {"gt": depth, "sensor": sensor, "da2": da2, "fused": fused},
         "model": model,
         "cfg": cfg,
+        "method": method,
     }
 
 
@@ -122,20 +123,29 @@ def _tree_box(frames: list[dict], pad: float = 0.04) -> tuple[int, int, int, int
     )
 
 
-def sweep_gif(frames: list[dict], out: Path, panel_h: int = 420) -> None:
-    """RGB | predicted graph | ground truth, cropped to the tree, one tile per height."""
+def sweep_gif(
+    frames: list[dict], out: Path, panel_h: int = 380, extra: list[tuple[str, list[dict]]] = ()
+) -> None:
+    """RGB | [extra predicted graphs] | predicted graph | ground truth, cropped to the tree."""
     x0, y0, x1, y1 = _tree_box(frames)
     s = panel_h / float(y1 - y0)
+    names = {"branchnet": "BranchNet", "tinyunet": "existing TinyUNet", "oracle": "GT classes"}
     tiles = []
     for k, f in enumerate(frames):
         rgb = f["rgb"][y0:y1, x0:x1]
         K = f["K"].copy()
         K[0, 2] -= x0
         K[1, 2] -= y0
-        a = label(cv2.resize(rgb, None, fx=s, fy=s, interpolation=cv2.INTER_AREA), "RGB")
-        b = label(draw_graph_2d(rgb, f["pred"], K, scale=s), "predicted graph")
-        c = label(draw_graph_2d(rgb, _visible(f["gt"]), K, scale=s), "ground truth")
-        row = np.concatenate([a, b, c], 1)
+        panels = [label(cv2.resize(rgb, None, fx=s, fy=s, interpolation=cv2.INTER_AREA), "RGB")]
+        for name, other in extra:
+            panels.append(
+                label(draw_graph_2d(rgb, other[k]["pred"], K, scale=s), f"{names[name]} + graph")
+            )
+        panels.append(
+            label(draw_graph_2d(rgb, f["pred"], K, scale=s), f"{names[f['method']]} + graph")
+        )
+        panels.append(label(draw_graph_2d(rgb, _visible(f["gt"]), K, scale=s), "ground truth"))
+        row = np.concatenate(panels, 1)
         row = label(row, f"camera height {k + 1}/6", y=row.shape[0] - 10, x=row.shape[1] - 210)
         tiles.append(np.concatenate([row, legend_strip(row.shape[1])], 0))
     save_gif(tiles, out, duration=900)
@@ -211,6 +221,7 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--pred-dir", type=Path, default=None)
     ap.add_argument("--method", choices=("branchnet", "tinyunet", "oracle"), default="branchnet")
+    ap.add_argument("--compare", nargs="*", default=[], choices=("branchnet", "tinyunet", "oracle"))
     ap.add_argument("--tree", default=G.PAPER_TEST[1])
     ap.add_argument("--rig", default="box_cam1")
     ap.add_argument("--side", default="l")
@@ -227,7 +238,8 @@ def main(argv=None) -> int:
         model = f["model"]
         frames.append(f)
         print("framed", ref.key, len(f["pred"].parts), flush=True)
-    sweep_gif(frames, args.out / "branch_sweep.gif")
+    extra = [(m, [_frame(r, args.pred_dir, cfg, model, m) for r in refs]) for m in args.compare]
+    sweep_gif(frames, args.out / "branch_sweep.gif", extra=extra)
     orbit_gif(
         frames,
         args.out / "branch_orbit.gif",
@@ -241,6 +253,7 @@ def main(argv=None) -> int:
                 "rig": args.rig,
                 "side": args.side,
                 "method": args.method,
+                "compare": args.compare,
                 "assemble_config": json.loads(args.cfg),
                 "depth_png_frame": refs[2].key,
                 "depth_png_metrics": rep,
