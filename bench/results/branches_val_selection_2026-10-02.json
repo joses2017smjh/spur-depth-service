@@ -1,0 +1,89 @@
+{
+  "rule": "docs/BRANCH_PROTOCOL.md: maximise mean(skeleton F1 @ 2 cm, edge F1, cut F1 Jain) on val, ties to the earlier letter",
+  "fallback_invoked": true,
+  "fallback_reason": "BranchNet val predictions unavailable: GPU job 21520501 (commit e23b40f) still queued (QOSGrpCpuLimit) when scoring started",
+  "method": "oracle",
+  "depth": "fused",
+  "split": "val",
+  "candidates": {
+    "A": {
+      "config": {},
+      "complete": true,
+      "n_frames": 240,
+      "skeleton_f1_2cm": 0.5936810892374019,
+      "edge_f1": 0.3988827718615502,
+      "cut_f1_jain": 0.3470526315789473,
+      "selection_score": 0.4465388308926331,
+      "git": {
+        "commit": "3060ef8e973d17bb25c3a1687f9c68a83de3b544",
+        "scorer_files_status": "",
+        "dirty": false
+      },
+      "frame_keys_sha256": "d9b94144a4912febed4eff58d0cb4e0e3fb8ce13ee8943ddfbb237ac4391d5f1"
+    },
+    "B": {
+      "config": {
+        "orphan_cost": 1.2,
+        "junction_bonus": 0.0
+      },
+      "complete": true,
+      "n_frames": 240,
+      "skeleton_f1_2cm": 0.5936248937938697,
+      "edge_f1": 0.4221522134069615,
+      "cut_f1_jain": 0.3729228415718519,
+      "selection_score": 0.46289998292422774,
+      "git": {
+        "commit": "3060ef8e973d17bb25c3a1687f9c68a83de3b544",
+        "scorer_files_status": "",
+        "dirty": false
+      },
+      "frame_keys_sha256": "d9b94144a4912febed4eff58d0cb4e0e3fb8ce13ee8943ddfbb237ac4391d5f1"
+    },
+    "C": {
+      "config": {
+        "orphan_cost": 1.2,
+        "junction_bonus": 0.0,
+        "depth_percentile": 50.0
+      },
+      "complete": true,
+      "n_frames": 240,
+      "skeleton_f1_2cm": 0.5923860431569546,
+      "edge_f1": 0.419584156679804,
+      "cut_f1_jain": 0.38162613033988146,
+      "selection_score": 0.46453211005887995,
+      "git": {
+        "commit": "3060ef8e973d17bb25c3a1687f9c68a83de3b544",
+        "scorer_files_status": "",
+        "dirty": false
+      },
+      "frame_keys_sha256": "d9b94144a4912febed4eff58d0cb4e0e3fb8ce13ee8943ddfbb237ac4391d5f1"
+    },
+    "D": {
+      "config": {
+        "orphan_cost": 1.2,
+        "junction_bonus": 0.0,
+        "depth_percentile": 50.0,
+        "attach_tol_m": 0.07
+      },
+      "complete": true,
+      "n_frames": 240,
+      "skeleton_f1_2cm": 0.5924232770837761,
+      "edge_f1": 0.411473715493983,
+      "cut_f1_jain": 0.3667524523516467,
+      "selection_score": 0.4568831483098019,
+      "git": {
+        "commit": "3060ef8e973d17bb25c3a1687f9c68a83de3b544",
+        "scorer_files_status": "",
+        "dirty": false
+      },
+      "frame_keys_sha256": "d9b94144a4912febed4eff58d0cb4e0e3fb8ce13ee8943ddfbb237ac4391d5f1"
+    }
+  },
+  "winner": "C",
+  "winner_config": {
+    "orphan_cost": 1.2,
+    "junction_bonus": 0.0,
+    "depth_percentile": 50.0
+  },
+  "selected_at": "2026-10-02T20:15:48-07:00"
+}
