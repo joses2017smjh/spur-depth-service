@@ -2,7 +2,7 @@
 
 Writes into --out (default docs/readme):
   branch_sweep.gif    one rig's 6-height camera sweep: RGB | prediction | ground truth
-  branch_orbit.gif    every frame of that rig, predicted graphs placed in the world frame
+  branch_orbit.gif    the 6 heights of that rig, predicted graphs placed in the world frame
                       with logged poses, over the GT axes in grey
   branch_depth.png    one frame lifted with each depth source, seen from above (x-z)
 
@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import argparse
 import json
+from dataclasses import replace
 from pathlib import Path
 
 import cv2
@@ -46,16 +47,42 @@ def _cls(pred_dir: Path, source: str, ref: G.FrameRef):
     return cls, conf
 
 
-def _frame(ref: G.FrameRef, pred_dir: Path, cfg: AssembleConfig, model=None):
+_TINY = None
+
+
+def _classes(method: str, ref: G.FrameRef, pred_dir: Path | None, rgb, fg):
+    """(class map, confidence, assembly tweaks) for the method shown in the figures."""
+    global _TINY
+    if method == "branchnet":
+        cls, conf = _cls(pred_dir, "sensor", ref)
+        return cls, conf, {}
+    if method == "oracle":
+        return fg.cls, None, {}
+    if _TINY is None:
+        import importlib.util
+
+        spec = importlib.util.spec_from_file_location(
+            "eval_branches", Path(__file__).with_name("eval_branches.py")
+        )
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        _TINY = mod.TinyUNetBaseline()
+    return _TINY(rgb).astype(np.uint8), None, {"geometric_classes": True}
+
+
+def _frame(ref: G.FrameRef, pred_dir: Path, cfg: AssembleConfig, model=None, method="branchnet"):
     rgb, depth, mask, ann = G.load_frame(ref)
     K, T = load_pose(ann)
     K, T = K.astype(np.float64), T.astype(np.float64)
     model = model or G.load_tree_model(ref.tree, ann)
     fg = G.label_frame(model, K, T, depth, mask)
+    # Same depth realisation the scorer and BranchNet used: the cached mm depth.
+    depth = np.round(np.minimum(depth, 65.535) * 1000.0) / 1000.0
     sensor = simulate_sensor(depth, fg.cls > 0, frame_seed(ref.key))
     da2 = np.load(ref.path("Da2Finetune")).astype(np.float32)
-    cls, conf = _cls(pred_dir, "sensor", ref)
-    wood = (cls > 0) & (cls != IGNORE)
+    cls, conf, tweak = _classes(method, ref, pred_dir, rgb, fg)
+    cfg = replace(cfg, **tweak)
+    wood = (cls > 0) & (cls != IGNORE) if method != "oracle" else fg.cls > 0
     fused, _ = fuse_sensor_mono(sensor, da2, wood)
     pred = assemble(cls, fused, K, conf=conf, cfg=cfg)
     return {
@@ -67,6 +94,7 @@ def _frame(ref: G.FrameRef, pred_dir: Path, cfg: AssembleConfig, model=None):
         "cls": cls,
         "depths": {"gt": depth, "sensor": sensor, "da2": da2, "fused": fused},
         "model": model,
+        "cfg": cfg,
     }
 
 
@@ -124,7 +152,7 @@ def depth_png(f: dict, out: Path, cfg: AssembleConfig) -> dict:
     report = {}
     gpts = np.concatenate([p.points[p.visible] for p in f["gt"].parts.values() if p.visible.any()])
     for ax, (key, title) in zip(axes, names.items()):
-        g = assemble(f["cls"], f["depths"][key], f["K"], cfg=cfg)
+        g = assemble(f["cls"], f["depths"][key], f["K"], cfg=f["cfg"])
         s = aggregate([evaluate_frame(g, f["gt"])])["summary"]
         report[key] = {k: s[k] for k in ("skeleton_f1_2cm", "edge_f1", "cut_recall_jain")}
         ax.scatter(gpts[:, 0], gpts[:, 2], s=0.3, c=MUTED, linewidths=0)
@@ -152,29 +180,30 @@ def depth_png(f: dict, out: Path, cfg: AssembleConfig) -> dict:
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--pred-dir", type=Path, required=True)
+    ap.add_argument("--pred-dir", type=Path, default=None)
+    ap.add_argument("--method", choices=("branchnet", "tinyunet", "oracle"), default="branchnet")
     ap.add_argument("--tree", default=G.PAPER_TEST[1])
     ap.add_argument("--rig", default="box_cam1")
     ap.add_argument("--side", default="l")
     ap.add_argument("--cfg", type=str, default="{}")
     ap.add_argument("--out", type=Path, default=Path("docs/readme"))
     args = ap.parse_args(argv)
-    from dataclasses import replace
-
     cfg = replace(AssembleConfig(), **json.loads(args.cfg))
     args.out.mkdir(parents=True, exist_ok=True)
     refs = [G.FrameRef(args.tree, args.rig, s, args.side) for s in G.SHOTS]
     model = None
     frames = []
     for ref in refs:
-        f = _frame(ref, args.pred_dir, cfg, model)
+        f = _frame(ref, args.pred_dir, cfg, model, args.method)
         model = f["model"]
         frames.append(f)
         print("framed", ref.key, len(f["pred"].parts), flush=True)
     sweep_gif(frames, args.out / "branch_sweep.gif")
-    other = [G.FrameRef(args.tree, args.rig, s, "r" if args.side == "l" else "l") for s in G.SHOTS]
-    both = frames + [_frame(r, args.pred_dir, cfg, model) for r in other]
-    orbit_gif(both, args.out / "branch_orbit.gif", f"{args.tree}: 12 frames, one rig, world frame")
+    orbit_gif(
+        frames,
+        args.out / "branch_orbit.gif",
+        f"{args.tree}: 6 camera heights placed in the world frame with their logged poses",
+    )
     rep = depth_png(frames[2], args.out / "branch_depth.png", cfg)
     (args.out / "branch_figures.json").write_text(
         json.dumps(

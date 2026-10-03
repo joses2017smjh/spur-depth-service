@@ -72,12 +72,6 @@ def draw_graph_2d(
         if len(pts) > 1:
             cv2.polylines(img, [pts], False, col, th, aa)
     for p in graph.parts.values():
-        if p.attach is not None:
-            (uv,), ok = project(p.attach[None], Ks)
-            if ok[0]:
-                cv2.circle(
-                    img, tuple(np.int32(uv)), max(2, int(3 * scale * 1.6)), (255, 255, 255), 1, aa
-                )
         if cuts and p.cls != TRUNK and p.parent is not None and p.length > 0:
             c, d = p.cut()
             seg = np.stack([c - 0.02 * d, c + 0.02 * d])
@@ -102,9 +96,25 @@ def label(img: np.ndarray, text: str, y: int = 22, x: int = 12, size: float = 0.
 
 
 def save_gif(frames: list[np.ndarray], path: Path, duration: int = 500, colors: int = 128) -> None:
-    ims = [Image.fromarray(f).convert("P", palette=Image.ADAPTIVE, colors=colors) for f in frames]
+    """Animated GIF whose palette always contains the exact class and chrome colours.
+
+    An adaptive palette alone drifts thin, rare colours (a 3 px blue trunk on a
+    brown field) to their neighbours, which would break the colour key.
+    """
+    fixed = [_rgb(c) for c in (HEX[TRUNK], HEX[BRANCH], HEX[SPUR], MUTED, INK, INK_2, SURFACE)]
+    fixed += [(255, 255, 255), (0, 0, 0)]
+    n_adapt = min(colors, 256 - len(fixed))
+    ims = []
+    for f in frames:
+        im = Image.fromarray(f)
+        adapt = im.convert("P", palette=Image.ADAPTIVE, colors=n_adapt).getpalette()[: 3 * n_adapt]
+        pal = adapt + [v for c in fixed for v in c]
+        pal += [0] * (768 - len(pal))
+        ref = Image.new("P", (1, 1))
+        ref.putpalette(pal)
+        ims.append(im.quantize(palette=ref, dither=Image.Dither.NONE))
     ims[0].save(
-        path, save_all=True, append_images=ims[1:], duration=duration, loop=0, optimize=True
+        path, save_all=True, append_images=ims[1:], duration=duration, loop=0, optimize=False
     )
 
 
@@ -135,8 +145,8 @@ def orbit_frames(
             if cut_points and p.cls != TRUNK and p.parent is not None and p.length > 0:
                 cuts.append(p.cut()[0])
     pts = np.concatenate(allpts) if allpts else np.zeros((1, 3))
-    lo = np.percentile(pts, 1, axis=0) - 0.05
-    hi = np.percentile(pts, 99, axis=0) + 0.05
+    lo = np.percentile(pts, 3, axis=0) - 0.05
+    hi = np.percentile(pts, 97, axis=0) + 0.05
     frames = []
     for az in azimuths:
         fig = plt.figure(figsize=size, facecolor=SURFACE)
@@ -166,7 +176,7 @@ def orbit_frames(
     return frames
 
 
-def legend_strip(width: int, height: int = 30) -> np.ndarray:
+def legend_strip(width: int, height: int = 30, with_gt: bool = False) -> np.ndarray:
     """Plain legend row: class colours, grey GT, white ring = junction, tick = cut axis."""
     img = np.full((height, width, 3), _rgb(SURFACE), np.uint8)
     x = 12
@@ -174,8 +184,7 @@ def legend_strip(width: int, height: int = 30) -> np.ndarray:
         (HEX[TRUNK], "trunk"),
         (HEX[BRANCH], "branch"),
         (HEX[SPUR], "shoot / spur"),
-        (MUTED, "ground truth"),
-    ]
+    ] + ([(MUTED, "ground truth")] if with_gt else [])
     for col, text in items:
         cv2.line(img, (x, height // 2), (x + 22, height // 2), _rgb(col), 3, cv2.LINE_AA)
         cv2.putText(
@@ -189,11 +198,10 @@ def legend_strip(width: int, height: int = 30) -> np.ndarray:
             cv2.LINE_AA,
         )
         x += 40 + 9 * len(text)
-    cv2.circle(img, (x + 6, height // 2), 5, _rgb(INK_2), 1, cv2.LINE_AA)
     cv2.putText(
         img,
-        "junction   white tick: cut point + axis",
-        (x + 16, height // 2 + 5),
+        "white tick: cut point (1.5 cm above the junction) along the cut axis",
+        (x, height // 2 + 5),
         cv2.FONT_HERSHEY_SIMPLEX,
         0.45,
         _rgb(INK_2),
