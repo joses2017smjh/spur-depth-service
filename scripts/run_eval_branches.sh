@@ -11,13 +11,15 @@
 #   eval_branches.py --summarize-only --out $OUT --split $SPLIT --cfg "$CFG"
 # once every task has finished. Submit (N = array size):
 #   sbatch --export=NONE --array=0-11 scripts/run_eval_branches.sh <sha> <split> <out> \
-#       <cfg-json-file> <pred-dir|none> "<methods>" "<depths>"
+#       <cfg-json-file> <pred-dir|none> <method,method> <depth,depth>
 
 set -euo pipefail
 export PATH=/usr/bin:/bin OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
 export PYTHONUNBUFFERED=1 MPLCONFIGDIR=/tmp/mpl-$SLURM_JOB_ID
 export TORCH_HOME=/nfs/hpc/share/sanchej7/.cache/torch XDG_CACHE_HOME=/nfs/hpc/share/sanchej7/.cache
-COMMIT=$1 SPLIT=$2 OUT=$3 CFG_FILE=$4 PRED=$5 METHODS=$6 DEPTHS=$7
+COMMIT=$1 SPLIT=$2 OUT=$3 CFG_FILE=$4 PRED=$5
+# Method and depth lists are comma-separated: sbatch re-splits quoted arguments.
+METHODS=${6//,/ } DEPTHS=${7//,/ }
 N=${SLURM_ARRAY_TASK_COUNT:?run as an array}
 REPO=/nfs/hpc/share/sanchej7/spur-depth-service
 PY=/nfs/hpc/share/sanchej7/miniforge3/envs/depth-env/bin/python
