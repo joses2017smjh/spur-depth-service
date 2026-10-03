@@ -19,6 +19,12 @@ Thin branches require depth in metres, explicit camera geometry, and a traceable
 
 All model accuracy above is synthetic. Real-orchard accuracy is unverified. Predicted-mask depth remains **0.112 m** versus **0.031 m** with ground-truth masks; detection and segmentation remain deployment constraints. [Research notes](docs/RESEARCH.md).
 
+## Camera intrinsics correction
+
+[![GT cylinder axes projected with the annotated K and with the render camera's K](docs/readme/k_fix_overlay.png)](docs/readme/k_fix_report.json)
+
+The `K` stored in every annotation, `[[2667, 0, 960], [0, 1500, 540]]`, is a hard-coded placeholder. The render camera is a 28 mm lens on a 36 mm sensor: f = 1493.3 px on both axes, principal point (959.5, 539.5); a free fit over 7 frames gives 1493.45 ± 0.10 px. With that `K`, ground-truth depth lies on the rendered branch cylinders with a **0.09 mm** median surface error instead of 7.2 cm, and the four-view DA2-ft reconstruction error falls from **7.0 cm to 7.4 mm**. Per-pixel depth RMSE does not use `K` and is unchanged. The six-view refiner was trained with the placeholder and has not been retrained. [Report](docs/readme/k_fix_report.json) · [Code](spur_depth/camera.py) · [Test](tests/test_camera.py)
+
 ## Architecture and decisions
 
 `RGB → fine-tuned Depth Anything V2 → optional six-view DINOv2 RGB+D refiner → metric depth → K / T_wc back-projection`

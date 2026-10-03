@@ -1,0 +1,53 @@
+{
+  "tree": "lpy_envy_00042",
+  "shot": "shot01",
+  "views": [
+    "box_l",
+    "box_r",
+    "box_cam1_l",
+    "box_cam1_r"
+  ],
+  "surface_error_vs_gt_cylinders": {
+    "gt_depth_annotated_K": {
+      "n_points": 29191,
+      "median_m": 0.0722976855333556,
+      "p90_m": 0.20083797514546342,
+      "frac_within_5mm": 0.062039669761227774
+    },
+    "gt_depth_render_K": {
+      "n_points": 29191,
+      "median_m": 8.568244058170492e-05,
+      "p90_m": 0.00018132625590768295,
+      "frac_within_5mm": 0.9984926861018807
+    },
+    "da2ft_depth_annotated_K": {
+      "n_points": 12975,
+      "median_m": 0.06954591026531395,
+      "p90_m": 0.1938617008091069,
+      "frac_within_5mm": 0.04238921001926782
+    },
+    "da2ft_depth_render_K": {
+      "n_points": 12975,
+      "median_m": 0.007371042412167547,
+      "p90_m": 0.035298360639350004,
+      "frac_within_5mm": 0.39090558766859346
+    }
+  },
+  "render_K": [
+    [
+      1493.3333740234375,
+      0.0,
+      959.5
+    ],
+    [
+      0.0,
+      1493.3333740234375,
+      539.5
+    ],
+    [
+      0.0,
+      0.0,
+      1.0
+    ]
+  ]
+}

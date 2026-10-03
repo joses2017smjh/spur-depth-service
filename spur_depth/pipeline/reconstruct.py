@@ -4,6 +4,9 @@ MVS nets (MSA-MVSNet and friends) learn a cost volume. We already have
 metric depth and Blender K / T_wc on every frame, so the geometry step is
 back-projection + merge — the same fusion those nets emit after depth
 regression. Poses come from ``ann/*.json`` (OpenCV world-to-camera).
+
+Intrinsics do not: the annotated ``K`` is a placeholder, see
+``spur_depth.camera``. ``load_pose`` returns the render camera's K.
 """
 
 from __future__ import annotations
@@ -12,6 +15,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
+from spur_depth.camera import intrinsics_from_ann
 from spur_depth.data.trunk_stereo_triplet import _euler_xyz_to_T
 
 
@@ -24,9 +28,10 @@ class Frame:
     T_wc: np.ndarray
 
 
-def load_pose(ann: dict) -> tuple[np.ndarray, np.ndarray]:
+def load_pose(ann: dict, *, trust_annotation_k: bool = False) -> tuple[np.ndarray, np.ndarray]:
+    """(K, T_wc) for one frame. ``trust_annotation_k`` reproduces pre-fix numbers."""
     cam = ann["camera"]
-    K = np.asarray(cam["intrinsics"]["K"], dtype=np.float32)
+    K = intrinsics_from_ann(ann, trust_annotation=trust_annotation_k).astype(np.float32)
     T_wc = _euler_xyz_to_T(cam["location"], cam["rotation_euler"])
     return K, T_wc
 
