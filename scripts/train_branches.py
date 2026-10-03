@@ -79,9 +79,18 @@ def pick_device(name: str | None) -> torch.device:
 
 
 def loader_kwargs(workers: int) -> dict:
+    """Spawned workers: a loader is rebuilt every epoch, and forking after validation has
+    started OpenCV/OpenMP thread pools deadlocks the new workers (job 21520501 hung at the
+    start of epoch 2). The timeout turns any future stall into an error, not an idle GPU."""
     if workers <= 0:
         return {"num_workers": 0}
-    return {"num_workers": workers, "worker_init_fn": worker_init_fn, "prefetch_factor": 2}
+    return {
+        "num_workers": workers,
+        "worker_init_fn": worker_init_fn,
+        "prefetch_factor": 2,
+        "multiprocessing_context": "spawn",
+        "timeout": 600,
+    }
 
 
 def _finite(v: float) -> float | None:
@@ -586,6 +595,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv=None) -> int:
+    cv2.setNumThreads(1)  # no OpenCV thread pool in the main process
     args = build_parser().parse_args(argv)
     return train(args) if args.cmd == "train" else predict_frames(args)
 
