@@ -7,6 +7,8 @@
 
 The budget is wall time, not epochs, because the GPU job has a hard limit and
 the per-epoch cost depends on the node (A40 / H100 / RTX 8000) and on Lustre.
+`train --init CKPT` warm-starts from an earlier run's weights (strict load); the
+optimizer and the learning-rate schedule start fresh.
 Both subcommands also run on CPU with tiny settings, e.g.
 
     train   --device cpu --max-minutes 0.5 --batch 2 --crop 128 --workers 0 --val-frames 2
@@ -16,6 +18,7 @@ Both subcommands also run on CPU with tiny settings, e.g.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 import os
@@ -191,6 +194,23 @@ def fit_iters(it: int, time_left: float, sec_per_iter: float, iters_per_epoch: i
     return it + int(max(time_left - val_s, 0.0) / max(per_iter, 1e-6))
 
 
+def load_init(model: BranchNet, path: Path) -> dict:
+    """Warm start: copy an earlier checkpoint's weights into ``model`` (strict)."""
+    blob = torch.load(path, map_location="cpu", weights_only=False)
+    model.load_state_dict(blob["model"], strict=True)
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(1 << 22), b""):
+            h.update(chunk)
+    return {
+        "path": str(path),
+        "sha256": h.hexdigest(),
+        "epoch": blob.get("epoch"),
+        "git_commit": blob.get("git_commit"),
+        "val_miou_tree": (blob.get("val") or {}).get("miou_tree"),
+    }
+
+
 def save_checkpoint(path: Path, model: BranchNet, **meta) -> None:
     """Atomic write, so a job killed mid-save never leaves a truncated best.pt."""
     state = {k: v.detach().cpu().contiguous() for k, v in model.state_dict().items()}
@@ -233,7 +253,15 @@ def train(args: argparse.Namespace) -> int:
     val_refs = pick_val(val_refs, args.val_frames)
 
     dtype = None if args.no_amp else amp_dtype(device)
-    model = BranchNet(pretrained=not args.no_pretrained).to(device)
+    model = BranchNet(pretrained=not (args.no_pretrained or args.init))
+    init = load_init(model, args.init) if args.init else None
+    if init:
+        print(
+            f"warm start from {init['path']} (epoch {init['epoch']}, val mIoU-tree "
+            f"{init['val_miou_tree']}, commit {init['git_commit']})",
+            flush=True,
+        )
+    model = model.to(device)
     if cuda:
         model = model.to(memory_format=torch.channels_last)
     n_params = sum(p.numel() for p in model.parameters())
@@ -265,6 +293,7 @@ def train(args: argparse.Namespace) -> int:
         n_params=n_params,
         torch=torch.__version__,
         n_train_frames=len(train_refs),
+        init_checkpoint=init,
         val_keys=[r.key for r in val_refs],
     )
     print(
@@ -577,6 +606,9 @@ def build_parser() -> argparse.ArgumentParser:
     t.add_argument("--no-amp", action="store_true")
     t.add_argument("--no-pretrained", action="store_true", help="random encoder init")
     t.add_argument("--limit-train", type=int, default=0, help="first N train frames (tests)")
+    t.add_argument(
+        "--init", type=Path, default=None, help="warm start from this checkpoint's weights"
+    )
 
     p = sub.add_parser("predict", help="full-frame predictions for held-out trees")
     p.add_argument("--ckpt", type=Path, required=True)

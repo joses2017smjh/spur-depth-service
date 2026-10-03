@@ -10,7 +10,10 @@
 # Train BranchNet from a frozen commit, then predict the val + paper-test trees.
 #
 #   sbatch --export=NONE,COMMIT=<sha> scripts/run_train_branches.sh
-#   sbatch --export=NONE scripts/run_train_branches.sh <sha> [max_minutes]
+#   sbatch --export=NONE scripts/run_train_branches.sh <sha> [max_minutes] [train args...]
+#
+# Arguments after max_minutes go to `train_branches.py train` unchanged, e.g. a warm
+# start: <sha> 80 --init /nfs/hpc/share/sanchej7/spur-branch-runs/<job>/best.pt --lr 2e-4
 #
 # `man sbatch` (25.11) says NONE accepts no explicit variables; if COMMIT does not
 # arrive that way, the positional form always works. The source is a shared clone
@@ -46,10 +49,11 @@ export PYTHONPATH="$RUN/src"
 
 echo "===== spur-branches job $SLURM_JOB_ID on $(hostname) at $(date -Is)"
 echo "commit $(git -C "$RUN/src" rev-parse HEAD) (requested $COMMIT), max train minutes $MAX_MIN"
+echo "extra train args: ${*:3}"
 nvidia-smi || true
 
 "$PY" "$RUN/src/scripts/train_branches.py" train \
-    --cache "$CACHE" --out "$RUN" --max-minutes "$MAX_MIN"
+    --cache "$CACHE" --out "$RUN" --max-minutes "$MAX_MIN" "${@:3}"
 echo "===== train done at $(date -Is)"
 
 "$PY" "$RUN/src/scripts/train_branches.py" predict \
