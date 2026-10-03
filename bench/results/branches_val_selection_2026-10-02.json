@@ -19,7 +19,7 @@
         "scorer_files_status": "",
         "dirty": false
       },
-      "frame_keys_sha256": "d9b94144a4912febed4eff58d0cb4e0e3fb8ce13ee8943ddfbb237ac4391d5f1"
+      "frame_list_sha256": "d9b94144a4912febed4eff58d0cb4e0e3fb8ce13ee8943ddfbb237ac4391d5f1"
     },
     "B": {
       "config": {
@@ -37,7 +37,7 @@
         "scorer_files_status": "",
         "dirty": false
       },
-      "frame_keys_sha256": "d9b94144a4912febed4eff58d0cb4e0e3fb8ce13ee8943ddfbb237ac4391d5f1"
+      "frame_list_sha256": "d9b94144a4912febed4eff58d0cb4e0e3fb8ce13ee8943ddfbb237ac4391d5f1"
     },
     "C": {
       "config": {
@@ -56,7 +56,7 @@
         "scorer_files_status": "",
         "dirty": false
       },
-      "frame_keys_sha256": "d9b94144a4912febed4eff58d0cb4e0e3fb8ce13ee8943ddfbb237ac4391d5f1"
+      "frame_list_sha256": "d9b94144a4912febed4eff58d0cb4e0e3fb8ce13ee8943ddfbb237ac4391d5f1"
     },
     "D": {
       "config": {
@@ -76,7 +76,7 @@
         "scorer_files_status": "",
         "dirty": false
       },
-      "frame_keys_sha256": "d9b94144a4912febed4eff58d0cb4e0e3fb8ce13ee8943ddfbb237ac4391d5f1"
+      "frame_list_sha256": "d9b94144a4912febed4eff58d0cb4e0e3fb8ce13ee8943ddfbb237ac4391d5f1"
     }
   },
   "winner": "C",

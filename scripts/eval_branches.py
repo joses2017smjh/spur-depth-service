@@ -279,7 +279,7 @@ def summarize_dir(args, prov: dict) -> dict:
         "split": args.split,
         "trees": list(G.PAPER_TEST if args.split == "test" else G.VAL_TREES),
         "frames_expected": len(expected),
-        "frame_keys_sha256": hashlib.sha256("\n".join(sorted(expected)).encode()).hexdigest(),
+        "frame_list_sha256": hashlib.sha256("\n".join(sorted(expected)).encode()).hexdigest(),
         "argv": {k: (str(v) if isinstance(v, Path) else v) for k, v in vars(args).items()},
         "git": git_state(REPO),
         "provenance": prov,
