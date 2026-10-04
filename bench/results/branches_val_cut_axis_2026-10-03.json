@@ -1,0 +1,306 @@
+{
+  "what": "val selection of the prediction-side cut axis (protocol v2)",
+  "rule": "highest strict cut recall (2 cm, 15 deg), branchnet + fused depth, all 240 val frames; ties to the earlier candidate in [tangent, fit_3_8, fit_2_10, fit_3_15]",
+  "candidates": {
+    "tangent": null,
+    "fit_3_8": [
+      0.03,
+      0.08
+    ],
+    "fit_2_10": [
+      0.02,
+      0.1
+    ],
+    "fit_3_15": [
+      0.03,
+      0.15
+    ]
+  },
+  "n_frames": 240,
+  "frame_list_sha256": "d9b94144a4912febed4eff58d0cb4e0e3fb8ce13ee8943ddfbb237ac4391d5f1",
+  "source_commit": "6b3addf",
+  "assemble_config_base": {
+    "orphan_cost": 1.2,
+    "junction_bonus": 0.0,
+    "depth_percentile": 50.0
+  },
+  "branchnet_pred": "/nfs/hpc/share/sanchej7/spur-branch-runs/21523238/pred",
+  "criterion": {
+    "tangent": 0.1343,
+    "fit_3_8": 0.1602,
+    "fit_2_10": 0.1796,
+    "fit_3_15": 0.1891
+  },
+  "winner": "fit_3_15",
+  "winner_config": {
+    "cut_axis": "fit",
+    "cut_fit_lo_m": 0.03,
+    "cut_fit_hi_m": 0.15
+  },
+  "table": {
+    "branchnet/fused/fit_2_10": {
+      "cut_recall_jain": 0.4472,
+      "cut_precision_jain": 0.3451,
+      "cut_f1_jain": 0.3896,
+      "cut_recall_strict": 0.1796,
+      "cut_precision_strict": 0.1376,
+      "cut_f1_strict": 0.1558,
+      "cut_angle_deg_mean_paired": 29.37,
+      "cut_dist_mm_mean_paired": 19.31,
+      "n_gt_cuts": 21035
+    },
+    "branchnet/fused/fit_3_15": {
+      "cut_recall_jain": 0.4702,
+      "cut_precision_jain": 0.3628,
+      "cut_f1_jain": 0.4096,
+      "cut_recall_strict": 0.1891,
+      "cut_precision_strict": 0.1449,
+      "cut_f1_strict": 0.1641,
+      "cut_angle_deg_mean_paired": 28.16,
+      "cut_dist_mm_mean_paired": 19.31,
+      "n_gt_cuts": 21035
+    },
+    "branchnet/fused/fit_3_8": {
+      "cut_recall_jain": 0.4335,
+      "cut_precision_jain": 0.3345,
+      "cut_f1_jain": 0.3776,
+      "cut_recall_strict": 0.1602,
+      "cut_precision_strict": 0.1228,
+      "cut_f1_strict": 0.139,
+      "cut_angle_deg_mean_paired": 30.86,
+      "cut_dist_mm_mean_paired": 19.31,
+      "n_gt_cuts": 21035
+    },
+    "branchnet/fused/tangent": {
+      "cut_recall_jain": 0.4283,
+      "cut_precision_jain": 0.3299,
+      "cut_f1_jain": 0.3727,
+      "cut_recall_strict": 0.1343,
+      "cut_precision_strict": 0.1028,
+      "cut_f1_strict": 0.1165,
+      "cut_angle_deg_mean_paired": 31.8,
+      "cut_dist_mm_mean_paired": 19.31,
+      "n_gt_cuts": 21035
+    },
+    "branchnet/gt/fit_2_10": {
+      "cut_recall_jain": 0.7011,
+      "cut_precision_jain": 0.6399,
+      "cut_f1_jain": 0.6691,
+      "cut_recall_strict": 0.4605,
+      "cut_precision_strict": 0.4165,
+      "cut_f1_strict": 0.4374,
+      "cut_angle_deg_mean_paired": 13.06,
+      "cut_dist_mm_mean_paired": 15.75,
+      "n_gt_cuts": 21035
+    },
+    "branchnet/gt/fit_3_15": {
+      "cut_recall_jain": 0.6926,
+      "cut_precision_jain": 0.6323,
+      "cut_f1_jain": 0.661,
+      "cut_recall_strict": 0.4187,
+      "cut_precision_strict": 0.3788,
+      "cut_f1_strict": 0.3978,
+      "cut_angle_deg_mean_paired": 15.87,
+      "cut_dist_mm_mean_paired": 15.75,
+      "n_gt_cuts": 21035
+    },
+    "branchnet/gt/fit_3_8": {
+      "cut_recall_jain": 0.7013,
+      "cut_precision_jain": 0.6402,
+      "cut_f1_jain": 0.6693,
+      "cut_recall_strict": 0.4549,
+      "cut_precision_strict": 0.4115,
+      "cut_f1_strict": 0.4321,
+      "cut_angle_deg_mean_paired": 13.27,
+      "cut_dist_mm_mean_paired": 15.75,
+      "n_gt_cuts": 21035
+    },
+    "branchnet/gt/tangent": {
+      "cut_recall_jain": 0.6591,
+      "cut_precision_jain": 0.6008,
+      "cut_f1_jain": 0.6286,
+      "cut_recall_strict": 0.2902,
+      "cut_precision_strict": 0.2623,
+      "cut_f1_strict": 0.2755,
+      "cut_angle_deg_mean_paired": 20.54,
+      "cut_dist_mm_mean_paired": 15.75,
+      "n_gt_cuts": 21035
+    },
+    "branchnet/sensor/fit_2_10": {
+      "cut_recall_jain": 0.4645,
+      "cut_precision_jain": 0.3982,
+      "cut_f1_jain": 0.4288,
+      "cut_recall_strict": 0.2226,
+      "cut_precision_strict": 0.1896,
+      "cut_f1_strict": 0.2047,
+      "cut_angle_deg_mean_paired": 29.76,
+      "cut_dist_mm_mean_paired": 17.39,
+      "n_gt_cuts": 21035
+    },
+    "branchnet/sensor/fit_3_15": {
+      "cut_recall_jain": 0.4569,
+      "cut_precision_jain": 0.3917,
+      "cut_f1_jain": 0.4218,
+      "cut_recall_strict": 0.2081,
+      "cut_precision_strict": 0.1773,
+      "cut_f1_strict": 0.1915,
+      "cut_angle_deg_mean_paired": 30.93,
+      "cut_dist_mm_mean_paired": 17.39,
+      "n_gt_cuts": 21035
+    },
+    "branchnet/sensor/fit_3_8": {
+      "cut_recall_jain": 0.4398,
+      "cut_precision_jain": 0.3768,
+      "cut_f1_jain": 0.4059,
+      "cut_recall_strict": 0.1839,
+      "cut_precision_strict": 0.1566,
+      "cut_f1_strict": 0.1692,
+      "cut_angle_deg_mean_paired": 31.93,
+      "cut_dist_mm_mean_paired": 17.39,
+      "n_gt_cuts": 21035
+    },
+    "branchnet/sensor/tangent": {
+      "cut_recall_jain": 0.4614,
+      "cut_precision_jain": 0.3951,
+      "cut_f1_jain": 0.4257,
+      "cut_recall_strict": 0.1576,
+      "cut_precision_strict": 0.1342,
+      "cut_f1_strict": 0.145,
+      "cut_angle_deg_mean_paired": 31.37,
+      "cut_dist_mm_mean_paired": 17.39,
+      "n_gt_cuts": 21035
+    },
+    "oracle/fused/fit_2_10": {
+      "cut_recall_jain": 0.4869,
+      "cut_precision_jain": 0.3764,
+      "cut_f1_jain": 0.4246,
+      "cut_recall_strict": 0.1992,
+      "cut_precision_strict": 0.153,
+      "cut_f1_strict": 0.1731,
+      "cut_angle_deg_mean_paired": 28.69,
+      "cut_dist_mm_mean_paired": 18.89,
+      "n_gt_cuts": 21035
+    },
+    "oracle/fused/fit_3_15": {
+      "cut_recall_jain": 0.5058,
+      "cut_precision_jain": 0.3912,
+      "cut_f1_jain": 0.4412,
+      "cut_recall_strict": 0.2033,
+      "cut_precision_strict": 0.1561,
+      "cut_f1_strict": 0.1766,
+      "cut_angle_deg_mean_paired": 27.84,
+      "cut_dist_mm_mean_paired": 18.89,
+      "n_gt_cuts": 21035
+    },
+    "oracle/fused/fit_3_8": {
+      "cut_recall_jain": 0.4694,
+      "cut_precision_jain": 0.363,
+      "cut_f1_jain": 0.4094,
+      "cut_recall_strict": 0.1788,
+      "cut_precision_strict": 0.1373,
+      "cut_f1_strict": 0.1553,
+      "cut_angle_deg_mean_paired": 30.13,
+      "cut_dist_mm_mean_paired": 18.89,
+      "n_gt_cuts": 21035
+    },
+    "oracle/fused/tangent": {
+      "cut_recall_jain": 0.4618,
+      "cut_precision_jain": 0.3565,
+      "cut_f1_jain": 0.4024,
+      "cut_recall_strict": 0.1468,
+      "cut_precision_strict": 0.1126,
+      "cut_f1_strict": 0.1274,
+      "cut_angle_deg_mean_paired": 31.25,
+      "cut_dist_mm_mean_paired": 18.89,
+      "n_gt_cuts": 21035
+    },
+    "oracle/gt/fit_2_10": {
+      "cut_recall_jain": 0.7594,
+      "cut_precision_jain": 0.7306,
+      "cut_f1_jain": 0.7447,
+      "cut_recall_strict": 0.5138,
+      "cut_precision_strict": 0.4893,
+      "cut_f1_strict": 0.5012,
+      "cut_angle_deg_mean_paired": 11.23,
+      "cut_dist_mm_mean_paired": 14.71,
+      "n_gt_cuts": 21035
+    },
+    "oracle/gt/fit_3_15": {
+      "cut_recall_jain": 0.7505,
+      "cut_precision_jain": 0.7223,
+      "cut_f1_jain": 0.7361,
+      "cut_recall_strict": 0.4673,
+      "cut_precision_strict": 0.445,
+      "cut_f1_strict": 0.4559,
+      "cut_angle_deg_mean_paired": 14.13,
+      "cut_dist_mm_mean_paired": 14.71,
+      "n_gt_cuts": 21035
+    },
+    "oracle/gt/fit_3_8": {
+      "cut_recall_jain": 0.7577,
+      "cut_precision_jain": 0.7292,
+      "cut_f1_jain": 0.7432,
+      "cut_recall_strict": 0.5036,
+      "cut_precision_strict": 0.4795,
+      "cut_f1_strict": 0.4912,
+      "cut_angle_deg_mean_paired": 11.61,
+      "cut_dist_mm_mean_paired": 14.71,
+      "n_gt_cuts": 21035
+    },
+    "oracle/gt/tangent": {
+      "cut_recall_jain": 0.7111,
+      "cut_precision_jain": 0.6836,
+      "cut_f1_jain": 0.6971,
+      "cut_recall_strict": 0.3325,
+      "cut_precision_strict": 0.3162,
+      "cut_f1_strict": 0.3241,
+      "cut_angle_deg_mean_paired": 18.73,
+      "cut_dist_mm_mean_paired": 14.71,
+      "n_gt_cuts": 21035
+    },
+    "oracle/sensor/fit_2_10": {
+      "cut_recall_jain": 0.5092,
+      "cut_precision_jain": 0.4465,
+      "cut_f1_jain": 0.4758,
+      "cut_recall_strict": 0.2525,
+      "cut_precision_strict": 0.2199,
+      "cut_f1_strict": 0.2351,
+      "cut_angle_deg_mean_paired": 27.95,
+      "cut_dist_mm_mean_paired": 16.79,
+      "n_gt_cuts": 21035
+    },
+    "oracle/sensor/fit_3_15": {
+      "cut_recall_jain": 0.5018,
+      "cut_precision_jain": 0.44,
+      "cut_f1_jain": 0.4688,
+      "cut_recall_strict": 0.2352,
+      "cut_precision_strict": 0.2049,
+      "cut_f1_strict": 0.219,
+      "cut_angle_deg_mean_paired": 28.98,
+      "cut_dist_mm_mean_paired": 16.79,
+      "n_gt_cuts": 21035
+    },
+    "oracle/sensor/fit_3_8": {
+      "cut_recall_jain": 0.4827,
+      "cut_precision_jain": 0.423,
+      "cut_f1_jain": 0.4509,
+      "cut_recall_strict": 0.2088,
+      "cut_precision_strict": 0.1818,
+      "cut_f1_strict": 0.1944,
+      "cut_angle_deg_mean_paired": 30.18,
+      "cut_dist_mm_mean_paired": 16.79,
+      "n_gt_cuts": 21035
+    },
+    "oracle/sensor/tangent": {
+      "cut_recall_jain": 0.4896,
+      "cut_precision_jain": 0.4286,
+      "cut_f1_jain": 0.4571,
+      "cut_recall_strict": 0.1706,
+      "cut_precision_strict": 0.1485,
+      "cut_f1_strict": 0.1588,
+      "cut_angle_deg_mean_paired": 30.32,
+      "cut_dist_mm_mean_paired": 16.79,
+      "n_gt_cuts": 21035
+    }
+  }
+}

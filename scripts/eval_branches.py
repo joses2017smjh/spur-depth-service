@@ -11,8 +11,9 @@ BranchNet's prediction step read them:
   da2       DA2-ft monocular metric depth, i.e. RGB only
   fused     sensor depth where it agrees with affine-aligned DA2-ft, DA2-ft elsewhere
             (spur_depth.branches.depth_fusion); the classifier still sees raw sensor depth
-  cdm       Camera Depth Model (CDM-D435, ICLR 2026) refinement of the same simulated
-            sensor frame, precomputed by scripts/refine_depth_cdm.py into --cdm-dir;
+  cdm       Camera Depth Model (CDM, ICLR 2026; checkpoint and preprocessing chosen on
+            val) refinement of the same simulated sensor frame, precomputed by
+            scripts/refine_depth_cdm.py into --cdm-dir;
             lift only, the classifier still sees raw sensor depth
 
 Every row carries a fingerprint of the scorer code, assembly config, inputs and
@@ -48,7 +49,9 @@ from spur_depth.branches.tree import CLASSES, IGNORE, TreeGraph
 
 REPO = Path(__file__).resolve().parents[1]
 CACHE = Path("/nfs/hpc/share/sanchej7/spur-branch-cache/v1")
-CDM_DIR = Path("/nfs/hpc/share/sanchej7/spur-branch-eval/depth/cdm")
+# Val round 2 winner (cdm_base, 518 px, sky filled at 20 m beyond 15 px of predicted wood);
+# round 1 (no sky fill) is in depth/cdm. See docs/BRANCH_PROTOCOL.md v2.
+CDM_DIR = Path("/nfs/hpc/share/sanchej7/spur-branch-eval/depth/cdm_skyfill")
 TINYUNET = REPO / "weights" / "trunk_unet_100tree.pt"
 SCORER_FILES = (
     *sorted(str(p.relative_to(REPO)) for p in (REPO / "spur_depth" / "branches").glob("*.py")),

@@ -176,3 +176,19 @@ its own directory, with the v1 fingerprinted rows and integrity checks.
 - The MFO scoping agent looked at GT overlays of four labelled frames (MFO test
   174_15, 177_34, 184_20 and one RozaCloudyAfternoon frame) and measured label
   widths on the 15 MFO test frames; nothing was tuned on them.
+
+## v2 val outcomes (fixed 2026-10-04, before any v2 test row)
+
+| item | val outcome | evidence |
+| --- | --- | --- |
+| cut axis | `fit` 3-15 cm wins: strict cut recall 0.189 vs tangent 0.134 (`branchnet` + `fused`, 240 frames). Test config = C + `{"cut_axis": "fit", "cut_fit_lo_m": 0.03, "cut_fit_hi_m": 0.15}` | `bench/results/branches_val_cut_axis_2026-10-03.json` |
+| CDM depth | round 1 best `base`@518: 3.0% of wood pixels within 2 cm; round 2 winner (15 px, 20 m) 7.7%, so round 2 is the `cdm` source; raw sensor 65.7%, `fused` 68.5%. Expected to lose to `fused`; scored on test as registered | `/nfs/hpc/share/sanchej7/spur-branch-eval/depth/cdm_skyfill_val_selection.json`, `.../cdm_val_selection.json` |
+| fine-tune | Slurm 21532184: 37 epochs in 79.4 min, best val tree-class mIoU 0.801 at epoch 30 (v1 run 0.784); 81.7 GPU-min of the 110 approved | `.../spur-branch-runs/21532184/history.json` |
+| multi-view | winner tolerance 3 cm, at least 2 views, `anchored`, 2 cm smoothing: criterion 0.505 vs single-frame 0.480 (skeleton F1 0.643 vs 0.603, edge F1 0.441 vs 0.427, cut F1 0.429 vs 0.410; strict cut recall 0.146 vs 0.189). It beats single-frame, so it is test-scored with fuse config `{"assoc_tol_m": 0.03, "min_views": 2, "view_mode": "anchored", "smooth_m": 0.02}` | `bench/results/branches_val_multiview_2026-10-03.json` |
+| MFO zero-shot | resize x1 chosen on MFO val (3-class mIoU 0.097 vs 0.091 at x1.6 and 0.065 at x2.4), written before any MFO train or test frame was predicted | `/nfs/hpc/share/sanchej7/spur-realdata/results/mfo_selection.json` |
+| Isaac proxy | truth segment 0.10 m (the control's isolated success is 1.0 at every length on the grid; the largest admissible length is kept) | `/nfs/hpc/share/sanchej7/spur-branch-eval/isaac_proxy/length_calibration.json` |
+
+The `cdm` source of `scripts/eval_branches.py` now defaults to the round-2
+directory. The fine-tune's predictions (`spur-branch-runs/21532184/pred`) are
+scored as `branchnet` in a separate output directory, so they never share rows
+with run 21523238's.
