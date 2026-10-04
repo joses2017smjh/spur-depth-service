@@ -208,3 +208,12 @@ with run 21523238's.
   assignment, input for input), its test guard, and its unit tests (5 pass).
 - Isaac proxy test runs: one output directory per configuration (tangent, fitted axis)
   and method, from a frozen clone, with the registered truth length (0.10 m).
+- Test summaries were first read at 15:19 PDT on 2026-10-04, after every v2 test row
+  existed. The README figures were rendered afterwards (`branch_cuts.gif`,
+  `branch_multiview.gif` on `lpy_envy_00065` box_cam1, `branch_v2.png`); their scripts
+  were tried on val tree `lpy_envy_00009` first. `branch_cuts.gif` was first rendered
+  with fused depth, then re-rendered with rendered depth, which shows the axis change
+  without depth error. That is a presentation choice made after seeing those test frames;
+  the tables report every depth source.
+- GPU: the fine-tune used 81.7 of the 110 approved GPU-minutes (dgxh). Local 2080 Ti:
+  CDM about 25 min (selection, sky-fill round and inference), MFO about 8 min.

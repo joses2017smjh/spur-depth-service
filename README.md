@@ -16,7 +16,7 @@ Thin branches require depth in metres, explicit camera geometry, and a traceable
 - **Re-render check:** seed 1 scores **0.0467 m** over 60 six-view groups; changed renders make this a separate evaluation. [Artifact](bench/results/tesla-v100-sxm3-32gb_2026-08-22_eval.json).
 - **Inference:** Tesla V100 fp16 refiner-only p50 **156 ms** for six 280×512 views, batch 1, 20 warmups and 200 timed calls. DA2 inference and HTTP overhead are excluded; the artifact retains earlier runs with larger tails. [Timing runs](bench/results/tesla-v100-sxm3-32gb_2026-08-22.json).
 - **Export parity:** Torch versus ONNX Runtime maximum absolute differences of **1.53e-5** for the encoder and **9.54e-7** for fuse/decode. This checks numerical agreement, not accuracy. [Artifact](bench/results/onnx_parity_2026-08-22.json).
-- **Branch perception:** on two held-out trees (120 frames) with fused D435 + DA2-ft depth, the new full-resolution BranchNet plus tree-graph assembly reaches skeleton F1 @2 cm **0.60** and Jain-criterion cut recall **0.40**, against **0.50** and **0.25** with the existing detector. [Section](#branch-perception-detect-localize-connect) · [Evidence](bench/results/branches_test_branchnet_2026-10-02.json)
+- **Branch perception:** on two held-out trees (120 frames) with fused D435 + DA2-ft depth, the new full-resolution BranchNet plus tree-graph assembly reaches skeleton F1 @2 cm **0.60** and Jain-criterion cut recall **0.40**, against **0.50** and **0.25** with the existing detector. A cut direction fitted past the junction (v2) raises strict cut recall (2 cm, 15°) from **0.12 to 0.17** (fused depth) and from **0.26 to 0.38** (rendered depth). [Section](#branch-perception-detect-localize-connect) · [Evidence](bench/results/branches_test_branchnet_2026-10-02.json) · [v2 evidence](bench/results/branches_test_v2_fitted_axis_2026-10-04.json)
 
 All model accuracy above is synthetic. Real-orchard accuracy is unverified. Predicted-mask depth remains **0.112 m** versus **0.031 m** with ground-truth masks; detection and segmentation remain deployment constraints. [Research notes](docs/RESEARCH.md).
 
@@ -64,7 +64,46 @@ A D435-class camera at 1-4 m cannot measure 6 mm wood: lost thin-wood pixels rea
 - **Learned detector:** BranchNet is a full-resolution RGB-D U-Net on a ResNet-34 with Skeleton Recall loss, whose depth input is drawn per crop from clean, simulated D435, DA2-ft or no depth. It trained for 60 min on one H100 MIG 4g.40gb slice (Slurm 21523238, commit `3fa8420`, 21 epochs, best val tree-class mIoU 0.78 at epoch 20) and was scored once on the test trees with the already-frozen config. A first run (21520501) hung after one epoch on a data-loader fork deadlock and was cancelled. [Training log](bench/results/branchnet_train_2026-10-02.json)
 - **Ground truth:** exact, from the L-Py metadata the renderer used and the corrected `K`: 127,910 of 127,911 tree pixels labelled at 0.06 mm median surface residual, with every part's parent, junction and visibility. [Code](spur_depth/branches/gt.py)
 - **Protocol:** splits, metrics, thresholds and the config-selection rule were committed before test scoring, after three blind reviews of the scorer, harness and assembly; one test frame's figure metrics were seen before scoring and are disclosed in the protocol. [Protocol](docs/BRANCH_PROTOCOL.md) · [Selection](bench/results/branches_val_selection_2026-10-02.json) · [Evidence](bench/results/branches_test_2026-10-02.json) · [BranchNet evidence](bench/results/branches_test_branchnet_2026-10-02.json)
-- **Scope:** synthetic Envy trees, one bark, 2 test trees and 120 correlated frames. The existing stack's part classes come from L-Py radii (10 mm vs 3 mm) that will not transfer to real trees, and BranchNet has never seen a real orchard. TinyUNet's published 0.930 IoU was measured at 256 px; at full resolution its wood IoU here is 0.72.
+- **Scope:** synthetic Envy trees, one bark, 2 test trees and 120 correlated frames. The existing stack's part classes come from L-Py radii (10 mm vs 3 mm) that will not transfer to real trees, and BranchNet was trained on renders only; on real cherry images it does not yet transfer (v2, below). TinyUNet's published 0.930 IoU was measured at 256 px; at full resolution its wood IoU here is 0.72.
+
+### v2: cut direction, multi-view fusion, real images, robot geometry
+
+[![Cut targets on held-out tree 00065, v1 tangent axis vs v2 fitted axis, coloured by strict and Jain success](docs/readme/branch_cuts.gif)](docs/readme/branch_cuts.json)
+
+A cutter needs the cut point and the direction of the wood there. v1 read the direction from the axis ±1.5 cm around the cut point, exactly where thinning bends a skeleton into its parent. v2 fits it to the predicted axis 3-15 cm past the junction (window chosen on val). Same predictions and cut points, only the direction changes: in the frame above (rendered depth) strict successes go from 20 to 34 of 103 cuts.
+
+[![Twelve single-frame graphs of one rig vs the fused tree, orbiting over the ground-truth axes](docs/readme/branch_multiview.gif)](docs/readme/branch_multiview.json)
+
+- **Fitted cut axis:** strict cut recall with BranchNet goes **0.12 → 0.17** (fused depth) and **0.26 → 0.38** (rendered depth); Jain recall **0.40 → 0.45** and **0.63 → 0.66**; the mean axis error of paired cuts drops 33° → 30° and 22° → 18°. Strict recall improves for every method, depth source and test tree, Jain recall in all but one case (BranchNet with raw D435 on tree 00065: 0.443 → 0.438); skeleton and edge scores are unchanged by construction. [Val selection](bench/results/branches_val_cut_axis_2026-10-03.json)
+- **Multi-view fusion:** one rig's 12 frames (6 heights × 2 eyes) are put in the world frame with the logged poses; parts are matched by 3D overlap, merged by per-centimetre medians and re-connected by parent votes and a maximum spanning arborescence (above: 1,906 overlapping parts become 366). With fused depth, skeleton F1 rises **0.60 → 0.64**, edge F1 **0.42 → 0.44** and cut F1 **0.39 → 0.40**, but cut recall falls **0.45 → 0.38** (strict **0.17 → 0.13**): the val-chosen setting keeps parts seen in at least two frames, trading recall for precision. [Val selection](bench/results/branches_val_multiview_2026-10-03.json) · [Evidence](bench/results/branches_test_v2_multiview_2026-10-04.json)
+- **More training does not move the graph:** 80 more minutes from the v1 checkpoint raise test mIoU **0.778 → 0.794** (spur IoU 0.78 → 0.79), yet no graph metric moves by more than 0.013. The remaining gap is depth and assembly, not pixels. [Evidence](bench/results/branches_test_v2_finetune_2026-10-04.json)
+- **Camera Depth Models, a negative result:** CDM (ICLR 2026; RGB plus raw D435 depth in, refined depth out) puts 3% of val wood pixels within 2 cm of the truth, 8% after filling empty sky with a far depth, against 66% for the raw sensor and 69% for the fusion. On test the lifted graphs collapse (skeleton F1 **0.03**): trained indoors, it pulls thin wood towards the camera (on one val frame to 0.75-0.86 of its true depth). Fusion with DA2-ft stays the depth path. Weights are CC-BY-NC-4.0 and are not shipped.
+- **Real images, zero-shot:** RGB-only BranchNet on the pixel-labelled real cherry frames of the MFO dataset (CVPRW 2025): 3-class mIoU **0.12** on its 15 test frames (0.11 on 326 train frames; resize chosen on its 45 val frames), trunk IoU 0.29, branch 0.07, spur 0.02. It finds 75% of the labelled wood but calls 31% of the background wood (other rows, the ground). Training on renders alone does not transfer; real-image adaptation is the next step. The MFO data carry no licence file, so no MFO image is in this repo. [Evidence](bench/results/branches_mfo_zero_shot_2026-10-03.json)
+- **Robot geometry proxy (CPU, not an Isaac run):** the pruning repo's own UR5e pruner geometry (`isaac-sim-pruning-workflow`, frozen clone) is posed at every perceived cut, approaching along the camera ray and closing across the perceived axis, and judged against the true branch. With fused depth the vision demo's cut gate (mouth within 8 mm, jaws within 15° of perpendicular) passes for **22%** of observable true cuts with v1 axes and **28%** with fitted axes (**36%** with an insertion-depth stop); with rendered depth **48% → 57%**. Clutter is the larger limit: even the true cut target clears all other wood only **10%** of the time with the demo jaws (24% with the legacy box), because 1.5 cm above the junction the open jaws reach the parent (65% of the wood they touch) or a neighbouring spur (34%), so the cut offset and approach, not perception, decide whether the jaws can close. [Evidence](bench/results/branches_isaac_proxy_test_2026-10-04.json) · [Code](scripts/isaac_cut_proxy.py)
+
+v2 test rows (same 120 frames, config C, protocol v2):
+
+| Classes | Depth | Skeleton F1 @2 cm | Edge F1 | Cut recall 5 cm/30° | Cut F1 5 cm/30° | Cut recall 2 cm/15° | Cut axis error (°) | mIoU (4 classes) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| BranchNet v1, tangent axis | D435 + DA2-ft fused | 0.60 | 0.42 | 0.40 | 0.34 | 0.12 | 33.4 | 0.78 |
+| BranchNet v1, tangent axis | rendered depth | 0.89 | 0.69 | 0.63 | 0.59 | 0.26 | 21.8 | 0.78 |
+| **BranchNet, fitted axis** | simulated D435 | 0.09 | 0.28 | 0.44 | 0.40 | 0.19 | 32.4 | 0.78 |
+| **BranchNet, fitted axis** | D435 + DA2-ft fused | 0.60 | 0.42 | 0.45 | 0.39 | 0.17 | 29.6 | 0.78 |
+| **BranchNet, fitted axis** | D435 + CDM refined | 0.03 | 0.00 | 0.03 | 0.02 | 0.00 | 54.0 | 0.78 |
+| **BranchNet, fitted axis** | rendered depth | 0.89 | 0.69 | 0.66 | 0.62 | 0.38 | 17.6 | 0.78 |
+| BranchNet fine-tuned, fitted axis | D435 + DA2-ft fused | 0.60 | 0.42 | 0.45 | 0.39 | 0.17 | 29.7 | 0.79 |
+| BranchNet fine-tuned, fitted axis | rendered depth | 0.88 | 0.69 | 0.67 | 0.63 | 0.38 | 17.1 | 0.80 |
+| BranchNet multi-view, fitted axis | simulated D435 | 0.18 | 0.25 | 0.19 | 0.25 | 0.07 | 37.5 | 0.78 |
+| BranchNet multi-view, fitted axis | D435 + DA2-ft fused | 0.64 | 0.44 | 0.38 | 0.40 | 0.13 | 27.9 | 0.78 |
+| TinyUNet (existing), fitted axis | D435 + DA2-ft fused | 0.50 | 0.28 | 0.27 | 0.25 | 0.09 | 38.1 | n/a |
+| TinyUNet (existing), fitted axis | rendered depth | 0.54 | 0.42 | 0.42 | 0.42 | 0.23 | 27.2 | n/a |
+| GT classes (ceiling), fitted axis | D435 + DA2-ft fused | 0.61 | 0.45 | 0.49 | 0.42 | 0.19 | 28.8 | 1.00 |
+| GT classes (ceiling), fitted axis | rendered depth | 0.93 | 0.78 | 0.73 | 0.70 | 0.44 | 15.3 | 1.00 |
+| GT classes, multi-view | D435 + DA2-ft fused | 0.65 | 0.47 | 0.41 | 0.43 | 0.14 | 28.6 | 1.00 |
+
+[![v1 vs v2 by depth source on the two test trees](docs/readme/branch_v2.png)](bench/results/branches_test_v2_fitted_axis_2026-10-04.json)
+
+Every v2 choice (fit window, CDM checkpoint and sky fill, fusion setting, MFO resize) was fixed on val and registered before its test rows existed; the record, reviews and exposures are in the [protocol](docs/BRANCH_PROTOCOL.md).
 
 ## Architecture and decisions
 

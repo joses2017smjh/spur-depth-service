@@ -1,0 +1,100 @@
+{
+  "tree": "lpy_envy_00065",
+  "rig": "box_cam1",
+  "side": "l",
+  "depth": "gt",
+  "cfg": {
+    "orphan_cost": 1.2,
+    "junction_bonus": 0.0,
+    "depth_percentile": 50.0,
+    "cut_axis": "fit",
+    "cut_fit_lo_m": 0.03,
+    "cut_fit_hi_m": 0.15
+  },
+  "frames": [
+    {
+      "frame": "lpy_envy_00065/box_cam1/lpy_envy_00065_shot01_l",
+      "rule": "tangent",
+      "gt_cuts": 79,
+      "strict": 17,
+      "jain_or_better": 47
+    },
+    {
+      "frame": "lpy_envy_00065/box_cam1/lpy_envy_00065_shot01_l",
+      "rule": "fitted",
+      "gt_cuts": 79,
+      "strict": 30,
+      "jain_or_better": 48
+    },
+    {
+      "frame": "lpy_envy_00065/box_cam1/lpy_envy_00065_shot02_l",
+      "rule": "tangent",
+      "gt_cuts": 104,
+      "strict": 28,
+      "jain_or_better": 60
+    },
+    {
+      "frame": "lpy_envy_00065/box_cam1/lpy_envy_00065_shot02_l",
+      "rule": "fitted",
+      "gt_cuts": 104,
+      "strict": 33,
+      "jain_or_better": 65
+    },
+    {
+      "frame": "lpy_envy_00065/box_cam1/lpy_envy_00065_shot03_l",
+      "rule": "tangent",
+      "gt_cuts": 103,
+      "strict": 20,
+      "jain_or_better": 56
+    },
+    {
+      "frame": "lpy_envy_00065/box_cam1/lpy_envy_00065_shot03_l",
+      "rule": "fitted",
+      "gt_cuts": 103,
+      "strict": 34,
+      "jain_or_better": 56
+    },
+    {
+      "frame": "lpy_envy_00065/box_cam1/lpy_envy_00065_shot04_l",
+      "rule": "tangent",
+      "gt_cuts": 72,
+      "strict": 17,
+      "jain_or_better": 44
+    },
+    {
+      "frame": "lpy_envy_00065/box_cam1/lpy_envy_00065_shot04_l",
+      "rule": "fitted",
+      "gt_cuts": 72,
+      "strict": 26,
+      "jain_or_better": 48
+    },
+    {
+      "frame": "lpy_envy_00065/box_cam1/lpy_envy_00065_shot05_l",
+      "rule": "tangent",
+      "gt_cuts": 55,
+      "strict": 9,
+      "jain_or_better": 27
+    },
+    {
+      "frame": "lpy_envy_00065/box_cam1/lpy_envy_00065_shot05_l",
+      "rule": "fitted",
+      "gt_cuts": 55,
+      "strict": 21,
+      "jain_or_better": 30
+    },
+    {
+      "frame": "lpy_envy_00065/box_cam1/lpy_envy_00065_shot06_l",
+      "rule": "tangent",
+      "gt_cuts": 20,
+      "strict": 2,
+      "jain_or_better": 4
+    },
+    {
+      "frame": "lpy_envy_00065/box_cam1/lpy_envy_00065_shot06_l",
+      "rule": "fitted",
+      "gt_cuts": 20,
+      "strict": 3,
+      "jain_or_better": 8
+    }
+  ]
+}

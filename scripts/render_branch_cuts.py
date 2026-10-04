@@ -66,16 +66,26 @@ def outcomes(gt_cuts: list, pred_cuts: list) -> list[str]:
     return out
 
 
-def frame_cuts(ref, pred_dir: Path, cfg: AssembleConfig, lo: float, hi: float) -> dict:
+DEPTH_NAMES = {"fused": "D435 + DA2-ft fused depth", "gt": "rendered depth"}
+
+
+def frame_cuts(
+    ref, pred_dir: Path, cfg: AssembleConfig, lo: float, hi: float, source: str = "fused"
+) -> dict:
+    """Cuts of one frame, built as eval_branches.py builds them for ``source``."""
     gtg, gt_cls, K = ev.gt_graph(ref, ev.CACHE)
     frame = load_cached_frame(ref, ev.CACHE, skel=False)
+    net_source = "sensor" if source in ev.LIFT_ONLY else source
     cls, conf, tweak, _ = ev.predicted_classes(
-        "branchnet", ref, "sensor", gt_cls, frame, pred_dir, None
+        "branchnet", ref, net_source, gt_cls, frame, pred_dir, None
     )
     wood = (cls > 0) & (cls != IGNORE)
-    depth, _ = fuse_sensor_mono(
-        frame_depth("sensor", frame, ref), frame_depth("da2", frame, ref), wood
-    )
+    if source == "fused":
+        depth, _ = fuse_sensor_mono(
+            frame_depth("sensor", frame, ref), frame_depth("da2", frame, ref), wood
+        )
+    else:
+        depth = frame_depth(source, frame, ref)
     pred = assemble(cls, depth, K, conf=conf, cfg=replace(cfg, cut_axis="tangent", **tweak))
     obs = observable_edges(gtg, scored_parts(gtg))
     gt_cuts = [p.cut() for p in gtg.parts.values() if p.cls != TRUNK and (p.pid, p.parent) in obs]
@@ -149,13 +159,14 @@ def main(argv=None) -> int:
     ap.add_argument("--tree", default=G.PAPER_TEST[1])
     ap.add_argument("--rig", default="box_cam1")
     ap.add_argument("--side", default="l")
+    ap.add_argument("--depth", choices=sorted(DEPTH_NAMES), default="fused")
     ap.add_argument("--panel-h", type=int, default=460)
     ap.add_argument("--out", type=Path, default=Path("docs/readme/branch_cuts.gif"))
     args = ap.parse_args(argv)
     cfg = replace(AssembleConfig(), **json.loads(args.cfg))
     lo, hi = cfg.cut_fit_lo_m, cfg.cut_fit_hi_m
     refs = [G.FrameRef(args.tree, args.rig, s, args.side) for s in G.SHOTS]
-    frames = [frame_cuts(r, args.pred_dir, cfg, lo, hi) for r in refs]
+    frames = [frame_cuts(r, args.pred_dir, cfg, lo, hi, args.depth) for r in refs]
     # One crop for the sweep: every GT cut point of every height.
     uv = np.concatenate(
         [project(np.array([c for c, _ in f["gt"]]), f["K"])[0] for f in frames if f["gt"]]
@@ -191,7 +202,7 @@ def main(argv=None) -> int:
         row = np.concatenate(panels, 1)
         row = label(
             row,
-            f"camera height {k + 1}/6 (BranchNet, D435 + DA2-ft fused depth)",
+            f"camera height {k + 1}/6 (BranchNet, {DEPTH_NAMES[args.depth]})",
             y=row.shape[0] - 10,
         )
         tiles.append(np.concatenate([row, _legend(row.shape[1])], 0))
@@ -203,6 +214,7 @@ def main(argv=None) -> int:
                 "tree": args.tree,
                 "rig": args.rig,
                 "side": args.side,
+                "depth": args.depth,
                 "cfg": json.loads(args.cfg),
                 "frames": report,
             },

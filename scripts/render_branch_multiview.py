@@ -106,7 +106,7 @@ def orbit(panels, gt_ab, titles, suptitle, n_frames=40, swing=55.0, elev=10.0):
             ax.set_xlim(lo[0], hi[0])
             ax.set_ylim(lo[1], hi[1])
             ax.set_zlim(lo[2], hi[2])
-            ax.set_box_aspect(tuple(np.maximum(hi - lo, 1e-3)), zoom=1.45)
+            ax.set_box_aspect(tuple(np.maximum(hi - lo, 1e-3)), zoom=1.12)
             ax.view_init(elev=elev, azim=az)
             ax.set_axis_off()
             fig.text(0.25 + 0.5 * k, 0.9, title, ha="center", color=INK, fontsize=10)

@@ -1,0 +1,2251 @@
+{
+ "what": "Isaac cut-success CPU proxy on the test trees: a geometry proxy, never an Isaac result",
+ "runs": {
+  "tangent/oracle": {
+   "file": "/nfs/hpc/share/sanchej7/spur-branch-eval/isaac_proxy/test_tangent_oracle/test.json",
+   "sha256": "b76e9a3006e6264884ad98b02038847a72d739a3ab06bb6157ae09973ba79869",
+   "n_frames": 120,
+   "frame_list_sha256": "55a01ab33f525ac54d80f65f5fe2a12d657b1af3fa436789be1f02608c903f03",
+   "truth_segment_m": 0.1,
+   "scorer_parity": {
+    "frames_x_method_depth": 240,
+    "all_ok": true,
+    "pairs": 10648,
+    "scorer_success_jain": 10648
+   },
+   "commit": "f1c066abf2390d6808207473bc8e03ddca971328",
+   "dirty": false,
+   "cfg_overrides": {
+    "orphan_cost": 1.2,
+    "junction_bonus": 0.0,
+    "depth_percentile": 50.0
+   },
+   "isaac_clone_head": "7498eee1d2f28bfe1e7e84bbfe7610501ad19985",
+   "script_sha256": "5edbbc06d7b32e976bc4d97bb74aab77ef359a93f353826368e297d899c8a5b7"
+  },
+  "tangent/branchnet": {
+   "file": "/nfs/hpc/share/sanchej7/spur-branch-eval/isaac_proxy/test_tangent_branchnet/test.json",
+   "sha256": "0e56ff28fb4417a100cee84d4a57cbf045b2ff4b53c91fed69c15e54d3946a22",
+   "n_frames": 120,
+   "frame_list_sha256": "55a01ab33f525ac54d80f65f5fe2a12d657b1af3fa436789be1f02608c903f03",
+   "truth_segment_m": 0.1,
+   "scorer_parity": {
+    "frames_x_method_depth": 240,
+    "all_ok": true,
+    "pairs": 9780,
+    "scorer_success_jain": 9780
+   },
+   "commit": "f1c066abf2390d6808207473bc8e03ddca971328",
+   "dirty": false,
+   "cfg_overrides": {
+    "orphan_cost": 1.2,
+    "junction_bonus": 0.0,
+    "depth_percentile": 50.0
+   },
+   "isaac_clone_head": "7498eee1d2f28bfe1e7e84bbfe7610501ad19985",
+   "script_sha256": "5edbbc06d7b32e976bc4d97bb74aab77ef359a93f353826368e297d899c8a5b7"
+  },
+  "fit/oracle": {
+   "file": "/nfs/hpc/share/sanchej7/spur-branch-eval/isaac_proxy/test_fit_oracle/test.json",
+   "sha256": "e575d5bf5ca99270ce22d138302a76798b0b896e974593d58fccf94cdbde51db",
+   "n_frames": 120,
+   "frame_list_sha256": "55a01ab33f525ac54d80f65f5fe2a12d657b1af3fa436789be1f02608c903f03",
+   "truth_segment_m": 0.1,
+   "scorer_parity": {
+    "frames_x_method_depth": 240,
+    "all_ok": true,
+    "pairs": 11576,
+    "scorer_success_jain": 11576
+   },
+   "commit": "f1c066abf2390d6808207473bc8e03ddca971328",
+   "dirty": false,
+   "cfg_overrides": {
+    "orphan_cost": 1.2,
+    "junction_bonus": 0.0,
+    "depth_percentile": 50.0,
+    "cut_axis": "fit",
+    "cut_fit_lo_m": 0.03,
+    "cut_fit_hi_m": 0.15
+   },
+   "isaac_clone_head": "7498eee1d2f28bfe1e7e84bbfe7610501ad19985",
+   "script_sha256": "5edbbc06d7b32e976bc4d97bb74aab77ef359a93f353826368e297d899c8a5b7"
+  },
+  "fit/branchnet": {
+   "file": "/nfs/hpc/share/sanchej7/spur-branch-eval/isaac_proxy/test_fit_branchnet/test.json",
+   "sha256": "74b1eee9f0c79db59ab5e9f7430debb19db6003148cfec56380fa2d87fff2e3d",
+   "n_frames": 120,
+   "frame_list_sha256": "55a01ab33f525ac54d80f65f5fe2a12d657b1af3fa436789be1f02608c903f03",
+   "truth_segment_m": 0.1,
+   "scorer_parity": {
+    "frames_x_method_depth": 240,
+    "all_ok": true,
+    "pairs": 10579,
+    "scorer_success_jain": 10579
+   },
+   "commit": "f1c066abf2390d6808207473bc8e03ddca971328",
+   "dirty": false,
+   "cfg_overrides": {
+    "orphan_cost": 1.2,
+    "junction_bonus": 0.0,
+    "depth_percentile": 50.0,
+    "cut_axis": "fit",
+    "cut_fit_lo_m": 0.03,
+    "cut_fit_hi_m": 0.15
+   },
+   "isaac_clone_head": "7498eee1d2f28bfe1e7e84bbfe7610501ad19985",
+   "script_sha256": "5edbbc06d7b32e976bc4d97bb74aab77ef359a93f353826368e297d899c8a5b7"
+  }
+ },
+ "summary": {
+  "tangent/oracle/fused/open_loop": {
+   "n_gt_cuts": 9496,
+   "n_paired": 4118,
+   "paired_rate": 0.4337,
+   "legacy": {
+    "rate": {
+     "jaw_hit": 0.3651,
+     "perpendicular": 0.3332,
+     "clear_target": 0.2033,
+     "clear_other": 0.1288,
+     "success_isolated": 0.0988,
+     "success": 0.0393,
+     "clear_other_surface": 0.0265,
+     "success_surface": 0.0046
+    },
+    "rate_given_paired": {
+     "jaw_hit": 0.8419,
+     "perpendicular": 0.7683,
+     "clear_target": 0.4689,
+     "clear_other": 0.297,
+     "success_isolated": 0.2278,
+     "success": 0.0906,
+     "clear_other_surface": 0.0612,
+     "success_surface": 0.0107
+    },
+    "counts": {
+     "jaw_hit": 3467,
+     "perpendicular": 3164,
+     "clear_target": 1931,
+     "clear_other": 1223,
+     "success_isolated": 938,
+     "success": 373,
+     "clear_other_surface": 252,
+     "success_surface": 44
+    },
+    "success_per_tree": {
+     "lpy_envy_00042": 0.0393,
+     "lpy_envy_00065": 0.0393
+    },
+    "success_per_gt_class": {
+     "branch": 0.103,
+     "shoot": 0.0444,
+     "spur": 0.0354
+    },
+    "other_wood_hits": {
+     "parent:branch": 1570,
+     "sibling:spur": 1545,
+     "parent:shoot": 411,
+     "sibling:shoot": 273,
+     "parent:trunk": 259,
+     "other:spur": 162,
+     "sibling:branch": 70,
+     "other:shoot": 60,
+     "child:spur": 54,
+     "grandparent:branch": 51,
+     "other:branch": 28,
+     "grandparent:trunk": 16,
+     "other:trunk": 3
+    }
+   },
+   "demo": {
+    "rate": {
+     "jaw_hit": 0.3082,
+     "perpendicular": 0.3332,
+     "radius_ok": 0.4337,
+     "clear_other": 0.1591,
+     "gate_only": 0.2382,
+     "success": 0.0816,
+     "clear_other_surface": 0.0589,
+     "success_surface": 0.0218
+    },
+    "rate_given_paired": {
+     "jaw_hit": 0.7108,
+     "perpendicular": 0.7683,
+     "radius_ok": 1.0,
+     "clear_other": 0.3669,
+     "gate_only": 0.5493,
+     "success": 0.1882,
+     "clear_other_surface": 0.1357,
+     "success_surface": 0.0503
+    },
+    "counts": {
+     "jaw_hit": 2927,
+     "perpendicular": 3164,
+     "radius_ok": 4118,
+     "clear_other": 1511,
+     "gate_only": 2262,
+     "success": 775,
+     "clear_other_surface": 559,
+     "success_surface": 207
+    },
+    "success_per_tree": {
+     "lpy_envy_00042": 0.0879,
+     "lpy_envy_00065": 0.0728
+    },
+    "success_per_gt_class": {
+     "branch": 0.2358,
+     "shoot": 0.088,
+     "spur": 0.0732
+    },
+    "other_wood_hits": {
+     "parent:branch": 1413,
+     "sibling:spur": 1108,
+     "parent:shoot": 369,
+     "parent:trunk": 286,
+     "sibling:shoot": 171,
+     "sibling:branch": 31,
+     "other:spur": 29,
+     "other:shoot": 22,
+     "child:spur": 14,
+     "grandparent:branch": 3
+    }
+   },
+   "degenerate_poses": 0
+  },
+  "tangent/oracle/fused/sensed_depth": {
+   "n_gt_cuts": 9496,
+   "n_paired": 4118,
+   "paired_rate": 0.4337,
+   "legacy": {
+    "rate": {
+     "jaw_hit": 0.4124,
+     "perpendicular": 0.3332,
+     "clear_target": 0.2268,
+     "clear_other": 0.1364,
+     "success_isolated": 0.1441,
+     "success": 0.042,
+     "clear_other_surface": 0.0147,
+     "success_surface": 0.0035
+    },
+    "rate_given_paired": {
+     "jaw_hit": 0.9509,
+     "perpendicular": 0.7683,
+     "clear_target": 0.5231,
+     "clear_other": 0.3145,
+     "success_isolated": 0.3322,
+     "success": 0.0969,
+     "clear_other_surface": 0.034,
+     "success_surface": 0.008
+    },
+    "counts": {
+     "jaw_hit": 3916,
+     "perpendicular": 3164,
+     "clear_target": 2154,
+     "clear_other": 1295,
+     "success_isolated": 1368,
+     "success": 399,
+     "clear_other_surface": 140,
+     "success_surface": 33
+    },
+    "success_per_tree": {
+     "lpy_envy_00042": 0.0416,
+     "lpy_envy_00065": 0.0426
+    },
+    "success_per_gt_class": {
+     "branch": 0.0867,
+     "shoot": 0.0481,
+     "spur": 0.0389
+    },
+    "other_wood_hits": {
+     "parent:branch": 1504,
+     "sibling:spur": 1351,
+     "parent:shoot": 384,
+     "parent:trunk": 249,
+     "sibling:shoot": 243,
+     "other:spur": 150,
+     "sibling:branch": 70,
+     "other:shoot": 58,
+     "grandparent:branch": 54,
+     "child:spur": 53,
+     "other:branch": 26,
+     "grandparent:trunk": 16
+    }
+   },
+   "demo": {
+    "rate": {
+     "jaw_hit": 0.3746,
+     "perpendicular": 0.3332,
+     "radius_ok": 0.4337,
+     "clear_other": 0.1461,
+     "gate_only": 0.2924,
+     "success": 0.0941,
+     "clear_other_surface": 0.047,
+     "success_surface": 0.026
+    },
+    "rate_given_paired": {
+     "jaw_hit": 0.8638,
+     "perpendicular": 0.7683,
+     "radius_ok": 1.0,
+     "clear_other": 0.3368,
+     "gate_only": 0.6744,
+     "success": 0.2171,
+     "clear_other_surface": 0.1083,
+     "success_surface": 0.06
+    },
+    "counts": {
+     "jaw_hit": 3557,
+     "perpendicular": 3164,
+     "radius_ok": 4118,
+     "clear_other": 1387,
+     "gate_only": 2777,
+     "success": 894,
+     "clear_other_surface": 446,
+     "success_surface": 247
+    },
+    "success_per_tree": {
+     "lpy_envy_00042": 0.0992,
+     "lpy_envy_00065": 0.0872
+    },
+    "success_per_gt_class": {
+     "branch": 0.2439,
+     "shoot": 0.0917,
+     "spur": 0.0875
+    },
+    "other_wood_hits": {
+     "parent:branch": 1481,
+     "sibling:spur": 1169,
+     "parent:shoot": 478,
+     "parent:trunk": 305,
+     "sibling:shoot": 184,
+     "sibling:branch": 32,
+     "other:spur": 21,
+     "other:shoot": 17,
+     "child:spur": 12
+    }
+   },
+   "degenerate_poses": 0
+  },
+  "tangent/oracle/gt/open_loop": {
+   "n_gt_cuts": 9496,
+   "n_paired": 6530,
+   "paired_rate": 0.6877,
+   "legacy": {
+    "rate": {
+     "jaw_hit": 0.6666,
+     "perpendicular": 0.5559,
+     "clear_target": 0.4538,
+     "clear_other": 0.2146,
+     "success_isolated": 0.3401,
+     "success": 0.125,
+     "clear_other_surface": 0.0334,
+     "success_surface": 0.0199
+    },
+    "rate_given_paired": {
+     "jaw_hit": 0.9694,
+     "perpendicular": 0.8084,
+     "clear_target": 0.6599,
+     "clear_other": 0.3121,
+     "success_isolated": 0.4946,
+     "success": 0.1818,
+     "clear_other_surface": 0.0485,
+     "success_surface": 0.0289
+    },
+    "counts": {
+     "jaw_hit": 6330,
+     "perpendicular": 5279,
+     "clear_target": 4309,
+     "clear_other": 2038,
+     "success_isolated": 3230,
+     "success": 1187,
+     "clear_other_surface": 317,
+     "success_surface": 189
+    },
+    "success_per_tree": {
+     "lpy_envy_00042": 0.1283,
+     "lpy_envy_00065": 0.1204
+    },
+    "success_per_gt_class": {
+     "branch": 0.2005,
+     "shoot": 0.0902,
+     "spur": 0.1274
+    },
+    "other_wood_hits": {
+     "parent:branch": 2352,
+     "sibling:spur": 1995,
+     "parent:shoot": 813,
+     "sibling:shoot": 384,
+     "parent:trunk": 284,
+     "other:spur": 260,
+     "grandparent:branch": 105,
+     "other:shoot": 95,
+     "sibling:branch": 76,
+     "child:spur": 60,
+     "other:branch": 46,
+     "grandparent:trunk": 24,
+     "other:trunk": 1
+    }
+   },
+   "demo": {
+    "rate": {
+     "jaw_hit": 0.6636,
+     "perpendicular": 0.5559,
+     "radius_ok": 0.6877,
+     "clear_other": 0.2729,
+     "gate_only": 0.5399,
+     "success": 0.2263,
+     "clear_other_surface": 0.1078,
+     "success_surface": 0.0909
+    },
+    "rate_given_paired": {
+     "jaw_hit": 0.9651,
+     "perpendicular": 0.8084,
+     "radius_ok": 1.0,
+     "clear_other": 0.3968,
+     "gate_only": 0.7851,
+     "success": 0.3291,
+     "clear_other_surface": 0.1568,
+     "success_surface": 0.1322
+    },
+    "counts": {
+     "jaw_hit": 6302,
+     "perpendicular": 5279,
+     "radius_ok": 6530,
+     "clear_other": 2591,
+     "gate_only": 5127,
+     "success": 2149,
+     "clear_other_surface": 1024,
+     "success_surface": 863
+    },
+    "success_per_tree": {
+     "lpy_envy_00042": 0.2385,
+     "lpy_envy_00065": 0.2093
+    },
+    "success_per_gt_class": {
+     "branch": 0.3008,
+     "shoot": 0.2203,
+     "spur": 0.2238
+    },
+    "other_wood_hits": {
+     "parent:branch": 1780,
+     "sibling:spur": 1524,
+     "parent:shoot": 987,
+     "parent:trunk": 358,
+     "sibling:shoot": 201,
+     "sibling:branch": 32,
+     "other:spur": 29,
+     "child:spur": 24,
+     "other:shoot": 14,
+     "grandparent:branch": 2
+    }
+   },
+   "degenerate_poses": 0
+  },
+  "tangent/oracle/gt/sensed_depth": {
+   "n_gt_cuts": 9496,
+   "n_paired": 6530,
+   "paired_rate": 0.6877,
+   "legacy": {
+    "rate": {
+     "jaw_hit": 0.6689,
+     "perpendicular": 0.5559,
+     "clear_target": 0.4644,
+     "clear_other": 0.1981,
+     "success_isolated": 0.3493,
+     "success": 0.1029,
+     "clear_other_surface": 0.0209,
+     "success_surface": 0.0142
+    },
+    "rate_given_paired": {
+     "jaw_hit": 0.9727,
+     "perpendicular": 0.8084,
+     "clear_target": 0.6753,
+     "clear_other": 0.2881,
+     "success_isolated": 0.508,
+     "success": 0.1496,
+     "clear_other_surface": 0.0303,
+     "success_surface": 0.0207
+    },
+    "counts": {
+     "jaw_hit": 6352,
+     "perpendicular": 5279,
+     "clear_target": 4410,
+     "clear_other": 1881,
+     "success_isolated": 3317,
+     "success": 977,
+     "clear_other_surface": 198,
+     "success_surface": 135
+    },
+    "success_per_tree": {
+     "lpy_envy_00042": 0.1017,
+     "lpy_envy_00065": 0.1045
+    },
+    "success_per_gt_class": {
+     "branch": 0.1301,
+     "shoot": 0.0654,
+     "spur": 0.108
+    },
+    "other_wood_hits": {
+     "parent:branch": 2422,
+     "sibling:spur": 2015,
+     "parent:shoot": 857,
+     "sibling:shoot": 388,
+     "parent:trunk": 312,
+     "other:spur": 261,
+     "grandparent:branch": 106,
+     "other:shoot": 96,
+     "sibling:branch": 82,
+     "child:spur": 64,
+     "other:branch": 50,
+     "grandparent:trunk": 19,
+     "other:trunk": 1
+    }
+   },
+   "demo": {
+    "rate": {
+     "jaw_hit": 0.6437,
+     "perpendicular": 0.5559,
+     "radius_ok": 0.6877,
+     "clear_other": 0.2755,
+     "gate_only": 0.5256,
+     "success": 0.2136,
+     "clear_other_surface": 0.1053,
+     "success_surface": 0.0815
+    },
+    "rate_given_paired": {
+     "jaw_hit": 0.9361,
+     "perpendicular": 0.8084,
+     "radius_ok": 1.0,
+     "clear_other": 0.4006,
+     "gate_only": 0.7643,
+     "success": 0.3106,
+     "clear_other_surface": 0.1531,
+     "success_surface": 0.1185
+    },
+    "counts": {
+     "jaw_hit": 6113,
+     "perpendicular": 5279,
+     "radius_ok": 6530,
+     "clear_other": 2616,
+     "gate_only": 4991,
+     "success": 2028,
+     "clear_other_surface": 1000,
+     "success_surface": 774
+    },
+    "success_per_tree": {
+     "lpy_envy_00042": 0.2257,
+     "lpy_envy_00065": 0.1967
+    },
+    "success_per_gt_class": {
+     "branch": 0.3035,
+     "shoot": 0.2038,
+     "spur": 0.211
+    },
+    "other_wood_hits": {
+     "parent:branch": 1793,
+     "sibling:spur": 1491,
+     "parent:shoot": 1006,
+     "parent:trunk": 355,
+     "sibling:shoot": 197,
+     "sibling:branch": 32,
+     "other:spur": 28,
+     "child:spur": 20,
+     "other:shoot": 13,
+     "grandparent:branch": 3
+    }
+   },
+   "degenerate_poses": 0
+  },
+  "tangent/truth/-/control": {
+   "n_gt_cuts": 9496,
+   "n_paired": 9496,
+   "paired_rate": 1.0,
+   "legacy": {
+    "rate": {
+     "jaw_hit": 1.0,
+     "perpendicular": 1.0,
+     "clear_target": 1.0,
+     "clear_other": 0.2377,
+     "success_isolated": 1.0,
+     "success": 0.2377,
+     "clear_other_surface": 0.0256,
+     "success_surface": 0.0256
+    },
+    "rate_given_paired": {
+     "jaw_hit": 1.0,
+     "perpendicular": 1.0,
+     "clear_target": 1.0,
+     "clear_other": 0.2377,
+     "success_isolated": 1.0,
+     "success": 0.2377,
+     "clear_other_surface": 0.0256,
+     "success_surface": 0.0256
+    },
+    "counts": {
+     "jaw_hit": 9496,
+     "perpendicular": 9496,
+     "clear_target": 9496,
+     "clear_other": 2257,
+     "success_isolated": 9496,
+     "success": 2257,
+     "clear_other_surface": 243,
+     "success_surface": 243
+    },
+    "success_per_tree": {
+     "lpy_envy_00042": 0.238,
+     "lpy_envy_00065": 0.2373
+    },
+    "success_per_gt_class": {
+     "branch": 0.2846,
+     "shoot": 0.2602,
+     "spur": 0.2316
+    },
+    "other_wood_hits": {
+     "parent:branch": 4082,
+     "sibling:spur": 2832,
+     "parent:shoot": 1334,
+     "sibling:shoot": 619,
+     "parent:trunk": 572,
+     "other:spur": 375,
+     "sibling:branch": 161,
+     "other:shoot": 158,
+     "grandparent:branch": 158,
+     "child:spur": 130,
+     "other:branch": 83,
+     "grandparent:trunk": 36
+    }
+   },
+   "demo": {
+    "rate": {
+     "jaw_hit": 1.0,
+     "perpendicular": 1.0,
+     "radius_ok": 1.0,
+     "clear_other": 0.1006,
+     "gate_only": 1.0,
+     "success": 0.1006,
+     "clear_other_surface": 0.0,
+     "success_surface": 0.0
+    },
+    "rate_given_paired": {
+     "jaw_hit": 1.0,
+     "perpendicular": 1.0,
+     "radius_ok": 1.0,
+     "clear_other": 0.1006,
+     "gate_only": 1.0,
+     "success": 0.1006,
+     "clear_other_surface": 0.0,
+     "success_surface": 0.0
+    },
+    "counts": {
+     "jaw_hit": 9496,
+     "perpendicular": 9496,
+     "radius_ok": 9496,
+     "clear_other": 955,
+     "gate_only": 9496,
+     "success": 955,
+     "clear_other_surface": 0,
+     "success_surface": 0
+    },
+    "success_per_tree": {
+     "lpy_envy_00042": 0.0977,
+     "lpy_envy_00065": 0.1045
+    },
+    "success_per_gt_class": {
+     "branch": 0.0,
+     "shoot": 0.0519,
+     "spur": 0.1136
+    },
+    "other_wood_hits": {
+     "parent:branch": 5312,
+     "sibling:spur": 3568,
+     "parent:shoot": 1684,
+     "parent:trunk": 930,
+     "sibling:shoot": 591,
+     "other:spur": 64,
+     "other:shoot": 62,
+     "sibling:branch": 42,
+     "child:spur": 25
+    }
+   },
+   "degenerate_poses": 0
+  },
+  "tangent/branchnet/fused/open_loop": {
+   "n_gt_cuts": 9496,
+   "n_paired": 3842,
+   "paired_rate": 0.4046,
+   "legacy": {
+    "rate": {
+     "jaw_hit": 0.3354,
+     "perpendicular": 0.3044,
+     "clear_target": 0.1997,
+     "clear_other": 0.1234,
+     "success_isolated": 0.0938,
+     "success": 0.0372,
+     "clear_other_surface": 0.0245,
+     "success_surface": 0.0039
+    },
+    "rate_given_paired": {
+     "jaw_hit": 0.829,
+     "perpendicular": 0.7525,
+     "clear_target": 0.4935,
+     "clear_other": 0.305,
+     "success_isolated": 0.2319,
+     "success": 0.0919,
+     "clear_other_surface": 0.0606,
+     "success_surface": 0.0096
+    },
+    "counts": {
+     "jaw_hit": 3185,
+     "perpendicular": 2891,
+     "clear_target": 1896,
+     "clear_other": 1172,
+     "success_isolated": 891,
+     "success": 353,
+     "clear_other_surface": 233,
+     "success_surface": 37
+    },
+    "success_per_tree": {
+     "lpy_envy_00042": 0.0384,
+     "lpy_envy_00065": 0.0355
+    },
+    "success_per_gt_class": {
+     "branch": 0.0921,
+     "shoot": 0.0391,
+     "spur": 0.0342
+    },
+    "other_wood_hits": {
+     "parent:branch": 1457,
+     "sibling:spur": 1394,
+     "parent:shoot": 387,
+     "sibling:shoot": 244,
+     "parent:trunk": 197,
+     "other:spur": 173,
+     "child:spur": 64,
+     "sibling:branch": 60,
+     "other:shoot": 52,
+     "grandparent:branch": 51,
+     "grandparent:trunk": 19,
+     "other:branch": 19,
+     "other:trunk": 5
+    }
+   },
+   "demo": {
+    "rate": {
+     "jaw_hit": 0.2844,
+     "perpendicular": 0.3044,
+     "radius_ok": 0.4046,
+     "clear_other": 0.1534,
+     "gate_only": 0.2152,
+     "success": 0.0791,
+     "clear_other_surface": 0.0576,
+     "success_surface": 0.0219
+    },
+    "rate_given_paired": {
+     "jaw_hit": 0.703,
+     "perpendicular": 0.7525,
+     "radius_ok": 1.0,
+     "clear_other": 0.3792,
+     "gate_only": 0.532,
+     "success": 0.1955,
+     "clear_other_surface": 0.1424,
+     "success_surface": 0.0541
+    },
+    "counts": {
+     "jaw_hit": 2701,
+     "perpendicular": 2891,
+     "radius_ok": 3842,
+     "clear_other": 1457,
+     "gate_only": 2044,
+     "success": 751,
+     "clear_other_surface": 547,
+     "success_surface": 208
+    },
+    "success_per_tree": {
+     "lpy_envy_00042": 0.0827,
+     "lpy_envy_00065": 0.0741
+    },
+    "success_per_gt_class": {
+     "branch": 0.2276,
+     "shoot": 0.0639,
+     "spur": 0.0746
+    },
+    "other_wood_hits": {
+     "parent:branch": 1305,
+     "sibling:spur": 990,
+     "parent:shoot": 302,
+     "parent:trunk": 229,
+     "sibling:shoot": 157,
+     "other:spur": 32,
+     "other:shoot": 25,
+     "sibling:branch": 21,
+     "child:spur": 14,
+     "grandparent:branch": 5
+    }
+   },
+   "degenerate_poses": 0
+  },
+  "tangent/branchnet/fused/sensed_depth": {
+   "n_gt_cuts": 9496,
+   "n_paired": 3842,
+   "paired_rate": 0.4046,
+   "legacy": {
+    "rate": {
+     "jaw_hit": 0.3821,
+     "perpendicular": 0.3044,
+     "clear_target": 0.2145,
+     "clear_other": 0.1277,
+     "success_isolated": 0.1346,
+     "success": 0.0379,
+     "clear_other_surface": 0.0126,
+     "success_surface": 0.0027
+    },
+    "rate_given_paired": {
+     "jaw_hit": 0.9443,
+     "perpendicular": 0.7525,
+     "clear_target": 0.5302,
+     "clear_other": 0.3157,
+     "success_isolated": 0.3326,
+     "success": 0.0937,
+     "clear_other_surface": 0.0312,
+     "success_surface": 0.0068
+    },
+    "counts": {
+     "jaw_hit": 3628,
+     "perpendicular": 2891,
+     "clear_target": 2037,
+     "clear_other": 1213,
+     "success_isolated": 1278,
+     "success": 360,
+     "clear_other_surface": 120,
+     "success_surface": 26
+    },
+    "success_per_tree": {
+     "lpy_envy_00042": 0.0371,
+     "lpy_envy_00065": 0.039
+    },
+    "success_per_gt_class": {
+     "branch": 0.065,
+     "shoot": 0.0414,
+     "spur": 0.036
+    },
+    "other_wood_hits": {
+     "parent:branch": 1426,
+     "sibling:spur": 1268,
+     "parent:shoot": 350,
+     "sibling:shoot": 223,
+     "parent:trunk": 183,
+     "other:spur": 151,
+     "child:spur": 69,
+     "sibling:branch": 64,
+     "other:shoot": 55,
+     "grandparent:branch": 53,
+     "grandparent:trunk": 17,
+     "other:branch": 16,
+     "other:trunk": 1
+    }
+   },
+   "demo": {
+    "rate": {
+     "jaw_hit": 0.3429,
+     "perpendicular": 0.3044,
+     "radius_ok": 0.4046,
+     "clear_other": 0.1448,
+     "gate_only": 0.2616,
+     "success": 0.0893,
+     "clear_other_surface": 0.0473,
+     "success_surface": 0.025
+    },
+    "rate_given_paired": {
+     "jaw_hit": 0.8475,
+     "perpendicular": 0.7525,
+     "radius_ok": 1.0,
+     "clear_other": 0.3579,
+     "gate_only": 0.6465,
+     "success": 0.2207,
+     "clear_other_surface": 0.1169,
+     "success_surface": 0.0617
+    },
+    "counts": {
+     "jaw_hit": 3256,
+     "perpendicular": 2891,
+     "radius_ok": 3842,
+     "clear_other": 1375,
+     "gate_only": 2484,
+     "success": 848,
+     "clear_other_surface": 449,
+     "success_surface": 237
+    },
+    "success_per_tree": {
+     "lpy_envy_00042": 0.0916,
+     "lpy_envy_00065": 0.0861
+    },
+    "success_per_gt_class": {
+     "branch": 0.2222,
+     "shoot": 0.0699,
+     "spur": 0.0863
+    },
+    "other_wood_hits": {
+     "parent:branch": 1366,
+     "sibling:spur": 1052,
+     "parent:shoot": 392,
+     "parent:trunk": 240,
+     "sibling:shoot": 171,
+     "other:spur": 26,
+     "sibling:branch": 21,
+     "other:shoot": 19,
+     "child:spur": 9,
+     "grandparent:branch": 1
+    }
+   },
+   "degenerate_poses": 0
+  },
+  "tangent/branchnet/gt/open_loop": {
+   "n_gt_cuts": 9496,
+   "n_paired": 5938,
+   "paired_rate": 0.6253,
+   "legacy": {
+    "rate": {
+     "jaw_hit": 0.5984,
+     "perpendicular": 0.4953,
+     "clear_target": 0.4204,
+     "clear_other": 0.2057,
+     "success_isolated": 0.3023,
+     "success": 0.114,
+     "clear_other_surface": 0.0317,
+     "success_surface": 0.0181
+    },
+    "rate_given_paired": {
+     "jaw_hit": 0.9569,
+     "perpendicular": 0.792,
+     "clear_target": 0.6723,
+     "clear_other": 0.3289,
+     "success_isolated": 0.4835,
+     "success": 0.1824,
+     "clear_other_surface": 0.0507,
+     "success_surface": 0.029
+    },
+    "counts": {
+     "jaw_hit": 5682,
+     "perpendicular": 4703,
+     "clear_target": 3992,
+     "clear_other": 1953,
+     "success_isolated": 2871,
+     "success": 1083,
+     "clear_other_surface": 301,
+     "success_surface": 172
+    },
+    "success_per_tree": {
+     "lpy_envy_00042": 0.1133,
+     "lpy_envy_00065": 0.1151
+    },
+    "success_per_gt_class": {
+     "branch": 0.1897,
+     "shoot": 0.0827,
+     "spur": 0.1158
+    },
+    "other_wood_hits": {
+     "parent:branch": 2154,
+     "sibling:spur": 1830,
+     "parent:shoot": 673,
+     "sibling:shoot": 299,
+     "other:spur": 216,
+     "parent:trunk": 208,
+     "grandparent:branch": 90,
+     "other:shoot": 87,
+     "child:spur": 75,
+     "sibling:branch": 68,
+     "other:branch": 31,
+     "grandparent:trunk": 29
+    }
+   },
+   "demo": {
+    "rate": {
+     "jaw_hit": 0.5941,
+     "perpendicular": 0.4953,
+     "radius_ok": 0.6253,
+     "clear_other": 0.254,
+     "gate_only": 0.4758,
+     "success": 0.2053,
+     "clear_other_surface": 0.0985,
+     "success_surface": 0.0814
+    },
+    "rate_given_paired": {
+     "jaw_hit": 0.9502,
+     "perpendicular": 0.792,
+     "radius_ok": 1.0,
+     "clear_other": 0.4062,
+     "gate_only": 0.7609,
+     "success": 0.3284,
+     "clear_other_surface": 0.1575,
+     "success_surface": 0.1302
+    },
+    "counts": {
+     "jaw_hit": 5642,
+     "perpendicular": 4703,
+     "radius_ok": 5938,
+     "clear_other": 2412,
+     "gate_only": 4518,
+     "success": 1950,
+     "clear_other_surface": 935,
+     "success_surface": 773
+    },
+    "success_per_tree": {
+     "lpy_envy_00042": 0.2146,
+     "lpy_envy_00065": 0.1924
+    },
+    "success_per_gt_class": {
+     "branch": 0.3089,
+     "shoot": 0.1977,
+     "spur": 0.2017
+    },
+    "other_wood_hits": {
+     "parent:branch": 1675,
+     "sibling:spur": 1352,
+     "parent:shoot": 767,
+     "parent:trunk": 275,
+     "sibling:shoot": 178,
+     "other:spur": 38,
+     "other:shoot": 19,
+     "sibling:branch": 18,
+     "child:spur": 16,
+     "grandparent:branch": 1
+    }
+   },
+   "degenerate_poses": 0
+  },
+  "tangent/branchnet/gt/sensed_depth": {
+   "n_gt_cuts": 9496,
+   "n_paired": 5938,
+   "paired_rate": 0.6253,
+   "legacy": {
+    "rate": {
+     "jaw_hit": 0.6074,
+     "perpendicular": 0.4953,
+     "clear_target": 0.4174,
+     "clear_other": 0.1871,
+     "success_isolated": 0.305,
+     "success": 0.0878,
+     "clear_other_surface": 0.0176,
+     "success_surface": 0.0099
+    },
+    "rate_given_paired": {
+     "jaw_hit": 0.9714,
+     "perpendicular": 0.792,
+     "clear_target": 0.6676,
+     "clear_other": 0.2993,
+     "success_isolated": 0.4877,
+     "success": 0.1405,
+     "clear_other_surface": 0.0281,
+     "success_surface": 0.0158
+    },
+    "counts": {
+     "jaw_hit": 5768,
+     "perpendicular": 4703,
+     "clear_target": 3964,
+     "clear_other": 1777,
+     "success_isolated": 2896,
+     "success": 834,
+     "clear_other_surface": 167,
+     "success_surface": 94
+    },
+    "success_per_tree": {
+     "lpy_envy_00042": 0.0827,
+     "lpy_envy_00065": 0.095
+    },
+    "success_per_gt_class": {
+     "branch": 0.0759,
+     "shoot": 0.0519,
+     "spur": 0.0945
+    },
+    "other_wood_hits": {
+     "parent:branch": 2238,
+     "sibling:spur": 1857,
+     "parent:shoot": 705,
+     "sibling:shoot": 313,
+     "parent:trunk": 244,
+     "other:spur": 217,
+     "grandparent:branch": 91,
+     "other:shoot": 84,
+     "sibling:branch": 78,
+     "child:spur": 78,
+     "other:branch": 32,
+     "grandparent:trunk": 25
+    }
+   },
+   "demo": {
+    "rate": {
+     "jaw_hit": 0.5794,
+     "perpendicular": 0.4953,
+     "radius_ok": 0.6253,
+     "clear_other": 0.2602,
+     "gate_only": 0.4649,
+     "success": 0.1944,
+     "clear_other_surface": 0.0975,
+     "success_surface": 0.0723
+    },
+    "rate_given_paired": {
+     "jaw_hit": 0.9266,
+     "perpendicular": 0.792,
+     "radius_ok": 1.0,
+     "clear_other": 0.4161,
+     "gate_only": 0.7435,
+     "success": 0.3109,
+     "clear_other_surface": 0.1559,
+     "success_surface": 0.1157
+    },
+    "counts": {
+     "jaw_hit": 5502,
+     "perpendicular": 4703,
+     "radius_ok": 5938,
+     "clear_other": 2471,
+     "gate_only": 4415,
+     "success": 1846,
+     "clear_other_surface": 926,
+     "success_surface": 687
+    },
+    "success_per_tree": {
+     "lpy_envy_00042": 0.2048,
+     "lpy_envy_00065": 0.1798
+    },
+    "success_per_gt_class": {
+     "branch": 0.2981,
+     "shoot": 0.1827,
+     "spur": 0.1915
+    },
+    "other_wood_hits": {
+     "parent:branch": 1650,
+     "sibling:spur": 1311,
+     "parent:shoot": 777,
+     "parent:trunk": 277,
+     "sibling:shoot": 181,
+     "other:spur": 36,
+     "other:shoot": 18,
+     "sibling:branch": 15,
+     "child:spur": 12,
+     "grandparent:branch": 2
+    }
+   },
+   "degenerate_poses": 0
+  },
+  "fit/oracle/fused/open_loop": {
+   "n_gt_cuts": 9496,
+   "n_paired": 4665,
+   "paired_rate": 0.4913,
+   "legacy": {
+    "rate": {
+     "jaw_hit": 0.3997,
+     "perpendicular": 0.4547,
+     "clear_target": 0.2246,
+     "clear_other": 0.1651,
+     "success_isolated": 0.1241,
+     "success": 0.0494,
+     "clear_other_surface": 0.0354,
+     "success_surface": 0.0052
+    },
+    "rate_given_paired": {
+     "jaw_hit": 0.8137,
+     "perpendicular": 0.9256,
+     "clear_target": 0.4572,
+     "clear_other": 0.3361,
+     "success_isolated": 0.2525,
+     "success": 0.1005,
+     "clear_other_surface": 0.072,
+     "success_surface": 0.0105
+    },
+    "counts": {
+     "jaw_hit": 3796,
+     "perpendicular": 4318,
+     "clear_target": 2133,
+     "clear_other": 1568,
+     "success_isolated": 1178,
+     "success": 469,
+     "clear_other_surface": 336,
+     "success_surface": 49
+    },
+    "success_per_tree": {
+     "lpy_envy_00042": 0.0483,
+     "lpy_envy_00065": 0.0509
+    },
+    "success_per_gt_class": {
+     "branch": 0.1572,
+     "shoot": 0.0323,
+     "spur": 0.0472
+    },
+    "other_wood_hits": {
+     "parent:branch": 1628,
+     "sibling:spur": 1601,
+     "parent:shoot": 511,
+     "sibling:shoot": 303,
+     "parent:trunk": 249,
+     "other:spur": 189,
+     "child:spur": 100,
+     "sibling:branch": 84,
+     "other:shoot": 66,
+     "grandparent:branch": 55,
+     "other:branch": 38,
+     "grandparent:trunk": 10,
+     "other:trunk": 3
+    }
+   },
+   "demo": {
+    "rate": {
+     "jaw_hit": 0.3183,
+     "perpendicular": 0.4547,
+     "radius_ok": 0.4913,
+     "clear_other": 0.1693,
+     "gate_only": 0.3009,
+     "success": 0.0911,
+     "clear_other_surface": 0.0706,
+     "success_surface": 0.0297
+    },
+    "rate_given_paired": {
+     "jaw_hit": 0.648,
+     "perpendicular": 0.9256,
+     "radius_ok": 1.0,
+     "clear_other": 0.3447,
+     "gate_only": 0.6124,
+     "success": 0.1854,
+     "clear_other_surface": 0.1436,
+     "success_surface": 0.0605
+    },
+    "counts": {
+     "jaw_hit": 3023,
+     "perpendicular": 4318,
+     "radius_ok": 4665,
+     "clear_other": 1608,
+     "gate_only": 2857,
+     "success": 865,
+     "clear_other_surface": 670,
+     "success_surface": 282
+    },
+    "success_per_tree": {
+     "lpy_envy_00042": 0.0943,
+     "lpy_envy_00065": 0.0866
+    },
+    "success_per_gt_class": {
+     "branch": 0.1653,
+     "shoot": 0.085,
+     "spur": 0.0886
+    },
+    "other_wood_hits": {
+     "parent:branch": 1623,
+     "sibling:spur": 1373,
+     "parent:shoot": 447,
+     "parent:trunk": 378,
+     "sibling:shoot": 209,
+     "sibling:branch": 38,
+     "other:spur": 35,
+     "other:shoot": 25,
+     "child:spur": 14,
+     "grandparent:branch": 3,
+     "other:branch": 1
+    }
+   },
+   "degenerate_poses": 0
+  },
+  "fit/oracle/fused/sensed_depth": {
+   "n_gt_cuts": 9496,
+   "n_paired": 4665,
+   "paired_rate": 0.4913,
+   "legacy": {
+    "rate": {
+     "jaw_hit": 0.468,
+     "perpendicular": 0.4547,
+     "clear_target": 0.2453,
+     "clear_other": 0.1656,
+     "success_isolated": 0.2061,
+     "success": 0.0566,
+     "clear_other_surface": 0.0176,
+     "success_surface": 0.0037
+    },
+    "rate_given_paired": {
+     "jaw_hit": 0.9526,
+     "perpendicular": 0.9256,
+     "clear_target": 0.4992,
+     "clear_other": 0.3372,
+     "success_isolated": 0.4195,
+     "success": 0.1151,
+     "clear_other_surface": 0.0358,
+     "success_surface": 0.0075
+    },
+    "counts": {
+     "jaw_hit": 4444,
+     "perpendicular": 4318,
+     "clear_target": 2329,
+     "clear_other": 1573,
+     "success_isolated": 1957,
+     "success": 537,
+     "clear_other_surface": 167,
+     "success_surface": 35
+    },
+    "success_per_tree": {
+     "lpy_envy_00042": 0.0534,
+     "lpy_envy_00065": 0.061
+    },
+    "success_per_gt_class": {
+     "branch": 0.1192,
+     "shoot": 0.0414,
+     "spur": 0.0562
+    },
+    "other_wood_hits": {
+     "parent:branch": 1667,
+     "sibling:spur": 1407,
+     "parent:shoot": 443,
+     "parent:trunk": 263,
+     "sibling:shoot": 261,
+     "other:spur": 174,
+     "child:spur": 97,
+     "sibling:branch": 79,
+     "grandparent:branch": 62,
+     "other:shoot": 62,
+     "other:branch": 35,
+     "grandparent:trunk": 10
+    }
+   },
+   "demo": {
+    "rate": {
+     "jaw_hit": 0.4149,
+     "perpendicular": 0.4547,
+     "radius_ok": 0.4913,
+     "clear_other": 0.1452,
+     "gate_only": 0.393,
+     "success": 0.1074,
+     "clear_other_surface": 0.0511,
+     "success_surface": 0.0336
+    },
+    "rate_given_paired": {
+     "jaw_hit": 0.8446,
+     "perpendicular": 0.9256,
+     "radius_ok": 1.0,
+     "clear_other": 0.2956,
+     "gate_only": 0.8,
+     "success": 0.2186,
+     "clear_other_surface": 0.104,
+     "success_surface": 0.0684
+    },
+    "counts": {
+     "jaw_hit": 3940,
+     "perpendicular": 4318,
+     "radius_ok": 4665,
+     "clear_other": 1379,
+     "gate_only": 3732,
+     "success": 1020,
+     "clear_other_surface": 485,
+     "success_surface": 319
+    },
+    "success_per_tree": {
+     "lpy_envy_00042": 0.1088,
+     "lpy_envy_00065": 0.1055
+    },
+    "success_per_gt_class": {
+     "branch": 0.168,
+     "shoot": 0.0789,
+     "spur": 0.1094
+    },
+    "other_wood_hits": {
+     "parent:branch": 1768,
+     "sibling:spur": 1517,
+     "parent:shoot": 603,
+     "parent:trunk": 399,
+     "sibling:shoot": 214,
+     "sibling:branch": 38,
+     "other:spur": 28,
+     "other:shoot": 23,
+     "child:spur": 11,
+     "grandparent:branch": 1
+    }
+   },
+   "degenerate_poses": 0
+  },
+  "fit/oracle/gt/open_loop": {
+   "n_gt_cuts": 9496,
+   "n_paired": 6911,
+   "paired_rate": 0.7278,
+   "legacy": {
+    "rate": {
+     "jaw_hit": 0.6926,
+     "perpendicular": 0.6748,
+     "clear_target": 0.5276,
+     "clear_other": 0.2635,
+     "success_isolated": 0.4544,
+     "success": 0.1744,
+     "clear_other_surface": 0.0442,
+     "success_surface": 0.024
+    },
+    "rate_given_paired": {
+     "jaw_hit": 0.9517,
+     "perpendicular": 0.9272,
+     "clear_target": 0.7249,
+     "clear_other": 0.362,
+     "success_isolated": 0.6244,
+     "success": 0.2396,
+     "clear_other_surface": 0.0608,
+     "success_surface": 0.033
+    },
+    "counts": {
+     "jaw_hit": 6577,
+     "perpendicular": 6408,
+     "clear_target": 5010,
+     "clear_other": 2502,
+     "success_isolated": 4315,
+     "success": 1656,
+     "clear_other_surface": 420,
+     "success_surface": 228
+    },
+    "success_per_tree": {
+     "lpy_envy_00042": 0.1734,
+     "lpy_envy_00065": 0.1758
+    },
+    "success_per_gt_class": {
+     "branch": 0.2629,
+     "shoot": 0.0699,
+     "spur": 0.188
+    },
+    "other_wood_hits": {
+     "parent:branch": 2250,
+     "sibling:spur": 1858,
+     "parent:shoot": 773,
+     "sibling:shoot": 359,
+     "parent:trunk": 286,
+     "other:spur": 268,
+     "child:spur": 119,
+     "grandparent:branch": 97,
+     "sibling:branch": 94,
+     "other:shoot": 88,
+     "other:branch": 32,
+     "grandparent:trunk": 21
+    }
+   },
+   "demo": {
+    "rate": {
+     "jaw_hit": 0.6904,
+     "perpendicular": 0.6748,
+     "radius_ok": 0.7278,
+     "clear_other": 0.2582,
+     "gate_only": 0.644,
+     "success": 0.2355,
+     "clear_other_surface": 0.1027,
+     "success_surface": 0.0949
+    },
+    "rate_given_paired": {
+     "jaw_hit": 0.9486,
+     "perpendicular": 0.9272,
+     "radius_ok": 1.0,
+     "clear_other": 0.3548,
+     "gate_only": 0.8848,
+     "success": 0.3235,
+     "clear_other_surface": 0.1411,
+     "success_surface": 0.1304
+    },
+    "counts": {
+     "jaw_hit": 6556,
+     "perpendicular": 6408,
+     "radius_ok": 6911,
+     "clear_other": 2452,
+     "gate_only": 6115,
+     "success": 2236,
+     "clear_other_surface": 975,
+     "success_surface": 901
+    },
+    "success_per_tree": {
+     "lpy_envy_00042": 0.2501,
+     "lpy_envy_00065": 0.2151
+    },
+    "success_per_gt_class": {
+     "branch": 0.2114,
+     "shoot": 0.1812,
+     "spur": 0.2459
+    },
+    "other_wood_hits": {
+     "parent:branch": 2098,
+     "sibling:spur": 1930,
+     "parent:shoot": 1021,
+     "parent:trunk": 440,
+     "sibling:shoot": 216,
+     "sibling:branch": 45,
+     "other:spur": 42,
+     "other:shoot": 23,
+     "child:spur": 21,
+     "grandparent:branch": 2
+    }
+   },
+   "degenerate_poses": 0
+  },
+  "fit/oracle/gt/sensed_depth": {
+   "n_gt_cuts": 9496,
+   "n_paired": 6911,
+   "paired_rate": 0.7278,
+   "legacy": {
+    "rate": {
+     "jaw_hit": 0.7112,
+     "perpendicular": 0.6748,
+     "clear_target": 0.5029,
+     "clear_other": 0.2335,
+     "success_isolated": 0.4546,
+     "success": 0.1225,
+     "clear_other_surface": 0.0313,
+     "success_surface": 0.0124
+    },
+    "rate_given_paired": {
+     "jaw_hit": 0.9773,
+     "perpendicular": 0.9272,
+     "clear_target": 0.6911,
+     "clear_other": 0.3208,
+     "success_isolated": 0.6247,
+     "success": 0.1683,
+     "clear_other_surface": 0.043,
+     "success_surface": 0.0171
+    },
+    "counts": {
+     "jaw_hit": 6754,
+     "perpendicular": 6408,
+     "clear_target": 4776,
+     "clear_other": 2217,
+     "success_isolated": 4317,
+     "success": 1163,
+     "clear_other_surface": 297,
+     "success_surface": 118
+    },
+    "success_per_tree": {
+     "lpy_envy_00042": 0.1151,
+     "lpy_envy_00065": 0.1327
+    },
+    "success_per_gt_class": {
+     "branch": 0.1653,
+     "shoot": 0.0579,
+     "spur": 0.1315
+    },
+    "other_wood_hits": {
+     "parent:branch": 2503,
+     "sibling:spur": 1947,
+     "parent:shoot": 854,
+     "sibling:shoot": 372,
+     "parent:trunk": 327,
+     "other:spur": 273,
+     "child:spur": 126,
+     "sibling:branch": 108,
+     "other:shoot": 98,
+     "grandparent:branch": 95,
+     "other:branch": 32,
+     "grandparent:trunk": 21
+    }
+   },
+   "demo": {
+    "rate": {
+     "jaw_hit": 0.6813,
+     "perpendicular": 0.6748,
+     "radius_ok": 0.7278,
+     "clear_other": 0.2555,
+     "gate_only": 0.6366,
+     "success": 0.2204,
+     "clear_other_surface": 0.0999,
+     "success_surface": 0.0836
+    },
+    "rate_given_paired": {
+     "jaw_hit": 0.9362,
+     "perpendicular": 0.9272,
+     "radius_ok": 1.0,
+     "clear_other": 0.351,
+     "gate_only": 0.8747,
+     "success": 0.3029,
+     "clear_other_surface": 0.1373,
+     "success_surface": 0.1149
+    },
+    "counts": {
+     "jaw_hit": 6470,
+     "perpendicular": 6408,
+     "radius_ok": 6911,
+     "clear_other": 2426,
+     "gate_only": 6045,
+     "success": 2093,
+     "clear_other_surface": 949,
+     "success_surface": 794
+    },
+    "success_per_tree": {
+     "lpy_envy_00042": 0.2347,
+     "lpy_envy_00065": 0.2005
+    },
+    "success_per_gt_class": {
+     "branch": 0.1924,
+     "shoot": 0.1504,
+     "spur": 0.2337
+    },
+    "other_wood_hits": {
+     "parent:branch": 2155,
+     "sibling:spur": 1910,
+     "parent:shoot": 1046,
+     "parent:trunk": 455,
+     "sibling:shoot": 212,
+     "sibling:branch": 50,
+     "other:spur": 37,
+     "child:spur": 18,
+     "other:shoot": 18
+    }
+   },
+   "degenerate_poses": 0
+  },
+  "fit/truth/-/control": {
+   "n_gt_cuts": 9496,
+   "n_paired": 9496,
+   "paired_rate": 1.0,
+   "legacy": {
+    "rate": {
+     "jaw_hit": 1.0,
+     "perpendicular": 1.0,
+     "clear_target": 1.0,
+     "clear_other": 0.2377,
+     "success_isolated": 1.0,
+     "success": 0.2377,
+     "clear_other_surface": 0.0256,
+     "success_surface": 0.0256
+    },
+    "rate_given_paired": {
+     "jaw_hit": 1.0,
+     "perpendicular": 1.0,
+     "clear_target": 1.0,
+     "clear_other": 0.2377,
+     "success_isolated": 1.0,
+     "success": 0.2377,
+     "clear_other_surface": 0.0256,
+     "success_surface": 0.0256
+    },
+    "counts": {
+     "jaw_hit": 9496,
+     "perpendicular": 9496,
+     "clear_target": 9496,
+     "clear_other": 2257,
+     "success_isolated": 9496,
+     "success": 2257,
+     "clear_other_surface": 243,
+     "success_surface": 243
+    },
+    "success_per_tree": {
+     "lpy_envy_00042": 0.238,
+     "lpy_envy_00065": 0.2373
+    },
+    "success_per_gt_class": {
+     "branch": 0.2846,
+     "shoot": 0.2602,
+     "spur": 0.2316
+    },
+    "other_wood_hits": {
+     "parent:branch": 4082,
+     "sibling:spur": 2832,
+     "parent:shoot": 1334,
+     "sibling:shoot": 619,
+     "parent:trunk": 572,
+     "other:spur": 375,
+     "sibling:branch": 161,
+     "other:shoot": 158,
+     "grandparent:branch": 158,
+     "child:spur": 130,
+     "other:branch": 83,
+     "grandparent:trunk": 36
+    }
+   },
+   "demo": {
+    "rate": {
+     "jaw_hit": 1.0,
+     "perpendicular": 1.0,
+     "radius_ok": 1.0,
+     "clear_other": 0.1006,
+     "gate_only": 1.0,
+     "success": 0.1006,
+     "clear_other_surface": 0.0,
+     "success_surface": 0.0
+    },
+    "rate_given_paired": {
+     "jaw_hit": 1.0,
+     "perpendicular": 1.0,
+     "radius_ok": 1.0,
+     "clear_other": 0.1006,
+     "gate_only": 1.0,
+     "success": 0.1006,
+     "clear_other_surface": 0.0,
+     "success_surface": 0.0
+    },
+    "counts": {
+     "jaw_hit": 9496,
+     "perpendicular": 9496,
+     "radius_ok": 9496,
+     "clear_other": 955,
+     "gate_only": 9496,
+     "success": 955,
+     "clear_other_surface": 0,
+     "success_surface": 0
+    },
+    "success_per_tree": {
+     "lpy_envy_00042": 0.0977,
+     "lpy_envy_00065": 0.1045
+    },
+    "success_per_gt_class": {
+     "branch": 0.0,
+     "shoot": 0.0519,
+     "spur": 0.1136
+    },
+    "other_wood_hits": {
+     "parent:branch": 5312,
+     "sibling:spur": 3568,
+     "parent:shoot": 1684,
+     "parent:trunk": 930,
+     "sibling:shoot": 591,
+     "other:spur": 64,
+     "other:shoot": 62,
+     "sibling:branch": 42,
+     "child:spur": 25
+    }
+   },
+   "degenerate_poses": 0
+  },
+  "fit/branchnet/fused/open_loop": {
+   "n_gt_cuts": 9496,
+   "n_paired": 4319,
+   "paired_rate": 0.4548,
+   "legacy": {
+    "rate": {
+     "jaw_hit": 0.3677,
+     "perpendicular": 0.4173,
+     "clear_target": 0.2154,
+     "clear_other": 0.1591,
+     "success_isolated": 0.1185,
+     "success": 0.0495,
+     "clear_other_surface": 0.0344,
+     "success_surface": 0.0061
+    },
+    "rate_given_paired": {
+     "jaw_hit": 0.8085,
+     "perpendicular": 0.9176,
+     "clear_target": 0.4735,
+     "clear_other": 0.3498,
+     "success_isolated": 0.2605,
+     "success": 0.1088,
+     "clear_other_surface": 0.0757,
+     "success_surface": 0.0134
+    },
+    "counts": {
+     "jaw_hit": 3492,
+     "perpendicular": 3963,
+     "clear_target": 2045,
+     "clear_other": 1511,
+     "success_isolated": 1125,
+     "success": 470,
+     "clear_other_surface": 327,
+     "success_surface": 58
+    },
+    "success_per_tree": {
+     "lpy_envy_00042": 0.0483,
+     "lpy_envy_00065": 0.0511
+    },
+    "success_per_gt_class": {
+     "branch": 0.1491,
+     "shoot": 0.0361,
+     "spur": 0.0471
+    },
+    "other_wood_hits": {
+     "parent:branch": 1480,
+     "sibling:spur": 1469,
+     "parent:shoot": 432,
+     "sibling:shoot": 287,
+     "parent:trunk": 211,
+     "other:spur": 182,
+     "child:spur": 94,
+     "sibling:branch": 74,
+     "other:shoot": 69,
+     "grandparent:branch": 53,
+     "other:branch": 31,
+     "grandparent:trunk": 18,
+     "other:trunk": 4,
+     "child:shoot": 1
+    }
+   },
+   "demo": {
+    "rate": {
+     "jaw_hit": 0.2938,
+     "perpendicular": 0.4173,
+     "radius_ok": 0.4548,
+     "clear_other": 0.1611,
+     "gate_only": 0.276,
+     "success": 0.088,
+     "clear_other_surface": 0.0669,
+     "success_surface": 0.0283
+    },
+    "rate_given_paired": {
+     "jaw_hit": 0.646,
+     "perpendicular": 0.9176,
+     "radius_ok": 1.0,
+     "clear_other": 0.3542,
+     "gate_only": 0.6069,
+     "success": 0.1936,
+     "clear_other_surface": 0.147,
+     "success_surface": 0.0623
+    },
+    "counts": {
+     "jaw_hit": 2790,
+     "perpendicular": 3963,
+     "radius_ok": 4319,
+     "clear_other": 1530,
+     "gate_only": 2621,
+     "success": 836,
+     "clear_other_surface": 635,
+     "success_surface": 269
+    },
+    "success_per_tree": {
+     "lpy_envy_00042": 0.0883,
+     "lpy_envy_00065": 0.0877
+    },
+    "success_per_gt_class": {
+     "branch": 0.1572,
+     "shoot": 0.0714,
+     "spur": 0.0876
+    },
+    "other_wood_hits": {
+     "parent:branch": 1531,
+     "sibling:spur": 1184,
+     "parent:shoot": 356,
+     "parent:trunk": 329,
+     "sibling:shoot": 186,
+     "other:spur": 34,
+     "other:shoot": 28,
+     "sibling:branch": 25,
+     "child:spur": 14,
+     "grandparent:branch": 5
+    }
+   },
+   "degenerate_poses": 0
+  },
+  "fit/branchnet/fused/sensed_depth": {
+   "n_gt_cuts": 9496,
+   "n_paired": 4319,
+   "paired_rate": 0.4548,
+   "legacy": {
+    "rate": {
+     "jaw_hit": 0.4307,
+     "perpendicular": 0.4173,
+     "clear_target": 0.2317,
+     "clear_other": 0.1546,
+     "success_isolated": 0.1909,
+     "success": 0.0503,
+     "clear_other_surface": 0.0152,
+     "success_surface": 0.0029
+    },
+    "rate_given_paired": {
+     "jaw_hit": 0.947,
+     "perpendicular": 0.9176,
+     "clear_target": 0.5094,
+     "clear_other": 0.3399,
+     "success_isolated": 0.4198,
+     "success": 0.1107,
+     "clear_other_surface": 0.0333,
+     "success_surface": 0.0065
+    },
+    "counts": {
+     "jaw_hit": 4090,
+     "perpendicular": 3963,
+     "clear_target": 2200,
+     "clear_other": 1468,
+     "success_isolated": 1813,
+     "success": 478,
+     "clear_other_surface": 144,
+     "success_surface": 28
+    },
+    "success_per_tree": {
+     "lpy_envy_00042": 0.0469,
+     "lpy_envy_00065": 0.0552
+    },
+    "success_per_gt_class": {
+     "branch": 0.1138,
+     "shoot": 0.0368,
+     "spur": 0.0496
+    },
+    "other_wood_hits": {
+     "parent:branch": 1530,
+     "sibling:spur": 1303,
+     "parent:shoot": 406,
+     "sibling:shoot": 256,
+     "parent:trunk": 222,
+     "other:spur": 163,
+     "child:spur": 91,
+     "sibling:branch": 75,
+     "other:shoot": 70,
+     "grandparent:branch": 52,
+     "other:branch": 28,
+     "grandparent:trunk": 16,
+     "child:shoot": 1
+    }
+   },
+   "demo": {
+    "rate": {
+     "jaw_hit": 0.3814,
+     "perpendicular": 0.4173,
+     "radius_ok": 0.4548,
+     "clear_other": 0.1408,
+     "gate_only": 0.3588,
+     "success": 0.1053,
+     "clear_other_surface": 0.0508,
+     "success_surface": 0.0335
+    },
+    "rate_given_paired": {
+     "jaw_hit": 0.8386,
+     "perpendicular": 0.9176,
+     "radius_ok": 1.0,
+     "clear_other": 0.3096,
+     "gate_only": 0.7888,
+     "success": 0.2315,
+     "clear_other_surface": 0.1116,
+     "success_surface": 0.0736
+    },
+    "counts": {
+     "jaw_hit": 3622,
+     "perpendicular": 3963,
+     "radius_ok": 4319,
+     "clear_other": 1337,
+     "gate_only": 3407,
+     "success": 1000,
+     "clear_other_surface": 482,
+     "success_surface": 318
+    },
+    "success_per_tree": {
+     "lpy_envy_00042": 0.1055,
+     "lpy_envy_00065": 0.105
+    },
+    "success_per_gt_class": {
+     "branch": 0.1463,
+     "shoot": 0.0737,
+     "spur": 0.1088
+    },
+    "other_wood_hits": {
+     "parent:branch": 1642,
+     "sibling:spur": 1336,
+     "parent:shoot": 491,
+     "parent:trunk": 347,
+     "sibling:shoot": 198,
+     "other:spur": 26,
+     "other:shoot": 25,
+     "sibling:branch": 25,
+     "child:spur": 13,
+     "grandparent:branch": 4
+    }
+   },
+   "degenerate_poses": 0
+  },
+  "fit/branchnet/gt/open_loop": {
+   "n_gt_cuts": 9496,
+   "n_paired": 6260,
+   "paired_rate": 0.6592,
+   "legacy": {
+    "rate": {
+     "jaw_hit": 0.6134,
+     "perpendicular": 0.6064,
+     "clear_target": 0.4866,
+     "clear_other": 0.2466,
+     "success_isolated": 0.4054,
+     "success": 0.1606,
+     "clear_other_surface": 0.0404,
+     "success_surface": 0.0212
+    },
+    "rate_given_paired": {
+     "jaw_hit": 0.9305,
+     "perpendicular": 0.9198,
+     "clear_target": 0.7382,
+     "clear_other": 0.3741,
+     "success_isolated": 0.615,
+     "success": 0.2436,
+     "clear_other_surface": 0.0613,
+     "success_surface": 0.0321
+    },
+    "counts": {
+     "jaw_hit": 5825,
+     "perpendicular": 5758,
+     "clear_target": 4621,
+     "clear_other": 2342,
+     "success_isolated": 3850,
+     "success": 1525,
+     "clear_other_surface": 384,
+     "success_surface": 201
+    },
+    "success_per_tree": {
+     "lpy_envy_00042": 0.162,
+     "lpy_envy_00065": 0.1587
+    },
+    "success_per_gt_class": {
+     "branch": 0.2331,
+     "shoot": 0.0744,
+     "spur": 0.1719
+    },
+    "other_wood_hits": {
+     "parent:branch": 2079,
+     "sibling:spur": 1675,
+     "parent:shoot": 658,
+     "sibling:shoot": 321,
+     "other:spur": 236,
+     "parent:trunk": 228,
+     "child:spur": 98,
+     "sibling:branch": 86,
+     "grandparent:branch": 86,
+     "other:shoot": 82,
+     "other:branch": 30,
+     "grandparent:trunk": 26
+    }
+   },
+   "demo": {
+    "rate": {
+     "jaw_hit": 0.6092,
+     "perpendicular": 0.6064,
+     "radius_ok": 0.6592,
+     "clear_other": 0.2389,
+     "gate_only": 0.5657,
+     "success": 0.2144,
+     "clear_other_surface": 0.0953,
+     "success_surface": 0.0859
+    },
+    "rate_given_paired": {
+     "jaw_hit": 0.9241,
+     "perpendicular": 0.9198,
+     "radius_ok": 1.0,
+     "clear_other": 0.3625,
+     "gate_only": 0.8581,
+     "success": 0.3252,
+     "clear_other_surface": 0.1446,
+     "success_surface": 0.1304
+    },
+    "counts": {
+     "jaw_hit": 5785,
+     "perpendicular": 5758,
+     "radius_ok": 6260,
+     "clear_other": 2269,
+     "gate_only": 5372,
+     "success": 2036,
+     "clear_other_surface": 905,
+     "success_surface": 816
+    },
+    "success_per_tree": {
+     "lpy_envy_00042": 0.2244,
+     "lpy_envy_00065": 0.2005
+    },
+    "success_per_gt_class": {
+     "branch": 0.2033,
+     "shoot": 0.1586,
+     "spur": 0.2244
+    },
+    "other_wood_hits": {
+     "parent:branch": 1973,
+     "sibling:spur": 1616,
+     "parent:shoot": 815,
+     "parent:trunk": 353,
+     "sibling:shoot": 210,
+     "other:spur": 44,
+     "other:shoot": 32,
+     "sibling:branch": 27,
+     "child:spur": 20,
+     "grandparent:branch": 3
+    }
+   },
+   "degenerate_poses": 0
+  },
+  "fit/branchnet/gt/sensed_depth": {
+   "n_gt_cuts": 9496,
+   "n_paired": 6260,
+   "paired_rate": 0.6592,
+   "legacy": {
+    "rate": {
+     "jaw_hit": 0.6378,
+     "perpendicular": 0.6064,
+     "clear_target": 0.4544,
+     "clear_other": 0.2157,
+     "success_isolated": 0.402,
+     "success": 0.105,
+     "clear_other_surface": 0.0274,
+     "success_surface": 0.0085
+    },
+    "rate_given_paired": {
+     "jaw_hit": 0.9676,
+     "perpendicular": 0.9198,
+     "clear_target": 0.6893,
+     "clear_other": 0.3272,
+     "success_isolated": 0.6097,
+     "success": 0.1593,
+     "clear_other_surface": 0.0415,
+     "success_surface": 0.0129
+    },
+    "counts": {
+     "jaw_hit": 6057,
+     "perpendicular": 5758,
+     "clear_target": 4315,
+     "clear_other": 2048,
+     "success_isolated": 3817,
+     "success": 997,
+     "clear_other_surface": 260,
+     "success_surface": 81
+    },
+    "success_per_tree": {
+     "lpy_envy_00042": 0.0972,
+     "lpy_envy_00065": 0.1159
+    },
+    "success_per_gt_class": {
+     "branch": 0.1463,
+     "shoot": 0.0549,
+     "spur": 0.1116
+    },
+    "other_wood_hits": {
+     "parent:branch": 2320,
+     "sibling:spur": 1784,
+     "parent:shoot": 725,
+     "sibling:shoot": 338,
+     "parent:trunk": 271,
+     "other:spur": 223,
+     "child:spur": 102,
+     "sibling:branch": 98,
+     "grandparent:branch": 85,
+     "other:shoot": 84,
+     "other:branch": 27,
+     "grandparent:trunk": 24
+    }
+   },
+   "demo": {
+    "rate": {
+     "jaw_hit": 0.603,
+     "perpendicular": 0.6064,
+     "radius_ok": 0.6592,
+     "clear_other": 0.2389,
+     "gate_only": 0.5607,
+     "success": 0.1998,
+     "clear_other_surface": 0.094,
+     "success_surface": 0.0737
+    },
+    "rate_given_paired": {
+     "jaw_hit": 0.9147,
+     "perpendicular": 0.9198,
+     "radius_ok": 1.0,
+     "clear_other": 0.3625,
+     "gate_only": 0.8505,
+     "success": 0.303,
+     "clear_other_surface": 0.1427,
+     "success_surface": 0.1118
+    },
+    "counts": {
+     "jaw_hit": 5726,
+     "perpendicular": 5758,
+     "radius_ok": 6260,
+     "clear_other": 2269,
+     "gate_only": 5324,
+     "success": 1897,
+     "clear_other_surface": 893,
+     "success_surface": 700
+    },
+    "success_per_tree": {
+     "lpy_envy_00042": 0.2106,
+     "lpy_envy_00065": 0.1846
+    },
+    "success_per_gt_class": {
+     "branch": 0.1843,
+     "shoot": 0.1323,
+     "spur": 0.212
+    },
+    "other_wood_hits": {
+     "parent:branch": 2018,
+     "sibling:spur": 1610,
+     "parent:shoot": 826,
+     "parent:trunk": 366,
+     "sibling:shoot": 212,
+     "other:spur": 41,
+     "sibling:branch": 27,
+     "other:shoot": 21,
+     "child:spur": 12,
+     "grandparent:branch": 2
+    }
+   },
+   "degenerate_poses": 0
+  }
+ },
+ "registered": {
+  "pose_rule": "approach = camera-to-perceived-target ray made perpendicular to the perceived axis (camera at the origin of the OpenCV camera frame); closing axis = normalize(cross(approach, perceived axis)) as in render_pruning_workflow.py proxy_closing_w and closing_axis_tool_at; tool x = closing axis, tool z = approach, tool y = z cross x = -perceived axis (base->tip axis from Part.cut())",
+  "closing_axis_sign": "the demo flips its PCA axis so the largest world component is positive (blender_component.py), which has no camera-frame equivalent; here the base->tip Part.cut() axis is used. The sign matters only for the legacy boxes' +y offset (mouth y in [-12.6, 42.0] mm, failure y in [-65.5, 94.5] mm); the demo jaws are symmetric",
+  "degenerate_rule": "if |ray - (ray.u)u| < 0.001, camera z then y stands in",
+  "legacy": {
+   "spec_source": "stl_aabb_pybullet_tree_sim_4d9f838",
+   "mouth_half_extents_m": [
+    0.007652,
+    0.027309,
+    0.024962
+   ],
+   "mouth_offset_m": [
+    0.000693,
+    0.014691,
+    0.024962
+   ],
+   "failure_half_extents_m": [
+    0.007,
+    0.08,
+    0.03
+   ],
+   "failure_offset_m": [
+    0.000447,
+    0.014543,
+    0.012502
+   ],
+   "perpendicularity_tolerance_deg": 15.0,
+   "success_window_tool_z_m": [
+    0.042502,
+    0.049924
+   ],
+   "perceived_point_in_tool_m": [
+    0.000693,
+    0.014691,
+    0.046213000000000004
+   ],
+   "closing_axis": "tool x (pruning_env._compute_cut_success)",
+   "other_wood": "nearby_wood_in_failure_zone over every other cylinder (axis lines)"
+  },
+  "demo": {
+   "mouth_offset_tool_m": [
+    0.0,
+    0.0,
+    0.07
+   ],
+   "gate": {
+    "max_branch_radius_m": 0.012,
+    "mouth_position_tolerance_m": 0.008,
+    "alignment_tolerance_deg": 15.0
+   },
+   "gate_inputs": "target = closest point of the true segment to the mouth, axis = true segment direction, radius = true median radius, semantic 'branch', age 0",
+   "jaw_sweep_box": {
+    "centre_tool_m": [
+     0.0,
+     0.0,
+     0.07
+    ],
+    "half_extents_m": [
+     0.022,
+     0.0125,
+     0.015
+    ],
+    "from": {
+     "half_extents_m": [
+      0.003,
+      0.0125,
+      0.015
+     ],
+     "open_gap_m": 0.032,
+     "height_m": 0.07
+    },
+    "note": "proxy-specific clearance (other wood inside the open jaws' sweep); Isaac's gate sees only contact-sensor hazards and its jaws are visual, so 'success' is stricter than Isaac's own gate ('gate_only')"
+   }
+  },
+  "truth": {
+   "segment": "GT part axis between arc lengths max(0, s_c - L/2) and min(len, s_c + L/2), s_c = min(0.015, len/2) as Part.cut(); straight chord",
+   "truth_segment_m": 0.1,
+   "length_grid_m": [
+    0.01,
+    0.02,
+    0.03,
+    0.05,
+    0.075,
+    0.1
+   ],
+   "other_wood": "every other cylinder of the L-Py tree model (occluded too), camera frame via the cache's T_wc; the target part's own cylinders are excluded",
+   "radius": "primary columns use axis lines as the Isaac primitives do; *_surface columns grow each box by the other wood's radius (target never inflated)",
+   "prefilter_m": 0.25
+  },
+  "sensed_depth": "p' = p - ((p - p_gt).a) a with the open-loop approach a and the same tool rotation (a live insertion stop zeroes the depth error along the approach)",
+  "pairing": "metrics._cut_counts Jain tier (5 cm, 30 deg), replicated and checked per frame; unpaired observable GT cuts are failures; don't-care pairs are skipped"
+ }
+}

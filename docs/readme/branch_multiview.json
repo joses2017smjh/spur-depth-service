@@ -1,0 +1,36 @@
+{
+  "tree": "lpy_envy_00065",
+  "rig": "box_cam1",
+  "frames": [
+    "lpy_envy_00065/box_cam1/lpy_envy_00065_shot01_l",
+    "lpy_envy_00065/box_cam1/lpy_envy_00065_shot01_r",
+    "lpy_envy_00065/box_cam1/lpy_envy_00065_shot02_l",
+    "lpy_envy_00065/box_cam1/lpy_envy_00065_shot02_r",
+    "lpy_envy_00065/box_cam1/lpy_envy_00065_shot03_l",
+    "lpy_envy_00065/box_cam1/lpy_envy_00065_shot03_r",
+    "lpy_envy_00065/box_cam1/lpy_envy_00065_shot04_l",
+    "lpy_envy_00065/box_cam1/lpy_envy_00065_shot04_r",
+    "lpy_envy_00065/box_cam1/lpy_envy_00065_shot05_l",
+    "lpy_envy_00065/box_cam1/lpy_envy_00065_shot05_r",
+    "lpy_envy_00065/box_cam1/lpy_envy_00065_shot06_l",
+    "lpy_envy_00065/box_cam1/lpy_envy_00065_shot06_r"
+  ],
+  "assemble_config": {
+    "orphan_cost": 1.2,
+    "junction_bonus": 0.0,
+    "depth_percentile": 50.0,
+    "cut_axis": "fit",
+    "cut_fit_lo_m": 0.03,
+    "cut_fit_hi_m": 0.15
+  },
+  "fuse_config": {
+    "assoc_tol_m": 0.03,
+    "min_views": 2,
+    "view_mode": "anchored",
+    "smooth_m": 0.02
+  },
+  "pred_dir": "/nfs/hpc/share/sanchej7/spur-branch-runs/21523238/pred",
+  "single_frame_parts": 1906,
+  "fused_parts": 366,
+  "gt_parts_visible_in_any_frame": 223
+}
