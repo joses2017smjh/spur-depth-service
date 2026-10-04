@@ -192,3 +192,19 @@ The `cdm` source of `scripts/eval_branches.py` now defaults to the round-2
 directory. The fine-tune's predictions (`spur-branch-runs/21532184/pred`) are
 scored as `branchnet` in a separate output directory, so they never share rows
 with run 21523238's.
+
+## v2 test scoring record (2026-10-04)
+
+- Single-frame (`test_v2/fit`: oracle, TinyUNet, BranchNet run 21523238; `test_v2/ft`:
+  the fine-tune) and multi-view (`test_v2/mv`) rows were scored once from the
+  frozen clone `adabaf8`, with config C + the fitted axis and the registered fuse
+  config, into their own directories. The v1 rows are untouched.
+- Review: two blind review agents (Isaac proxy; multi-view harness and the v2 scorer
+  changes) were stopped by API rate limits before reading any code. Checks that ran
+  instead: the multi-view test harness reproduces the val driver's rows for the selected
+  config exactly (804 fields over the 12 frames of `lpy_envy_00001/box`); a main-session
+  read of the proxy's graph-cache key (it includes the full assembly config, the
+  prediction provenance and the build-path file hashes), its pairing (the scorer's Jain
+  assignment, input for input), its test guard, and its unit tests (5 pass).
+- Isaac proxy test runs: one output directory per configuration (tangent, fitted axis)
+  and method, from a frozen clone, with the registered truth length (0.10 m).

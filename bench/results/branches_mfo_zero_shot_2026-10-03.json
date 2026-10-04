@@ -1,0 +1,1903 @@
+{
+  "what": "BranchNet (synthetic-only training) zero-shot on MFO cherry UFORozaVideos labels",
+  "protocol": "data     the 386 current UFORozaVideos frames (``video_184/old/`` is a superseded\n           copy and is skipped); splits by video id as shipped with the data:\n           train 89-163, val 164-173, test 174-184\n  labels   labelme polygons rasterised as labelme does (PIL polygon, outline and\n           fill), later on top: nonbranch, other, leader, sidebranch, spur; leader ->\n           trunk, sidebranch -> branch, spur -> spur, other -> ignored for the\n           per-class scores, nonbranch and unlabelled -> background; a label outside\n           these five names is treated as \"other\" and counted in the manifest\n  input    RGB only: depth \"none\" (1/z = 0, valid = 0), one of the four inputs\n           BranchNet trained with (10% of crops); the frames carry no metric depth\n  predict  RGB upsampled bicubic (cv2.INTER_CUBIC) by f in {1, 1.6, 2.4}, full frame\n           (``forward_full`` pads to the stride), softmax resized back to 640x480\n           (bilinear, align_corners=False, no antialias), argmax; predicted shoot\n           is scored as branch\n  metrics  micro-averaged pixel counts per split: IoU of trunk, branch and spur\n           with \"other\" pixels ignored, their mean (mIoU over the classes present),\n           binary wood IoU against ``N_t.png`` (predicted wood = any non-background\n           class), recall of labelled wood, and the raw confusion matrix of GT\n           {background, leader, sidebranch, spur, other, nonbranch} x predicted\n           {background, trunk, branch, shoot, spur}\n  select   the factor with the highest val 3-class mIoU (ties: the smaller factor)\n           is written to ``results/mfo_selection.json`` before any train or test\n           frame is predicted; it is the headline, all factors are reported",
+  "gt_mapping": {
+    "leader": "trunk (1)",
+    "sidebranch": "branch (2)",
+    "spur": "spur (4)",
+    "other": "ignored in per-class IoU; wood for N_t.png and labelled-wood recall",
+    "nonbranch": "background (0)",
+    "unlabelled": "background (0)",
+    "rasterisation_order": [
+      "nonbranch",
+      "other",
+      "leader",
+      "sidebranch",
+      "spur"
+    ]
+  },
+  "depth_input": "none (1/z = 0, valid = 0)",
+  "factors": [
+    1.0,
+    1.6,
+    2.4
+  ],
+  "selection": {
+    "file": "/nfs/hpc/share/sanchej7/spur-realdata/results/mfo_selection.json",
+    "sha256": "9702c718d1639fe211cee96605f3b321d31eecee91e8e8fc870f4ccf66444c73",
+    "chosen_factor": 1.0,
+    "val_miou3": {
+      "x1": 0.09698073640848624,
+      "x1.6": 0.09148316010016318,
+      "x2.4": 0.06459026709222933
+    },
+    "written_at": "2026-10-03T11:34:17-07:00",
+    "script_unchanged_since_selection": true
+  },
+  "headline": {
+    "factor": 1.0,
+    "val": {
+      "miou3": 0.09698073640848624,
+      "iou": {
+        "trunk": 0.23695814027453505,
+        "branch": 0.04001478509702406,
+        "spur": 0.013969283853899632
+      },
+      "wood_iou_t": 0.17134888303908316,
+      "labelled_wood_recall": 0.5913391171463226
+    },
+    "test": {
+      "miou3": 0.12283935714467692,
+      "iou": {
+        "trunk": 0.28584913255801686,
+        "branch": 0.06617952278029858,
+        "spur": 0.016489416095715307
+      },
+      "wood_iou_t": 0.23597567434697464,
+      "labelled_wood_recall": 0.7507083194704677
+    },
+    "train": {
+      "miou3": 0.11217834892497568,
+      "iou": {
+        "trunk": 0.2710774063398533,
+        "branch": 0.053211941563487124,
+        "spur": 0.01224569887158663
+      },
+      "wood_iou_t": 0.18927109908596765,
+      "labelled_wood_recall": 0.7126151428942143
+    }
+  },
+  "splits": {
+    "val": {
+      "frames": 45,
+      "videos": [
+        164,
+        165,
+        166,
+        167,
+        168,
+        169
+      ],
+      "factors": {
+        "x1": {
+          "trunk": {
+            "iou": 0.23695814027453505,
+            "precision": 0.6421009333346391,
+            "recall": 0.27301763123485273,
+            "tp": 262252,
+            "fp": 146176,
+            "fn": 698316
+          },
+          "branch": {
+            "iou": 0.04001478509702406,
+            "precision": 0.04290694062664395,
+            "recall": 0.37250745279894004,
+            "tp": 95591,
+            "fp": 2132277,
+            "fn": 161024
+          },
+          "spur": {
+            "iou": 0.013969283853899632,
+            "precision": 0.014753341618001013,
+            "recall": 0.20814354331986898,
+            "tp": 21797,
+            "fp": 1455631,
+            "fn": 82924
+          },
+          "miou3": 0.09698073640848624,
+          "miou3_classes": [
+            "trunk",
+            "branch",
+            "spur"
+          ],
+          "wood_vs_t": {
+            "iou": 0.17134888303908316,
+            "precision": 0.19459799378713044,
+            "recall": 0.589189403436866,
+            "tp": 802714,
+            "fp": 3322272,
+            "fn": 559690
+          },
+          "labelled_wood_recall": 0.5913391171463226,
+          "labelled_wood_recall_excl_other": 0.5945000544668901,
+          "wood_recall_by_label": {
+            "leader": 0.5986801559077546,
+            "sidebranch": 0.6096447986282953,
+            "spur": 0.5190458456279066,
+            "other": 0.4313124736701007,
+            "nonbranch": 0.3882554748889081
+          },
+          "background_predicted_wood_rate": 0.26057773846426846,
+          "confusion": {
+            "rows_gt": [
+              "background",
+              "leader",
+              "sidebranch",
+              "spur",
+              "other",
+              "nonbranch"
+            ],
+            "cols_pred": [
+              "background",
+              "trunk",
+              "branch",
+              "shoot",
+              "spur"
+            ],
+            "counts": [
+              [
+                8779738,
+                130490,
+                1399909,
+                360287,
+                1203357
+              ],
+              [
+                385495,
+                262252,
+                179956,
+                15230,
+                117635
+              ],
+              [
+                100171,
+                2850,
+                71863,
+                23728,
+                58003
+              ],
+              [
+                50366,
+                2051,
+                24290,
+                6217,
+                21797
+              ],
+              [
+                14849,
+                0,
+                3053,
+                710,
+                7499
+              ],
+              [
+                368395,
+                10785,
+                130497,
+                15891,
+                76636
+              ]
+            ]
+          }
+        },
+        "x1.6": {
+          "trunk": {
+            "iou": 0.21767390056857988,
+            "precision": 0.6039534578518209,
+            "recall": 0.25391851487869677,
+            "tp": 243906,
+            "fp": 159943,
+            "fn": 716662
+          },
+          "branch": {
+            "iou": 0.044108661273896954,
+            "precision": 0.0470304076824984,
+            "recall": 0.41520565828186196,
+            "tp": 106548,
+            "fp": 2158965,
+            "fn": 150067
+          },
+          "spur": {
+            "iou": 0.012666918458012726,
+            "precision": 0.013636900090539368,
+            "recall": 0.1511635679567613,
+            "tp": 15830,
+            "fp": 1144991,
+            "fn": 88891
+          },
+          "miou3": 0.09148316010016318,
+          "miou3_classes": [
+            "trunk",
+            "branch",
+            "spur"
+          ],
+          "wood_vs_t": {
+            "iou": 0.17379025939399953,
+            "precision": 0.2005411177132664,
+            "recall": 0.5657536237415627,
+            "tp": 770785,
+            "fp": 3072741,
+            "fn": 591619
+          },
+          "labelled_wood_recall": 0.5677948687514605,
+          "labelled_wood_recall_excl_other": 0.56891650225735,
+          "wood_recall_by_label": {
+            "leader": 0.5628482314630511,
+            "sidebranch": 0.608230228162812,
+            "spur": 0.5282417089218018,
+            "other": 0.5110106851518517,
+            "nonbranch": 0.333994792462355
+          },
+          "background_predicted_wood_rate": 0.2422983041374942,
+          "confusion": {
+            "rows_gt": [
+              "background",
+              "leader",
+              "sidebranch",
+              "spur",
+              "other",
+              "nonbranch"
+            ],
+            "cols_pred": [
+              "background",
+              "trunk",
+              "branch",
+              "shoot",
+              "spur"
+            ],
+            "counts": [
+              [
+                8996784,
+                112633,
+                1500620,
+                290072,
+                973672
+              ],
+              [
+                419914,
+                243906,
+                215257,
+                5911,
+                75580
+              ],
+              [
+                100534,
+                4823,
+                93491,
+                13057,
+                44710
+              ],
+              [
+                49403,
+                1917,
+                35020,
+                2551,
+                15830
+              ],
+              [
+                12768,
+                0,
+                6149,
+                597,
+                6597
+              ],
+              [
+                401071,
+                40570,
+                94195,
+                15339,
+                51029
+              ]
+            ]
+          }
+        },
+        "x2.4": {
+          "trunk": {
+            "iou": 0.13741080312342588,
+            "precision": 0.4863451664724226,
+            "recall": 0.16073822988065395,
+            "tp": 154400,
+            "fp": 163070,
+            "fn": 806168
+          },
+          "branch": {
+            "iou": 0.04594844977012788,
+            "precision": 0.04915015246549557,
+            "recall": 0.4136157278413187,
+            "tp": 106140,
+            "fp": 2053365,
+            "fn": 150475
+          },
+          "spur": {
+            "iou": 0.010411548383134232,
+            "precision": 0.011442354747802022,
+            "recall": 0.10359908709809876,
+            "tp": 10849,
+            "fp": 937295,
+            "fn": 93872
+          },
+          "miou3": 0.06459026709222933,
+          "miou3_classes": [
+            "trunk",
+            "branch",
+            "spur"
+          ],
+          "wood_vs_t": {
+            "iou": 0.16280570614321754,
+            "precision": 0.19550178848619829,
+            "recall": 0.49327952648406787,
+            "tp": 672046,
+            "fp": 2765498,
+            "fn": 690358
+          },
+          "labelled_wood_recall": 0.4951161522683353,
+          "labelled_wood_recall_excl_other": 0.49549664726031545,
+          "wood_recall_by_label": {
+            "leader": 0.4755196925152618,
+            "sidebranch": 0.5681974943008008,
+            "spur": 0.5005872747586444,
+            "other": 0.4758530887365478,
+            "nonbranch": 0.28606419087219614
+          },
+          "background_predicted_wood_rate": 0.2187888592521624,
+          "confusion": {
+            "rows_gt": [
+              "background",
+              "leader",
+              "sidebranch",
+              "spur",
+              "other",
+              "nonbranch"
+            ],
+            "cols_pred": [
+              "background",
+              "trunk",
+              "branch",
+              "shoot",
+              "spur"
+            ],
+            "counts": [
+              [
+                9275930,
+                117650,
+                1457601,
+                209984,
+                812616
+              ],
+              [
+                503799,
+                154400,
+                239554,
+                5915,
+                56900
+              ],
+              [
+                110807,
+                6796,
+                98671,
+                7469,
+                32872
+              ],
+              [
+                52299,
+                2024,
+                38012,
+                1537,
+                10849
+              ],
+              [
+                13686,
+                30,
+                9045,
+                654,
+                2696
+              ],
+              [
+                429935,
+                36600,
+                91000,
+                9762,
+                34907
+              ]
+            ]
+          }
+        }
+      },
+      "per_video_at_chosen_factor": {
+        "video_164": {
+          "frames": 7,
+          "miou3": 0.14204460201193742,
+          "iou": {
+            "trunk": 0.35603330613188133,
+            "branch": 0.06255428906887107,
+            "spur": 0.007546210835059879
+          },
+          "wood_iou_t": 0.15739029447926745,
+          "labelled_wood_recall": 0.6628864602577514
+        },
+        "video_165": {
+          "frames": 7,
+          "miou3": 0.1483750209234704,
+          "iou": {
+            "trunk": 0.3697788416387021,
+            "branch": 0.05573907636651405,
+            "spur": 0.01960714476519509
+          },
+          "wood_iou_t": 0.2158217726128661,
+          "labelled_wood_recall": 0.7008773533174922
+        },
+        "video_166": {
+          "frames": 8,
+          "miou3": 0.08648118917703579,
+          "iou": {
+            "trunk": 0.19953646535838446,
+            "branch": 0.046177508498817715,
+            "spur": 0.013729593673905216
+          },
+          "wood_iou_t": 0.17852300871200905,
+          "labelled_wood_recall": 0.5449967087046924
+        },
+        "video_167": {
+          "frames": 8,
+          "miou3": 0.04886092056097521,
+          "iou": {
+            "trunk": 0.11605540912238285,
+            "branch": 0.024708925547815633,
+            "spur": 0.005818427012727129
+          },
+          "wood_iou_t": 0.11941785506535961,
+          "labelled_wood_recall": 0.5772408671030033
+        },
+        "video_168": {
+          "frames": 7,
+          "miou3": 0.13341904638929658,
+          "iou": {
+            "trunk": 0.33473624686969866,
+            "branch": 0.024195416530206328,
+            "spur": 0.04132547576798476
+          },
+          "wood_iou_t": 0.25528968462141594,
+          "labelled_wood_recall": 0.49219939428664977
+        },
+        "video_169": {
+          "frames": 8,
+          "miou3": 0.06774420137309967,
+          "iou": {
+            "trunk": 0.1658210506750012,
+            "branch": 0.023703674301062464,
+            "spur": 0.013707879143235343
+          },
+          "wood_iou_t": 0.17647039317151947,
+          "labelled_wood_recall": 0.5630762347602384
+        }
+      }
+    },
+    "test": {
+      "frames": 15,
+      "videos": [
+        174,
+        177,
+        182,
+        183,
+        184
+      ],
+      "factors": {
+        "x1": {
+          "trunk": {
+            "iou": 0.28584913255801686,
+            "precision": 0.7311603465416844,
+            "recall": 0.3194214786296415,
+            "tp": 102962,
+            "fp": 37858,
+            "fn": 219377
+          },
+          "branch": {
+            "iou": 0.06617952278029858,
+            "precision": 0.069618966594641,
+            "recall": 0.5725696594427244,
+            "tp": 64729,
+            "fp": 865032,
+            "fn": 48321
+          },
+          "spur": {
+            "iou": 0.016489416095715307,
+            "precision": 0.016857236197321136,
+            "recall": 0.43043043043043044,
+            "tp": 9030,
+            "fp": 526645,
+            "fn": 11949
+          },
+          "miou3": 0.12283935714467692,
+          "miou3_classes": [
+            "trunk",
+            "branch",
+            "spur"
+          ],
+          "wood_vs_t": {
+            "iou": 0.23597567434697464,
+            "precision": 0.2563289010471556,
+            "recall": 0.7482301753805769,
+            "tp": 434397,
+            "fp": 1260289,
+            "fn": 146169
+          },
+          "labelled_wood_recall": 0.7507083194704677,
+          "labelled_wood_recall_excl_other": 0.7456197629982821,
+          "wood_recall_by_label": {
+            "leader": 0.7199190913913612,
+            "sidebranch": 0.8238478549314463,
+            "spur": 0.7189570522903856,
+            "other": 0.7709542989660163,
+            "nonbranch": 0.44940454445824507
+          },
+          "background_predicted_wood_rate": 0.31267227593279656,
+          "confusion": {
+            "rows_gt": [
+              "background",
+              "leader",
+              "sidebranch",
+              "spur",
+              "other",
+              "nonbranch"
+            ],
+            "cols_pred": [
+              "background",
+              "trunk",
+              "branch",
+              "shoot",
+              "spur"
+            ],
+            "counts": [
+              [
+                2755879,
+                35590,
+                595401,
+                147819,
+                474867
+              ],
+              [
+                90281,
+                102962,
+                106790,
+                3168,
+                19138
+              ],
+              [
+                19914,
+                1621,
+                50706,
+                14023,
+                26786
+              ],
+              [
+                5896,
+                507,
+                4610,
+                936,
+                9030
+              ],
+              [
+                26272,
+                10193,
+                28761,
+                8428,
+                41048
+              ],
+              [
+                15072,
+                140,
+                5973,
+                335,
+                5854
+              ]
+            ]
+          }
+        },
+        "x1.6": {
+          "trunk": {
+            "iou": 0.18391050868864106,
+            "precision": 0.6683126222941617,
+            "recall": 0.20238320525905956,
+            "tp": 65236,
+            "fp": 32377,
+            "fn": 257103
+          },
+          "branch": {
+            "iou": 0.0722554984264969,
+            "precision": 0.07516547432569595,
+            "recall": 0.6511278195488722,
+            "tp": 73610,
+            "fp": 905696,
+            "fn": 39440
+          },
+          "spur": {
+            "iou": 0.011273676888164122,
+            "precision": 0.011701651677599728,
+            "recall": 0.2356165689499023,
+            "tp": 4943,
+            "fp": 417476,
+            "fn": 16036
+          },
+          "miou3": 0.08914656133443401,
+          "miou3_classes": [
+            "trunk",
+            "branch",
+            "spur"
+          ],
+          "wood_vs_t": {
+            "iou": 0.23775195409280542,
+            "precision": 0.2623257290500084,
+            "recall": 0.7173551327497649,
+            "tp": 416472,
+            "fp": 1171142,
+            "fn": 164094
+          },
+          "labelled_wood_recall": 0.7195194984852995,
+          "labelled_wood_recall_excl_other": 0.7069294954948638,
+          "wood_recall_by_label": {
+            "leader": 0.6607329550566329,
+            "sidebranch": 0.8312958867757629,
+            "spur": 0.7465560798894132,
+            "other": 0.769611689421283,
+            "nonbranch": 0.4665741214290933
+          },
+          "background_predicted_wood_rate": 0.2902929900467782,
+          "confusion": {
+            "rows_gt": [
+              "background",
+              "leader",
+              "sidebranch",
+              "spur",
+              "other",
+              "nonbranch"
+            ],
+            "cols_pred": [
+              "background",
+              "trunk",
+              "branch",
+              "shoot",
+              "spur"
+            ],
+            "counts": [
+              [
+                2845610,
+                30130,
+                637437,
+                117231,
+                379148
+              ],
+              [
+                109359,
+                65236,
+                132164,
+                1051,
+                14529
+              ],
+              [
+                19072,
+                1538,
+                68783,
+                4827,
+                18830
+              ],
+              [
+                5317,
+                410,
+                9961,
+                348,
+                4943
+              ],
+              [
+                26426,
+                8868,
+                46774,
+                3322,
+                29312
+              ],
+              [
+                14602,
+                299,
+                6465,
+                1039,
+                4969
+              ]
+            ]
+          }
+        },
+        "x2.4": {
+          "trunk": {
+            "iou": 0.08346832409525055,
+            "precision": 0.37388082003466616,
+            "recall": 0.09703138621141097,
+            "tp": 31277,
+            "fp": 52378,
+            "fn": 291062
+          },
+          "branch": {
+            "iou": 0.07737109570128894,
+            "precision": 0.08007722455675771,
+            "recall": 0.6960017691287042,
+            "tp": 78683,
+            "fp": 903906,
+            "fn": 34367
+          },
+          "spur": {
+            "iou": 0.006948407632069754,
+            "precision": 0.007350996056853513,
+            "recall": 0.11258877925544593,
+            "tp": 2362,
+            "fp": 318955,
+            "fn": 18617
+          },
+          "miou3": 0.05592927580953641,
+          "miou3_classes": [
+            "trunk",
+            "branch",
+            "spur"
+          ],
+          "wood_vs_t": {
+            "iou": 0.22958548769781528,
+            "precision": 0.26032660250686335,
+            "recall": 0.6603504166623605,
+            "tp": 383377,
+            "fp": 1089300,
+            "fn": 197189
+          },
+          "labelled_wood_recall": 0.6621692612114102,
+          "labelled_wood_recall_excl_other": 0.6420892788276128,
+          "wood_recall_by_label": {
+            "leader": 0.5710509742848368,
+            "sidebranch": 0.8229013710747457,
+            "spur": 0.7592354259020926,
+            "other": 0.7420620390228593,
+            "nonbranch": 0.49802732519909404
+          },
+          "background_predicted_wood_rate": 0.2695807216559639,
+          "confusion": {
+            "rows_gt": [
+              "background",
+              "leader",
+              "sidebranch",
+              "spur",
+              "other",
+              "nonbranch"
+            ],
+            "cols_pred": [
+              "background",
+              "trunk",
+              "branch",
+              "shoot",
+              "spur"
+            ],
+            "counts": [
+              [
+                2928657,
+                48003,
+                643843,
+                98828,
+                290225
+              ],
+              [
+                138267,
+                31277,
+                138134,
+                1408,
+                13253
+              ],
+              [
+                20021,
+                3229,
+                74184,
+                4499,
+                11117
+              ],
+              [
+                5051,
+                397,
+                12657,
+                512,
+                2362
+              ],
+              [
+                29586,
+                12048,
+                54249,
+                2457,
+                16362
+              ],
+              [
+                13741,
+                749,
+                7217,
+                1307,
+                4360
+              ]
+            ]
+          }
+        }
+      },
+      "per_video_at_chosen_factor": {
+        "video_174": {
+          "frames": 3,
+          "miou3": 0.11882938071967879,
+          "iou": {
+            "trunk": 0.24915899108310197,
+            "branch": 0.1073291510759344,
+            "spur": 0.0
+          },
+          "wood_iou_t": 0.27525068133902403,
+          "labelled_wood_recall": 0.7567836123213331
+        },
+        "video_177": {
+          "frames": 5,
+          "miou3": 0.20314843277741454,
+          "iou": {
+            "trunk": 0.4838938200608409,
+            "branch": 0.08147142957257443,
+            "spur": 0.044080048698828186
+          },
+          "wood_iou_t": 0.34258037912566225,
+          "labelled_wood_recall": 0.7292825730568061
+        },
+        "video_182": {
+          "frames": 1,
+          "miou3": 0.11236329314572314,
+          "iou": {
+            "trunk": 0.24871853472199548,
+            "branch": 0.06356080489938758,
+            "spur": 0.024810539815786407
+          },
+          "wood_iou_t": 0.27874112454423333,
+          "labelled_wood_recall": 0.8199660269947663
+        },
+        "video_183": {
+          "frames": 1,
+          "miou3": 0.1151645658262946,
+          "iou": {
+            "trunk": 0.25605518112889636,
+            "branch": 0.06249225430660553,
+            "spur": 0.026946262043381936
+          },
+          "wood_iou_t": 0.2567554208132868,
+          "labelled_wood_recall": 0.850914828244803
+        },
+        "video_184": {
+          "frames": 5,
+          "miou3": 0.08043106073903404,
+          "iou": {
+            "trunk": 0.18477289014776643,
+            "branch": 0.051664354425262536,
+            "spur": 0.004855937644073128
+          },
+          "wood_iou_t": 0.16375283189850476,
+          "labelled_wood_recall": 0.734486303129979
+        }
+      }
+    },
+    "train": {
+      "frames": 326,
+      "videos": [
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        117,
+        118,
+        119,
+        120,
+        121,
+        122,
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        130,
+        131,
+        132,
+        134,
+        136,
+        137,
+        138,
+        139,
+        140,
+        141,
+        142,
+        143,
+        144,
+        145,
+        146,
+        147,
+        148,
+        149,
+        150,
+        151,
+        152,
+        153,
+        154,
+        155,
+        156,
+        157,
+        158,
+        159,
+        160
+      ],
+      "factors": {
+        "x1": {
+          "trunk": {
+            "iou": 0.2710774063398533,
+            "precision": 0.6097680562746409,
+            "recall": 0.32797473223866697,
+            "tp": 1911482,
+            "fp": 1223287,
+            "fn": 3916656
+          },
+          "branch": {
+            "iou": 0.053211941563487124,
+            "precision": 0.05661022366822977,
+            "recall": 0.4698982259521181,
+            "tp": 978681,
+            "fp": 16309380,
+            "fn": 1104070
+          },
+          "spur": {
+            "iou": 0.01224569887158663,
+            "precision": 0.012670753958311038,
+            "recall": 0.2674208972825332,
+            "tp": 157827,
+            "fp": 12298180,
+            "fn": 432355
+          },
+          "miou3": 0.11217834892497568,
+          "miou3_classes": [
+            "trunk",
+            "branch",
+            "spur"
+          ],
+          "wood_vs_t": {
+            "iou": 0.18927109908596765,
+            "precision": 0.20513580816432436,
+            "recall": 0.7099209690206251,
+            "tp": 6905003,
+            "fp": 26755639,
+            "fn": 2821436
+          },
+          "labelled_wood_recall": 0.7126151428942143,
+          "labelled_wood_recall_excl_other": 0.7117339685787826,
+          "wood_recall_by_label": {
+            "leader": 0.713517250277876,
+            "sidebranch": 0.7053166701156307,
+            "spur": 0.7167704199721442,
+            "other": 0.7195091760301349,
+            "nonbranch": 0.5327480251032636
+          },
+          "background_predicted_wood_rate": 0.29267203114140045,
+          "confusion": {
+            "rows_gt": [
+              "background",
+              "leader",
+              "sidebranch",
+              "spur",
+              "other",
+              "nonbranch"
+            ],
+            "cols_pred": [
+              "background",
+              "trunk",
+              "branch",
+              "shoot",
+              "spur"
+            ],
+            "counts": [
+              [
+                63100448,
+                1109890,
+                11247464,
+                2731536,
+                11020266
+              ],
+              [
+                1669661,
+                1911482,
+                1581945,
+                92059,
+                572991
+              ],
+              [
+                613752,
+                26166,
+                827597,
+                151084,
+                464152
+              ],
+              [
+                167157,
+                18101,
+                225720,
+                21377,
+                157827
+              ],
+              [
+                304776,
+                60052,
+                351011,
+                67294,
+                303448
+              ],
+              [
+                630764,
+                69130,
+                334947,
+                74332,
+                240771
+              ]
+            ]
+          }
+        },
+        "x1.6": {
+          "trunk": {
+            "iou": 0.22218050482235088,
+            "precision": 0.5676211882077976,
+            "recall": 0.267443564308189,
+            "tp": 1558698,
+            "fp": 1187320,
+            "fn": 4269440
+          },
+          "branch": {
+            "iou": 0.05765554299285657,
+            "precision": 0.06084967352364503,
+            "recall": 0.5234384715215598,
+            "tp": 1090192,
+            "fp": 16825960,
+            "fn": 992559
+          },
+          "spur": {
+            "iou": 0.009124935021942329,
+            "precision": 0.009585715747321677,
+            "recall": 0.15954231067704538,
+            "tp": 94159,
+            "fp": 9728686,
+            "fn": 496023
+          },
+          "miou3": 0.09632032761238325,
+          "miou3_classes": [
+            "trunk",
+            "branch",
+            "spur"
+          ],
+          "wood_vs_t": {
+            "iou": 0.19624229017347963,
+            "precision": 0.21508311828310533,
+            "recall": 0.6913830436812486,
+            "tp": 6724695,
+            "fp": 24540869,
+            "fn": 3001744
+          },
+          "labelled_wood_recall": 0.6937920775597612,
+          "labelled_wood_recall_excl_other": 0.6906527424603324,
+          "wood_recall_by_label": {
+            "leader": 0.6809233068949294,
+            "sidebranch": 0.7046848134990693,
+            "spur": 0.7372132664161225,
+            "other": 0.7183532566831189,
+            "nonbranch": 0.5117545616707063
+          },
+          "background_predicted_wood_rate": 0.2681649276237119,
+          "confusion": {
+            "rows_gt": [
+              "background",
+              "leader",
+              "sidebranch",
+              "spur",
+              "other",
+              "nonbranch"
+            ],
+            "cols_pred": [
+              "background",
+              "trunk",
+              "branch",
+              "shoot",
+              "spur"
+            ],
+            "counts": [
+              [
+                65286717,
+                1075932,
+                11631916,
+                2392602,
+                8822437
+              ],
+              [
+                1859623,
+                1558698,
+                1984340,
+                34303,
+                391174
+              ],
+              [
+                615068,
+                44718,
+                1009889,
+                80303,
+                332773
+              ],
+              [
+                155092,
+                17929,
+                310676,
+                12326,
+                94159
+              ],
+              [
+                306032,
+                69902,
+                458786,
+                36194,
+                215667
+              ],
+              [
+                659104,
+                48741,
+                396458,
+                63339,
+                182302
+              ]
+            ]
+          }
+        },
+        "x2.4": {
+          "trunk": {
+            "iou": 0.1349934026879528,
+            "precision": 0.4326650261845031,
+            "recall": 0.1640282024893714,
+            "tp": 955979,
+            "fp": 1253534,
+            "fn": 4872159
+          },
+          "branch": {
+            "iou": 0.060821761905769024,
+            "precision": 0.06432695358233127,
+            "recall": 0.5274538338956505,
+            "tp": 1098555,
+            "fp": 15979123,
+            "fn": 984196
+          },
+          "spur": {
+            "iou": 0.00846584664960446,
+            "precision": 0.009024050162485994,
+            "recall": 0.12038489821783789,
+            "tp": 71049,
+            "fp": 7802245,
+            "fn": 519133
+          },
+          "miou3": 0.06809367041444209,
+          "miou3_classes": [
+            "trunk",
+            "branch",
+            "spur"
+          ],
+          "wood_vs_t": {
+            "iou": 0.19827152628275002,
+            "precision": 0.22312374634973192,
+            "recall": 0.6402988801965447,
+            "tp": 6227828,
+            "fp": 21684163,
+            "fn": 3498611
+          },
+          "labelled_wood_recall": 0.642569838788475,
+          "labelled_wood_recall_excl_other": 0.6362998262218961,
+          "wood_recall_by_label": {
+            "leader": 0.6135494732623009,
+            "sidebranch": 0.6817977761143795,
+            "spur": 0.7004008932837668,
+            "other": 0.6916244624192767,
+            "nonbranch": 0.4880491338899984
+          },
+          "background_predicted_wood_rate": 0.23643660608559589,
+          "confusion": {
+            "rows_gt": [
+              "background",
+              "leader",
+              "sidebranch",
+              "spur",
+              "other",
+              "nonbranch"
+            ],
+            "cols_pred": [
+              "background",
+              "trunk",
+              "branch",
+              "shoot",
+              "spur"
+            ],
+            "counts": [
+              [
+                68117188,
+                1103694,
+                10870453,
+                1990979,
+                7127290
+              ],
+              [
+                2252287,
+                955979,
+                2296048,
+                26162,
+                297662
+              ],
+              [
+                662736,
+                80429,
+                1041687,
+                56868,
+                241031
+              ],
+              [
+                176818,
+                18057,
+                313324,
+                10934,
+                71049
+              ],
+              [
+                335075,
+                83410,
+                509343,
+                20666,
+                138087
+              ],
+              [
+                691105,
+                51354,
+                427391,
+                43832,
+                136262
+              ]
+            ]
+          }
+        }
+      },
+      "per_video_at_chosen_factor": {
+        "video_89": {
+          "frames": 2,
+          "miou3": 0.06376378672285514,
+          "iou": {
+            "trunk": 0.16046875,
+            "branch": 0.03082261016856542,
+            "spur": 0.0
+          },
+          "wood_iou_t": 0.15246785143897024,
+          "labelled_wood_recall": 0.6411515044679783
+        },
+        "video_90": {
+          "frames": 3,
+          "miou3": 0.11923281144348417,
+          "iou": {
+            "trunk": 0.28327660819614064,
+            "branch": 0.0664531798927265,
+            "spur": 0.007968646241585397
+          },
+          "wood_iou_t": 0.23697018149176696,
+          "labelled_wood_recall": 0.6056178245677724
+        },
+        "video_91": {
+          "frames": 7,
+          "miou3": 0.09476187487589798,
+          "iou": {
+            "trunk": 0.18094074727345433,
+            "branch": 0.09807934075413176,
+            "spur": 0.005265536600107815
+          },
+          "wood_iou_t": 0.24430465725757977,
+          "labelled_wood_recall": 0.5670972630985319
+        },
+        "video_92": {
+          "frames": 7,
+          "miou3": 0.061841635271240654,
+          "iou": {
+            "trunk": 0.17921631021978834,
+            "branch": 0.0018534515570647948,
+            "spur": 0.004455144036868835
+          },
+          "wood_iou_t": 0.1868606980913213,
+          "labelled_wood_recall": 0.6036294791281862
+        },
+        "video_93": {
+          "frames": 5,
+          "miou3": 0.10658803533436435,
+          "iou": {
+            "trunk": 0.29919841230743244,
+            "branch": 0.017367310501541958,
+            "spur": 0.0031983831941186833
+          },
+          "wood_iou_t": 0.196405948697251,
+          "labelled_wood_recall": 0.7687692155112565
+        },
+        "video_94": {
+          "frames": 2,
+          "miou3": 0.08596591329323011,
+          "iou": {
+            "trunk": 0.25365953526461255,
+            "branch": 0.003035841710587263,
+            "spur": 0.001202362904490564
+          },
+          "wood_iou_t": 0.12430399322352649,
+          "labelled_wood_recall": 0.6239787380647701
+        },
+        "video_95": {
+          "frames": 6,
+          "miou3": 0.07749821947358951,
+          "iou": {
+            "trunk": 0.21491015055852355,
+            "branch": 0.009654822747785992,
+            "spur": 0.007929685114458991
+          },
+          "wood_iou_t": 0.14677543588623773,
+          "labelled_wood_recall": 0.9012148144164253
+        },
+        "video_96": {
+          "frames": 6,
+          "miou3": 0.0944413095406005,
+          "iou": {
+            "trunk": 0.2389657212066586,
+            "branch": 0.03559391697492807,
+            "spur": 0.0087642904402148
+          },
+          "wood_iou_t": 0.3010426759348972,
+          "labelled_wood_recall": 0.8781152774969507
+        },
+        "video_97": {
+          "frames": 6,
+          "miou3": 0.10684119834098632,
+          "iou": {
+            "trunk": 0.21585156562004165,
+            "branch": 0.09982826022550179,
+            "spur": 0.004843769177415534
+          },
+          "wood_iou_t": 0.24841724722615294,
+          "labelled_wood_recall": 0.8694519055392144
+        },
+        "video_117": {
+          "frames": 7,
+          "miou3": 0.08635216287880433,
+          "iou": {
+            "trunk": 0.20524235569834845,
+            "branch": 0.04644434924882478,
+            "spur": 0.007369783689239799
+          },
+          "wood_iou_t": 0.1931128424119512,
+          "labelled_wood_recall": 0.8773606661340669
+        },
+        "video_118": {
+          "frames": 7,
+          "miou3": 0.1124460285013492,
+          "iou": {
+            "trunk": 0.25532707217708,
+            "branch": 0.07841598508761222,
+            "spur": 0.003595028239355346
+          },
+          "wood_iou_t": 0.14767750795710158,
+          "labelled_wood_recall": 0.8635303373650179
+        },
+        "video_119": {
+          "frames": 3,
+          "miou3": 0.1435808936886379,
+          "iou": {
+            "trunk": 0.3370018491360071,
+            "branch": 0.08564450047273874,
+            "spur": 0.008096331457167887
+          },
+          "wood_iou_t": 0.2663092973957536,
+          "labelled_wood_recall": 0.8845424538240045
+        },
+        "video_120": {
+          "frames": 8,
+          "miou3": 0.12973081490916102,
+          "iou": {
+            "trunk": 0.29086920192143956,
+            "branch": 0.0926387688878507,
+            "spur": 0.005684473918192777
+          },
+          "wood_iou_t": 0.20177821460561765,
+          "labelled_wood_recall": 0.8825573207491229
+        },
+        "video_121": {
+          "frames": 7,
+          "miou3": 0.18966087160211145,
+          "iou": {
+            "trunk": 0.3567896293044455,
+            "branch": 0.20864254725885645,
+            "spur": 0.003550438243032492
+          },
+          "wood_iou_t": 0.2612451817670943,
+          "labelled_wood_recall": 0.8582543107714846
+        },
+        "video_122": {
+          "frames": 7,
+          "miou3": 0.08998179751414048,
+          "iou": {
+            "trunk": 0.21570253154561678,
+            "branch": 0.049079658439991014,
+            "spur": 0.005163202556813687
+          },
+          "wood_iou_t": 0.1304809302007767,
+          "labelled_wood_recall": 0.8997101449275362
+        },
+        "video_123": {
+          "frames": 7,
+          "miou3": 0.06850940683448158,
+          "iou": {
+            "trunk": 0.17480533708964277,
+            "branch": 0.02533396542674771,
+            "spur": 0.0053889179870542725
+          },
+          "wood_iou_t": 0.10062898464722082,
+          "labelled_wood_recall": 0.6307368547635511
+        },
+        "video_124": {
+          "frames": 6,
+          "miou3": 0.02803002097719481,
+          "iou": {
+            "trunk": 0.06681502201216698,
+            "branch": 0.009955167692556992,
+            "spur": 0.007319873226860468
+          },
+          "wood_iou_t": 0.10732608400262944,
+          "labelled_wood_recall": 0.641397817577986
+        },
+        "video_125": {
+          "frames": 6,
+          "miou3": 0.11567421617144345,
+          "iou": {
+            "trunk": 0.30105506014102035,
+            "branch": 0.03987481971072839,
+            "spur": 0.006092768662581637
+          },
+          "wood_iou_t": 0.12287374562591549,
+          "labelled_wood_recall": 0.5291666666666667
+        },
+        "video_126": {
+          "frames": 8,
+          "miou3": 0.084355761826697,
+          "iou": {
+            "trunk": 0.1624448379313192,
+            "branch": 0.0904023067417273,
+            "spur": 0.0002201408070445058
+          },
+          "wood_iou_t": 0.16115762250900867,
+          "labelled_wood_recall": 0.6178708754636136
+        },
+        "video_127": {
+          "frames": 8,
+          "miou3": 0.09403246434058922,
+          "iou": {
+            "trunk": 0.22340041266903843,
+            "branch": 0.02613772934352045,
+            "spur": 0.03255925100920876
+          },
+          "wood_iou_t": 0.20388224059709284,
+          "labelled_wood_recall": 0.6258878767205747
+        },
+        "video_128": {
+          "frames": 8,
+          "miou3": 0.11167668958789317,
+          "iou": {
+            "trunk": 0.25486482423930085,
+            "branch": 0.06756666990286302,
+            "spur": 0.012598574621515625
+          },
+          "wood_iou_t": 0.2585768294072021,
+          "labelled_wood_recall": 0.6219593177110349
+        },
+        "video_129": {
+          "frames": 8,
+          "miou3": 0.10871019470377115,
+          "iou": {
+            "trunk": 0.27002889775698363,
+            "branch": 0.03576905410561568,
+            "spur": 0.020332632248714188
+          },
+          "wood_iou_t": 0.15797837341245702,
+          "labelled_wood_recall": 0.6747695697740037
+        },
+        "video_130": {
+          "frames": 7,
+          "miou3": 0.2281905233309699,
+          "iou": {
+            "trunk": 0.5834360223527726,
+            "branch": 0.05196133749868113,
+            "spur": 0.04917421014145591
+          },
+          "wood_iou_t": 0.27358474954907247,
+          "labelled_wood_recall": 0.782224901372136
+        },
+        "video_131": {
+          "frames": 7,
+          "miou3": 0.09650262342915684,
+          "iou": {
+            "trunk": 0.1998599854211624,
+            "branch": 0.0294647656849586,
+            "spur": 0.06018311918134954
+          },
+          "wood_iou_t": 0.16599388227794634,
+          "labelled_wood_recall": 0.65715944779875
+        },
+        "video_132": {
+          "frames": 8,
+          "miou3": 0.1427572721286898,
+          "iou": {
+            "trunk": 0.3147837857372837,
+            "branch": 0.054145260566270004,
+            "spur": 0.05934277008251565
+          },
+          "wood_iou_t": 0.23505307506870235,
+          "labelled_wood_recall": 0.7161234245980008
+        },
+        "video_134": {
+          "frames": 7,
+          "miou3": 0.09092760833577097,
+          "iou": {
+            "trunk": 0.2186476638531433,
+            "branch": 0.027341782286554955,
+            "spur": 0.026793378867614674
+          },
+          "wood_iou_t": 0.18983157537686804,
+          "labelled_wood_recall": 0.6869475369105069
+        },
+        "video_136": {
+          "frames": 7,
+          "miou3": 0.13709595052361342,
+          "iou": {
+            "trunk": 0.2857761194029851,
+            "branch": 0.1039475083695889,
+            "spur": 0.021564223798266353
+          },
+          "wood_iou_t": 0.20383402981145735,
+          "labelled_wood_recall": 0.6818220239075019
+        },
+        "video_137": {
+          "frames": 8,
+          "miou3": 0.05458271077372301,
+          "iou": {
+            "trunk": 0.11376459297849678,
+            "branch": 0.024898095397010798,
+            "spur": 0.02508544394566145
+          },
+          "wood_iou_t": 0.1749642776104941,
+          "labelled_wood_recall": 0.6253839870731751
+        },
+        "video_138": {
+          "frames": 8,
+          "miou3": 0.20019829207712522,
+          "iou": {
+            "trunk": 0.5209942764967107,
+            "branch": 0.05619722633288587,
+            "spur": 0.023403373401779167
+          },
+          "wood_iou_t": 0.2867987302740478,
+          "labelled_wood_recall": 0.7076691125770564
+        },
+        "video_139": {
+          "frames": 8,
+          "miou3": 0.04131342656438667,
+          "iou": {
+            "trunk": 0.08166752542087719,
+            "branch": 0.02485581965277586,
+            "spur": 0.017416934619506965
+          },
+          "wood_iou_t": 0.16193305351233334,
+          "labelled_wood_recall": 0.6174710792080085
+        },
+        "video_140": {
+          "frames": 8,
+          "miou3": 0.20051021214229767,
+          "iou": {
+            "trunk": 0.5255075625901409,
+            "branch": 0.06901970437709666,
+            "spur": 0.007003369459655394
+          },
+          "wood_iou_t": 0.191114467215182,
+          "labelled_wood_recall": 0.7587575968618487
+        },
+        "video_141": {
+          "frames": 8,
+          "miou3": 0.17970809989267664,
+          "iou": {
+            "trunk": 0.4523141847773791,
+            "branch": 0.08350855359230804,
+            "spur": 0.0033015613083427152
+          },
+          "wood_iou_t": 0.16930628233172573,
+          "labelled_wood_recall": 0.8032491405083995
+        },
+        "video_142": {
+          "frames": 10,
+          "miou3": 0.10163741869153864,
+          "iou": {
+            "trunk": 0.23225487948939472,
+            "branch": 0.07265737658522123,
+            "spur": 0.0
+          },
+          "wood_iou_t": 0.20474697081298898,
+          "labelled_wood_recall": 0.6489934712376086
+        },
+        "video_143": {
+          "frames": 7,
+          "miou3": 0.14992967163661955,
+          "iou": {
+            "trunk": 0.42200579785674736,
+            "branch": 0.026779141185819495,
+            "spur": 0.0010040758672918032
+          },
+          "wood_iou_t": 0.15382929472358375,
+          "labelled_wood_recall": 0.6399977176765947
+        },
+        "video_144": {
+          "frames": 8,
+          "miou3": 0.11659234263187833,
+          "iou": {
+            "trunk": 0.295257586450247,
+            "branch": 0.052574166745518396,
+            "spur": 0.0019452746998695444
+          },
+          "wood_iou_t": 0.13569688204675381,
+          "labelled_wood_recall": 0.767158381885046
+        },
+        "video_145": {
+          "frames": 7,
+          "miou3": 0.14250372601315497,
+          "iou": {
+            "trunk": 0.372481106178195,
+            "branch": 0.05456067319174581,
+            "spur": 0.000469398669524099
+          },
+          "wood_iou_t": 0.15275253497312757,
+          "labelled_wood_recall": 0.7550364181140532
+        },
+        "video_146": {
+          "frames": 1,
+          "miou3": 0.16914798714330195,
+          "iou": {
+            "trunk": 0.4328099814936422,
+            "branch": 0.034506267868924564,
+            "spur": 0.04012771206733909
+          },
+          "wood_iou_t": 0.25388097153353906,
+          "labelled_wood_recall": 0.6207081705097992
+        },
+        "video_147": {
+          "frames": 8,
+          "miou3": 0.22929980614720039,
+          "iou": {
+            "trunk": 0.5669877127863817,
+            "branch": 0.09256973353570597,
+            "spur": 0.028341972119513528
+          },
+          "wood_iou_t": 0.28356991632740314,
+          "labelled_wood_recall": 0.6942421954642201
+        },
+        "video_148": {
+          "frames": 7,
+          "miou3": 0.14249762660770154,
+          "iou": {
+            "trunk": 0.3612396837305939,
+            "branch": 0.04888728374504207,
+            "spur": 0.017365912347468638
+          },
+          "wood_iou_t": 0.1634830103426661,
+          "labelled_wood_recall": 0.7886118943860548
+        },
+        "video_149": {
+          "frames": 7,
+          "miou3": 0.13065059705100665,
+          "iou": {
+            "trunk": 0.34576539633980974,
+            "branch": 0.0330501874992512,
+            "spur": 0.013136207313959003
+          },
+          "wood_iou_t": 0.18329238890729802,
+          "labelled_wood_recall": 0.6564210229323729
+        },
+        "video_150": {
+          "frames": 7,
+          "miou3": 0.06993782866692998,
+          "iou": {
+            "trunk": 0.178506593436973,
+            "branch": 0.025203088670092143,
+            "spur": 0.006103803893724772
+          },
+          "wood_iou_t": 0.14945945395687849,
+          "labelled_wood_recall": 0.6755479064093067
+        },
+        "video_151": {
+          "frames": 3,
+          "miou3": 0.0908168339300326,
+          "iou": {
+            "trunk": 0.2302757581955782,
+            "branch": 0.03008421205346839,
+            "spur": 0.012090531541051287
+          },
+          "wood_iou_t": 0.1807447388738959,
+          "labelled_wood_recall": 0.6507682659140797
+        },
+        "video_152": {
+          "frames": 7,
+          "miou3": 0.119969195670959,
+          "iou": {
+            "trunk": 0.2889566287939016,
+            "branch": 0.0569990096756534,
+            "spur": 0.013951948543321983
+          },
+          "wood_iou_t": 0.28506239896444585,
+          "labelled_wood_recall": 0.6362061295684952
+        },
+        "video_153": {
+          "frames": 7,
+          "miou3": 0.14449593291156562,
+          "iou": {
+            "trunk": 0.3929581627052814,
+            "branch": 0.03168353276972188,
+            "spur": 0.008846103259693589
+          },
+          "wood_iou_t": 0.16727535279027422,
+          "labelled_wood_recall": 0.7526102822870523
+        },
+        "video_154": {
+          "frames": 8,
+          "miou3": 0.03797110088799479,
+          "iou": {
+            "trunk": 0.07366783663050415,
+            "branch": 0.03144000299143701,
+            "spur": 0.008805463042043195
+          },
+          "wood_iou_t": 0.16853365573458354,
+          "labelled_wood_recall": 0.6229957710201469
+        },
+        "video_155": {
+          "frames": 3,
+          "miou3": 0.14383873237446995,
+          "iou": {
+            "trunk": 0.3862146088547756,
+            "branch": 0.02734068647900015,
+            "spur": 0.017960901789634068
+          },
+          "wood_iou_t": 0.1958860786325366,
+          "labelled_wood_recall": 0.6912956240714362
+        },
+        "video_156": {
+          "frames": 8,
+          "miou3": 0.12295791117349002,
+          "iou": {
+            "trunk": 0.32388822514270543,
+            "branch": 0.026860093619983132,
+            "spur": 0.018125414757781455
+          },
+          "wood_iou_t": 0.20309874117268023,
+          "labelled_wood_recall": 0.6353944464876793
+        },
+        "video_157": {
+          "frames": 5,
+          "miou3": 0.13578557899599936,
+          "iou": {
+            "trunk": 0.3714358154230214,
+            "branch": 0.033298463910147,
+            "spur": 0.0026224576548296383
+          },
+          "wood_iou_t": 0.17680819586254007,
+          "labelled_wood_recall": 0.6018224017880168
+        },
+        "video_158": {
+          "frames": 4,
+          "miou3": 0.15757515444684753,
+          "iou": {
+            "trunk": 0.37773712692864686,
+            "branch": 0.0762242813610727,
+            "spur": 0.018764055050823063
+          },
+          "wood_iou_t": 0.27946443018175937,
+          "labelled_wood_recall": 0.7524607237681712
+        },
+        "video_159": {
+          "frames": 1,
+          "miou3": 0.06890809151319086,
+          "iou": {
+            "trunk": 0.16808981657179,
+            "branch": 0.029755139993801014,
+            "spur": 0.008879317973981534
+          },
+          "wood_iou_t": 0.1810543720679843,
+          "labelled_wood_recall": 0.8311107133267699
+        },
+        "video_160": {
+          "frames": 8,
+          "miou3": 0.09240272814673833,
+          "iou": {
+            "trunk": 0.22122412994291832,
+            "branch": 0.03960722744085793,
+            "spur": 0.016376827056438708
+          },
+          "wood_iou_t": 0.19089411400260295,
+          "labelled_wood_recall": 0.6937520758755582
+        }
+      }
+    }
+  },
+  "gpu": {
+    "select_wall_s": 32.95,
+    "score_wall_s": 244.14,
+    "minutes": 4.62,
+    "score": {
+      "wall_s": 244.14,
+      "forward_s": 144.76,
+      "device": "NVIDIA GeForce RTX 2080 Ti",
+      "pci_bus_id": "85:00.0",
+      "max_memory_gb": 1.62,
+      "amp_dtype": "torch.float16",
+      "torch": "2.10.0+cu128"
+    }
+  },
+  "provenance": {
+    "checkpoint": {
+      "path": "/nfs/hpc/share/sanchej7/spur-branch-runs/21523238/best.pt",
+      "sha256": "2b8dc48978eb8075ed9b34f35af5141cb286bf3c687bb9db0f8508a6372901b0"
+    },
+    "data_manifest": {
+      "path": "/nfs/hpc/share/sanchej7/spur-realdata/mfo_cherry_ufo/manifest.json",
+      "sha256": "0b3b04a1875816870607d926f231c94735e572a4daaf506933e7c0e800cdb0fc"
+    },
+    "script": {
+      "path": "scripts/eval_real_mfo.py",
+      "sha256": "5a8d3e1d2288abf1c5bf933b4faea0c67f8cabb898cc8e126c004dd8a2d69bbb"
+    },
+    "repo": {
+      "commit": "6b3addf55919fcf521caeb727b22c977d3815f2c",
+      "tracked_files_modified": "M docs/BRANCH_PROTOCOL.md\n M scripts/eval_branches.py\n M tests/test_branches.py",
+      "script_status": "?? scripts/eval_real_mfo.py"
+    },
+    "argv": [
+      "scripts/eval_real_mfo.py",
+      "score",
+      "--disclosure",
+      "Prior exposure (previous agent, before this run): GT overlays of 4 labelled frames were viewed (test 174_15, 177_34, 184_20; RozaCloudyAfternoon video_3 frame 61), and class counts and label pixel widths (leader ~40 px, sidebranch and spur ~7-8 px) were computed from all 15 test-split labels. The factor set {1, 1.6, 2.4} was proposed in that report from focal lengths (render 1493 px vs a nominal D435 ~615 px at 640x480), before any prediction existed. Nothing was tuned on it.",
+      "--disclosure",
+      "This agent, before the selection: read N_t.png pixel values of test frame 174_15 against its polygons to fix the mask polarity (white = wood); scanned label names and shape types of all 386 JSONs (no pixels, no predictions), which found 'branch' (2 polygons) and 'ignore' (1 polygon), train only, both treated as 'other'; the manifest step compared every N_t.png with the union of its wood polygons (median IoU 0.985, min 0.52), so wood IoU against N_t.png is not an independent mask.",
+      "--disclosure",
+      "Smoke tests before the selection, in a scratch root: select and score on the first 2 val frames (video_164/8, video_164/15), the panel figure on video_164/8, and an Envy_2 tree9 rgb0001 prediction and GIF. No train or test frame was predicted before mfo_selection.json was written.",
+      "--disclosure",
+      "Unlabelled wood (background trees, hedges, posts) is background in the GT, so predictions there count as false positives and depress IoU and precision; recall on labelled wood is reported next to IoU.",
+      "--disclosure",
+      "Inference used fp16 autocast on an RTX 2080 Ti (Turing, physical GPU 1); BranchNet trained in bf16 on an H100 MIG slice. The superseded copy UFORozaVideos/video_184/old/33 is excluded (the paper's 387-image count may include it). The MFO data ships without a licence file; nothing derived from it is in the repo."
+    ],
+    "interpolation": {
+      "upsample": "cv2.resize INTER_CUBIC on uint8 RGB",
+      "downsample": "torch.nn.functional.interpolate(prob, mode='bilinear', align_corners=False, antialias=False)",
+      "amp": "torch.autocast as in spur_depth.branches.infer.forward_full (fp16 on Turing)"
+    },
+    "cuda_visible_devices": "1"
+  },
+  "disclosures": [
+    "Prior exposure (previous agent, before this run): GT overlays of 4 labelled frames were viewed (test 174_15, 177_34, 184_20; RozaCloudyAfternoon video_3 frame 61), and class counts and label pixel widths (leader ~40 px, sidebranch and spur ~7-8 px) were computed from all 15 test-split labels. The factor set {1, 1.6, 2.4} was proposed in that report from focal lengths (render 1493 px vs a nominal D435 ~615 px at 640x480), before any prediction existed. Nothing was tuned on it.",
+    "This agent, before the selection: read N_t.png pixel values of test frame 174_15 against its polygons to fix the mask polarity (white = wood); scanned label names and shape types of all 386 JSONs (no pixels, no predictions), which found 'branch' (2 polygons) and 'ignore' (1 polygon), train only, both treated as 'other'; the manifest step compared every N_t.png with the union of its wood polygons (median IoU 0.985, min 0.52), so wood IoU against N_t.png is not an independent mask.",
+    "Smoke tests before the selection, in a scratch root: select and score on the first 2 val frames (video_164/8, video_164/15), the panel figure on video_164/8, and an Envy_2 tree9 rgb0001 prediction and GIF. No train or test frame was predicted before mfo_selection.json was written.",
+    "Unlabelled wood (background trees, hedges, posts) is background in the GT, so predictions there count as false positives and depress IoU and precision; recall on labelled wood is reported next to IoU.",
+    "Inference used fp16 autocast on an RTX 2080 Ti (Turing, physical GPU 1); BranchNet trained in bf16 on an H100 MIG slice. The superseded copy UFORozaVideos/video_184/old/33 is excluded (the paper's 387-image count may include it). The MFO data ships without a licence file; nothing derived from it is in the repo."
+  ],
+  "written_at": "2026-10-03T11:39:02-07:00"
+}

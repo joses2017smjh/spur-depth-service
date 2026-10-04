@@ -1,0 +1,64 @@
+{
+  "rule": "factor with the highest val 3-class mIoU (trunk, branch incl. predicted shoot, spur; 'other' ignored; micro-averaged pixel counts); ties -> smaller factor",
+  "factors": [
+    1.0,
+    1.6,
+    2.4
+  ],
+  "val_miou3": {
+    "x1": 0.09698073640848624,
+    "x1.6": 0.09148316010016318,
+    "x2.4": 0.06459026709222933
+  },
+  "chosen_factor": 1.0,
+  "val_frames": 45,
+  "val_videos": [
+    164,
+    165,
+    166,
+    167,
+    168,
+    169
+  ],
+  "limit": null,
+  "written_at": "2026-10-03T11:34:17-07:00",
+  "test_or_train_predicted_before": false,
+  "gpu": {
+    "wall_s": 32.95,
+    "forward_s": 18.54,
+    "device": "NVIDIA GeForce RTX 2080 Ti",
+    "pci_bus_id": "85:00.0",
+    "max_memory_gb": 1.62,
+    "amp_dtype": "torch.float16",
+    "torch": "2.10.0+cu128"
+  },
+  "provenance": {
+    "checkpoint": {
+      "path": "/nfs/hpc/share/sanchej7/spur-branch-runs/21523238/best.pt",
+      "sha256": "2b8dc48978eb8075ed9b34f35af5141cb286bf3c687bb9db0f8508a6372901b0"
+    },
+    "data_manifest": {
+      "path": "/nfs/hpc/share/sanchej7/spur-realdata/mfo_cherry_ufo/manifest.json",
+      "sha256": "0b3b04a1875816870607d926f231c94735e572a4daaf506933e7c0e800cdb0fc"
+    },
+    "script": {
+      "path": "scripts/eval_real_mfo.py",
+      "sha256": "5a8d3e1d2288abf1c5bf933b4faea0c67f8cabb898cc8e126c004dd8a2d69bbb"
+    },
+    "repo": {
+      "commit": "6b3addf55919fcf521caeb727b22c977d3815f2c",
+      "tracked_files_modified": "M docs/BRANCH_PROTOCOL.md\n M scripts/eval_branches.py\n M tests/test_branches.py",
+      "script_status": "?? scripts/eval_real_mfo.py"
+    },
+    "argv": [
+      "scripts/eval_real_mfo.py",
+      "select"
+    ],
+    "interpolation": {
+      "upsample": "cv2.resize INTER_CUBIC on uint8 RGB",
+      "downsample": "torch.nn.functional.interpolate(prob, mode='bilinear', align_corners=False, antialias=False)",
+      "amp": "torch.autocast as in spur_depth.branches.infer.forward_full (fp16 on Turing)"
+    },
+    "cuda_visible_devices": "1"
+  }
+}

@@ -2,7 +2,7 @@
 
 BranchNet has only seen Blender renders of L-Py Envy trees. This script scores the
 unchanged checkpoint on the pixel-labelled real cherry frames of the MFO dataset
-(MFO dataset, CVPRW 2025; "Labelled Data/UFORozaVideos" on its Box share) and
+(Wang et al., CVPRW 2025; "Labelled Data/UFORozaVideos" on its Box share) and
 draws a qualitative GIF on unlabelled real Envy frames (Envy_2 tree9, Azure
 Kinect). The MFO data ships without a licence file, so every input and output
 stays outside the repo (``--root``; writing inside the repo is refused).
