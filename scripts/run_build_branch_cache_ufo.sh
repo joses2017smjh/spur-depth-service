@@ -8,11 +8,12 @@
 
 # Label cache for the rendered UFO trees (protocol v3), from a frozen commit, next to the
 # Envy cache in v1/ with its own manifests (manifest_ufo_shardNN.json):
-#   sbatch --export=NONE --array=0-9 scripts/run_build_branch_cache_ufo.sh <sha> <tree-list-file>
+#   sbatch --export=NONE --array=0-9 scripts/run_build_branch_cache_ufo.sh <sha> <tree-list-file> [tag]
+# (tag: manifest_<tag>shardNN.json, default "ufo_"; orchard keys use "orchard_")
 # Array task i builds trees k % N == i of the list (N = array size), skipping complete frames.
 
 set -euo pipefail
-COMMIT=${1:?commit} LIST=${2:?tree list}
+COMMIT=${1:?commit} LIST=${2:?tree list} TAG=${3:-ufo_}
 export PATH=/usr/bin:/bin OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
 export PYTHONUNBUFFERED=1 MPLCONFIGDIR=/tmp/mpl-$SLURM_JOB_ID
 export TORCH_HOME=/nfs/hpc/share/sanchej7/.cache/torch XDG_CACHE_HOME=/nfs/hpc/share/sanchej7/.cache
@@ -28,5 +29,5 @@ echo "spur-bcache-ufo shard $SLURM_ARRAY_TASK_ID/$N commit $COMMIT on $(hostname
 cd "$SRC/src"
 ulimit -d 15000000
 PYTHONPATH="$SRC/src" "$PY" scripts/build_branch_cache.py --trees "${TREES[@]}" \
-    --shard "$SLURM_ARRAY_TASK_ID" --n-shards "$N" --workers 4 --manifest-tag ufo_
+    --shard "$SLURM_ARRAY_TASK_ID" --n-shards "$N" --workers 4 --manifest-tag "$TAG"
 echo "finished $(date -Is)"

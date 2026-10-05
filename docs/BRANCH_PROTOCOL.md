@@ -375,3 +375,8 @@ in that domain. This fixes v3's trunk artefact.
 - Orchard test trees (8 UFO + 2 Envy in context): pixel IoU with IGNORE excluded, v3 vs v4.
   Graph metrics are reported but flagged: neighbour wood the model finds counts against
   precision there.
+- Orchard smoke gate (job 21565423, `orchard_lpy_ufo_00000`, 38.9 GPU-min on a V100): pass.
+  63 trees in the scene, 60 frames and 60 DA2-ft maps, median GT residual 0.098 mm, 50 of 60
+  frames framed, same-row neighbours IGNORE in all 60 frames, all 4 rows in the layout
+  (`bench/results/branches_orchard_smoke_gate_2026-10-05.json`, `scripts/check_smoke_gate.py`).
+  Viewed on one frame: target uprights labelled, neighbours IGNORE, rows behind background.
