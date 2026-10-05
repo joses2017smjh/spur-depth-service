@@ -272,3 +272,12 @@ If any check fails, nothing more is rendered and the user is asked.
 - MFO rescoring (`scripts/rescore_mfo_mapping.py`) reproduces v2's numbers from the saved
   confusion counts (val/test/train 0.097/0.123/0.112). Under the UFO mapping the Envy-only
   model scores 0.071/0.092/0.073, with the same wood IoU (0.171/0.236/0.189).
+- Smoke gate (job 21549346, 21.8 GPU-min on an RTX 8000): pass. 60 frames, 60 DA2-ft maps,
+  median GT surface residual 0.099 mm, 52 of 60 frames with at least 5,000 labelled pixels
+  (`bench/results/branches_ufo_smoke_gate_2026-10-04.json`, `scripts/check_ufo_smoke.py`).
+  Two findings from viewing the smoke tree (a train tree):
+  - No trunk pixels in any frame. The UFO cordon lies at ground level where the generator
+    places the tree, so UFO frames carry uprights (branch), laterals (shoot) and spurs only.
+    Trunk IoU on UFO trees is therefore undefined, and mIoU uses the classes present.
+  - The top camera height sees no tree, because UFO trees are about 2.4 m tall.
+  Neither changes a registered rule. The other 39 trees render unchanged.

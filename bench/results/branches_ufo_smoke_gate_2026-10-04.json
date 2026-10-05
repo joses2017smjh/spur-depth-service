@@ -1,0 +1,858 @@
+{
+ "tree": "lpy_ufo_00000",
+ "gate": {
+  "frames": 60,
+  "da2_maps": 60,
+  "median_residual_mm": 0.099,
+  "frames_with_5000_labelled_px": 52,
+  "pass": true
+ },
+ "class_px_total": {
+  "trunk": 0,
+  "branch": 1605475,
+  "shoot": 94615,
+  "spur": 381325
+ },
+ "frames": [
+  {
+   "key": "lpy_ufo_00000/box/lpy_ufo_00000_shot01_l",
+   "residual_mm": 0.098,
+   "labelled_px": 48160,
+   "tree_px": 48160,
+   "unmatched_frac": 0.0,
+   "class_px": {
+    "trunk": 0,
+    "branch": 37127,
+    "shoot": 3751,
+    "spur": 7282
+   },
+   "parts": 49
+  },
+  {
+   "key": "lpy_ufo_00000/box/lpy_ufo_00000_shot01_r",
+   "residual_mm": 0.097,
+   "labelled_px": 46550,
+   "tree_px": 46550,
+   "unmatched_frac": 0.0,
+   "class_px": {
+    "trunk": 0,
+    "branch": 35591,
+    "shoot": 3938,
+    "spur": 7021
+   },
+   "parts": 48
+  },
+  {
+   "key": "lpy_ufo_00000/box/lpy_ufo_00000_shot02_l",
+   "residual_mm": 0.097,
+   "labelled_px": 68332,
+   "tree_px": 68332,
+   "unmatched_frac": 0.0,
+   "class_px": {
+    "trunk": 0,
+    "branch": 51685,
+    "shoot": 3951,
+    "spur": 12696
+   },
+   "parts": 70
+  },
+  {
+   "key": "lpy_ufo_00000/box/lpy_ufo_00000_shot02_r",
+   "residual_mm": 0.097,
+   "labelled_px": 67268,
+   "tree_px": 67269,
+   "unmatched_frac": 0.0,
+   "class_px": {
+    "trunk": 0,
+    "branch": 50685,
+    "shoot": 4163,
+    "spur": 12420
+   },
+   "parts": 66
+  },
+  {
+   "key": "lpy_ufo_00000/box/lpy_ufo_00000_shot03_l",
+   "residual_mm": 0.098,
+   "labelled_px": 59000,
+   "tree_px": 59004,
+   "unmatched_frac": 0.0001,
+   "class_px": {
+    "trunk": 0,
+    "branch": 45176,
+    "shoot": 2378,
+    "spur": 11446
+   },
+   "parts": 54
+  },
+  {
+   "key": "lpy_ufo_00000/box/lpy_ufo_00000_shot03_r",
+   "residual_mm": 0.098,
+   "labelled_px": 59363,
+   "tree_px": 59368,
+   "unmatched_frac": 0.0001,
+   "class_px": {
+    "trunk": 0,
+    "branch": 45485,
+    "shoot": 2519,
+    "spur": 11359
+   },
+   "parts": 50
+  },
+  {
+   "key": "lpy_ufo_00000/box/lpy_ufo_00000_shot04_l",
+   "residual_mm": 0.101,
+   "labelled_px": 35646,
+   "tree_px": 35661,
+   "unmatched_frac": 0.0004,
+   "class_px": {
+    "trunk": 0,
+    "branch": 27947,
+    "shoot": 0,
+    "spur": 7699
+   },
+   "parts": 31
+  },
+  {
+   "key": "lpy_ufo_00000/box/lpy_ufo_00000_shot04_r",
+   "residual_mm": 0.102,
+   "labelled_px": 37264,
+   "tree_px": 37278,
+   "unmatched_frac": 0.0004,
+   "class_px": {
+    "trunk": 0,
+    "branch": 29414,
+    "shoot": 0,
+    "spur": 7850
+   },
+   "parts": 29
+  },
+  {
+   "key": "lpy_ufo_00000/box/lpy_ufo_00000_shot05_l",
+   "residual_mm": 0.102,
+   "labelled_px": 9462,
+   "tree_px": 9489,
+   "unmatched_frac": 0.0028,
+   "class_px": {
+    "trunk": 0,
+    "branch": 7299,
+    "shoot": 0,
+    "spur": 2163
+   },
+   "parts": 9
+  },
+  {
+   "key": "lpy_ufo_00000/box/lpy_ufo_00000_shot05_r",
+   "residual_mm": 0.102,
+   "labelled_px": 9980,
+   "tree_px": 10007,
+   "unmatched_frac": 0.0027,
+   "class_px": {
+    "trunk": 0,
+    "branch": 7709,
+    "shoot": 0,
+    "spur": 2271
+   },
+   "parts": 9
+  },
+  {
+   "key": "lpy_ufo_00000/box/lpy_ufo_00000_shot06_l",
+   "residual_mm": NaN,
+   "labelled_px": 0,
+   "tree_px": 0,
+   "unmatched_frac": 0.0,
+   "class_px": {
+    "trunk": 0,
+    "branch": 0,
+    "shoot": 0,
+    "spur": 0
+   },
+   "parts": 0
+  },
+  {
+   "key": "lpy_ufo_00000/box/lpy_ufo_00000_shot06_r",
+   "residual_mm": NaN,
+   "labelled_px": 0,
+   "tree_px": 0,
+   "unmatched_frac": 0.0,
+   "class_px": {
+    "trunk": 0,
+    "branch": 0,
+    "shoot": 0,
+    "spur": 0
+   },
+   "parts": 0
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam1/lpy_ufo_00000_shot01_l",
+   "residual_mm": 0.099,
+   "labelled_px": 67699,
+   "tree_px": 67699,
+   "unmatched_frac": 0.0,
+   "class_px": {
+    "trunk": 0,
+    "branch": 52758,
+    "shoot": 3903,
+    "spur": 11038
+   },
+   "parts": 47
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam1/lpy_ufo_00000_shot01_r",
+   "residual_mm": 0.099,
+   "labelled_px": 39864,
+   "tree_px": 39864,
+   "unmatched_frac": 0.0,
+   "class_px": {
+    "trunk": 0,
+    "branch": 31313,
+    "shoot": 3179,
+    "spur": 5372
+   },
+   "parts": 30
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam1/lpy_ufo_00000_shot02_l",
+   "residual_mm": 0.098,
+   "labelled_px": 78390,
+   "tree_px": 78390,
+   "unmatched_frac": 0.0,
+   "class_px": {
+    "trunk": 0,
+    "branch": 59866,
+    "shoot": 3870,
+    "spur": 14654
+   },
+   "parts": 54
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam1/lpy_ufo_00000_shot02_r",
+   "residual_mm": 0.097,
+   "labelled_px": 64758,
+   "tree_px": 64758,
+   "unmatched_frac": 0.0,
+   "class_px": {
+    "trunk": 0,
+    "branch": 49070,
+    "shoot": 3371,
+    "spur": 12317
+   },
+   "parts": 47
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam1/lpy_ufo_00000_shot03_l",
+   "residual_mm": 0.1,
+   "labelled_px": 66598,
+   "tree_px": 66603,
+   "unmatched_frac": 0.0001,
+   "class_px": {
+    "trunk": 0,
+    "branch": 51552,
+    "shoot": 2152,
+    "spur": 12894
+   },
+   "parts": 43
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam1/lpy_ufo_00000_shot03_r",
+   "residual_mm": 0.1,
+   "labelled_px": 59144,
+   "tree_px": 59147,
+   "unmatched_frac": 0.0001,
+   "class_px": {
+    "trunk": 0,
+    "branch": 46298,
+    "shoot": 2047,
+    "spur": 10799
+   },
+   "parts": 37
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam1/lpy_ufo_00000_shot04_l",
+   "residual_mm": 0.109,
+   "labelled_px": 41095,
+   "tree_px": 41210,
+   "unmatched_frac": 0.0028,
+   "class_px": {
+    "trunk": 0,
+    "branch": 34013,
+    "shoot": 0,
+    "spur": 7082
+   },
+   "parts": 26
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam1/lpy_ufo_00000_shot04_r",
+   "residual_mm": 0.107,
+   "labelled_px": 33363,
+   "tree_px": 33375,
+   "unmatched_frac": 0.0004,
+   "class_px": {
+    "trunk": 0,
+    "branch": 27026,
+    "shoot": 0,
+    "spur": 6337
+   },
+   "parts": 21
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam1/lpy_ufo_00000_shot05_l",
+   "residual_mm": 0.117,
+   "labelled_px": 5261,
+   "tree_px": 5336,
+   "unmatched_frac": 0.0141,
+   "class_px": {
+    "trunk": 0,
+    "branch": 4359,
+    "shoot": 0,
+    "spur": 902
+   },
+   "parts": 4
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam1/lpy_ufo_00000_shot05_r",
+   "residual_mm": 0.119,
+   "labelled_px": 5233,
+   "tree_px": 5313,
+   "unmatched_frac": 0.0151,
+   "class_px": {
+    "trunk": 0,
+    "branch": 4402,
+    "shoot": 0,
+    "spur": 831
+   },
+   "parts": 4
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam1/lpy_ufo_00000_shot06_l",
+   "residual_mm": NaN,
+   "labelled_px": 0,
+   "tree_px": 0,
+   "unmatched_frac": 0.0,
+   "class_px": {
+    "trunk": 0,
+    "branch": 0,
+    "shoot": 0,
+    "spur": 0
+   },
+   "parts": 0
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam1/lpy_ufo_00000_shot06_r",
+   "residual_mm": NaN,
+   "labelled_px": 0,
+   "tree_px": 0,
+   "unmatched_frac": 0.0,
+   "class_px": {
+    "trunk": 0,
+    "branch": 0,
+    "shoot": 0,
+    "spur": 0
+   },
+   "parts": 0
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam2/lpy_ufo_00000_shot01_l",
+   "residual_mm": 0.098,
+   "labelled_px": 48222,
+   "tree_px": 48222,
+   "unmatched_frac": 0.0,
+   "class_px": {
+    "trunk": 0,
+    "branch": 37348,
+    "shoot": 3423,
+    "spur": 7451
+   },
+   "parts": 50
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam2/lpy_ufo_00000_shot01_r",
+   "residual_mm": 0.095,
+   "labelled_px": 33230,
+   "tree_px": 33230,
+   "unmatched_frac": 0.0,
+   "class_px": {
+    "trunk": 0,
+    "branch": 25303,
+    "shoot": 3097,
+    "spur": 4830
+   },
+   "parts": 33
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam2/lpy_ufo_00000_shot02_l",
+   "residual_mm": 0.099,
+   "labelled_px": 66607,
+   "tree_px": 66607,
+   "unmatched_frac": 0.0,
+   "class_px": {
+    "trunk": 0,
+    "branch": 51137,
+    "shoot": 3325,
+    "spur": 12145
+   },
+   "parts": 66
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam2/lpy_ufo_00000_shot02_r",
+   "residual_mm": 0.098,
+   "labelled_px": 50788,
+   "tree_px": 50788,
+   "unmatched_frac": 0.0,
+   "class_px": {
+    "trunk": 0,
+    "branch": 38763,
+    "shoot": 1831,
+    "spur": 10194
+   },
+   "parts": 55
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam2/lpy_ufo_00000_shot03_l",
+   "residual_mm": 0.098,
+   "labelled_px": 55614,
+   "tree_px": 55616,
+   "unmatched_frac": 0.0,
+   "class_px": {
+    "trunk": 0,
+    "branch": 42775,
+    "shoot": 1876,
+    "spur": 10963
+   },
+   "parts": 50
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam2/lpy_ufo_00000_shot03_r",
+   "residual_mm": 0.097,
+   "labelled_px": 44936,
+   "tree_px": 44939,
+   "unmatched_frac": 0.0001,
+   "class_px": {
+    "trunk": 0,
+    "branch": 34408,
+    "shoot": 1911,
+    "spur": 8617
+   },
+   "parts": 41
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam2/lpy_ufo_00000_shot04_l",
+   "residual_mm": 0.101,
+   "labelled_px": 34526,
+   "tree_px": 34540,
+   "unmatched_frac": 0.0004,
+   "class_px": {
+    "trunk": 0,
+    "branch": 27048,
+    "shoot": 0,
+    "spur": 7478
+   },
+   "parts": 30
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam2/lpy_ufo_00000_shot04_r",
+   "residual_mm": 0.1,
+   "labelled_px": 21580,
+   "tree_px": 21594,
+   "unmatched_frac": 0.0006,
+   "class_px": {
+    "trunk": 0,
+    "branch": 16465,
+    "shoot": 0,
+    "spur": 5115
+   },
+   "parts": 21
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam2/lpy_ufo_00000_shot05_l",
+   "residual_mm": 0.101,
+   "labelled_px": 8935,
+   "tree_px": 8967,
+   "unmatched_frac": 0.0036,
+   "class_px": {
+    "trunk": 0,
+    "branch": 6916,
+    "shoot": 0,
+    "spur": 2019
+   },
+   "parts": 9
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam2/lpy_ufo_00000_shot05_r",
+   "residual_mm": 0.096,
+   "labelled_px": 9179,
+   "tree_px": 9198,
+   "unmatched_frac": 0.0021,
+   "class_px": {
+    "trunk": 0,
+    "branch": 6990,
+    "shoot": 0,
+    "spur": 2189
+   },
+   "parts": 9
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam2/lpy_ufo_00000_shot06_l",
+   "residual_mm": NaN,
+   "labelled_px": 0,
+   "tree_px": 0,
+   "unmatched_frac": 0.0,
+   "class_px": {
+    "trunk": 0,
+    "branch": 0,
+    "shoot": 0,
+    "spur": 0
+   },
+   "parts": 0
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam2/lpy_ufo_00000_shot06_r",
+   "residual_mm": NaN,
+   "labelled_px": 0,
+   "tree_px": 0,
+   "unmatched_frac": 0.0,
+   "class_px": {
+    "trunk": 0,
+    "branch": 0,
+    "shoot": 0,
+    "spur": 0
+   },
+   "parts": 0
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam3/lpy_ufo_00000_shot01_l",
+   "residual_mm": 0.096,
+   "labelled_px": 54067,
+   "tree_px": 54067,
+   "unmatched_frac": 0.0,
+   "class_px": {
+    "trunk": 0,
+    "branch": 41368,
+    "shoot": 3255,
+    "spur": 9444
+   },
+   "parts": 89
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam3/lpy_ufo_00000_shot01_r",
+   "residual_mm": 0.095,
+   "labelled_px": 35432,
+   "tree_px": 35432,
+   "unmatched_frac": 0.0,
+   "class_px": {
+    "trunk": 0,
+    "branch": 26946,
+    "shoot": 2650,
+    "spur": 5836
+   },
+   "parts": 49
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam3/lpy_ufo_00000_shot02_l",
+   "residual_mm": 0.096,
+   "labelled_px": 74944,
+   "tree_px": 74944,
+   "unmatched_frac": 0.0,
+   "class_px": {
+    "trunk": 0,
+    "branch": 57021,
+    "shoot": 4125,
+    "spur": 13798
+   },
+   "parts": 113
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam3/lpy_ufo_00000_shot02_r",
+   "residual_mm": 0.099,
+   "labelled_px": 44653,
+   "tree_px": 44654,
+   "unmatched_frac": 0.0,
+   "class_px": {
+    "trunk": 0,
+    "branch": 34113,
+    "shoot": 1635,
+    "spur": 8905
+   },
+   "parts": 64
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam3/lpy_ufo_00000_shot03_l",
+   "residual_mm": 0.096,
+   "labelled_px": 66938,
+   "tree_px": 66941,
+   "unmatched_frac": 0.0,
+   "class_px": {
+    "trunk": 0,
+    "branch": 50929,
+    "shoot": 3171,
+    "spur": 12838
+   },
+   "parts": 94
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam3/lpy_ufo_00000_shot03_r",
+   "residual_mm": 0.097,
+   "labelled_px": 47507,
+   "tree_px": 47512,
+   "unmatched_frac": 0.0001,
+   "class_px": {
+    "trunk": 0,
+    "branch": 36416,
+    "shoot": 1874,
+    "spur": 9217
+   },
+   "parts": 65
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam3/lpy_ufo_00000_shot04_l",
+   "residual_mm": 0.098,
+   "labelled_px": 39979,
+   "tree_px": 39983,
+   "unmatched_frac": 0.0001,
+   "class_px": {
+    "trunk": 0,
+    "branch": 30814,
+    "shoot": 1023,
+    "spur": 8142
+   },
+   "parts": 56
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam3/lpy_ufo_00000_shot04_r",
+   "residual_mm": 0.102,
+   "labelled_px": 21112,
+   "tree_px": 21112,
+   "unmatched_frac": 0.0,
+   "class_px": {
+    "trunk": 0,
+    "branch": 16471,
+    "shoot": 140,
+    "spur": 4501
+   },
+   "parts": 32
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam3/lpy_ufo_00000_shot05_l",
+   "residual_mm": 0.097,
+   "labelled_px": 12688,
+   "tree_px": 12706,
+   "unmatched_frac": 0.0014,
+   "class_px": {
+    "trunk": 0,
+    "branch": 9629,
+    "shoot": 377,
+    "spur": 2682
+   },
+   "parts": 21
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam3/lpy_ufo_00000_shot05_r",
+   "residual_mm": 0.099,
+   "labelled_px": 8748,
+   "tree_px": 8754,
+   "unmatched_frac": 0.0007,
+   "class_px": {
+    "trunk": 0,
+    "branch": 6802,
+    "shoot": 0,
+    "spur": 1946
+   },
+   "parts": 16
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam3/lpy_ufo_00000_shot06_l",
+   "residual_mm": NaN,
+   "labelled_px": 0,
+   "tree_px": 0,
+   "unmatched_frac": 0.0,
+   "class_px": {
+    "trunk": 0,
+    "branch": 0,
+    "shoot": 0,
+    "spur": 0
+   },
+   "parts": 0
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam3/lpy_ufo_00000_shot06_r",
+   "residual_mm": NaN,
+   "labelled_px": 0,
+   "tree_px": 0,
+   "unmatched_frac": 0.0,
+   "class_px": {
+    "trunk": 0,
+    "branch": 0,
+    "shoot": 0,
+    "spur": 0
+   },
+   "parts": 0
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam4/lpy_ufo_00000_shot01_l",
+   "residual_mm": 0.095,
+   "labelled_px": 43555,
+   "tree_px": 43555,
+   "unmatched_frac": 0.0,
+   "class_px": {
+    "trunk": 0,
+    "branch": 32845,
+    "shoot": 2918,
+    "spur": 7792
+   },
+   "parts": 120
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam4/lpy_ufo_00000_shot01_r",
+   "residual_mm": 0.097,
+   "labelled_px": 43419,
+   "tree_px": 43419,
+   "unmatched_frac": 0.0,
+   "class_px": {
+    "trunk": 0,
+    "branch": 33270,
+    "shoot": 2942,
+    "spur": 7207
+   },
+   "parts": 110
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam4/lpy_ufo_00000_shot02_l",
+   "residual_mm": 0.101,
+   "labelled_px": 57367,
+   "tree_px": 57367,
+   "unmatched_frac": 0.0,
+   "class_px": {
+    "trunk": 0,
+    "branch": 44586,
+    "shoot": 2935,
+    "spur": 9846
+   },
+   "parts": 144
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam4/lpy_ufo_00000_shot02_r",
+   "residual_mm": 0.098,
+   "labelled_px": 48180,
+   "tree_px": 48180,
+   "unmatched_frac": 0.0,
+   "class_px": {
+    "trunk": 0,
+    "branch": 37012,
+    "shoot": 2946,
+    "spur": 8222
+   },
+   "parts": 111
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam4/lpy_ufo_00000_shot03_l",
+   "residual_mm": 0.099,
+   "labelled_px": 50653,
+   "tree_px": 50653,
+   "unmatched_frac": 0.0,
+   "class_px": {
+    "trunk": 0,
+    "branch": 39134,
+    "shoot": 2614,
+    "spur": 8905
+   },
+   "parts": 126
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam4/lpy_ufo_00000_shot03_r",
+   "residual_mm": 0.099,
+   "labelled_px": 42348,
+   "tree_px": 42348,
+   "unmatched_frac": 0.0,
+   "class_px": {
+    "trunk": 0,
+    "branch": 32977,
+    "shoot": 2524,
+    "spur": 6847
+   },
+   "parts": 94
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam4/lpy_ufo_00000_shot04_l",
+   "residual_mm": 0.099,
+   "labelled_px": 36704,
+   "tree_px": 36704,
+   "unmatched_frac": 0.0,
+   "class_px": {
+    "trunk": 0,
+    "branch": 28288,
+    "shoot": 1736,
+    "spur": 6680
+   },
+   "parts": 94
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam4/lpy_ufo_00000_shot04_r",
+   "residual_mm": 0.101,
+   "labelled_px": 24178,
+   "tree_px": 24178,
+   "unmatched_frac": 0.0,
+   "class_px": {
+    "trunk": 0,
+    "branch": 18780,
+    "shoot": 1033,
+    "spur": 4365
+   },
+   "parts": 63
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam4/lpy_ufo_00000_shot05_l",
+   "residual_mm": 0.105,
+   "labelled_px": 22995,
+   "tree_px": 22996,
+   "unmatched_frac": 0.0,
+   "class_px": {
+    "trunk": 0,
+    "branch": 18420,
+    "shoot": 758,
+    "spur": 3817
+   },
+   "parts": 61
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam4/lpy_ufo_00000_shot05_r",
+   "residual_mm": 0.102,
+   "labelled_px": 16386,
+   "tree_px": 16387,
+   "unmatched_frac": 0.0001,
+   "class_px": {
+    "trunk": 0,
+    "branch": 12909,
+    "shoot": 466,
+    "spur": 3011
+   },
+   "parts": 49
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam4/lpy_ufo_00000_shot06_l",
+   "residual_mm": 0.106,
+   "labelled_px": 6932,
+   "tree_px": 6932,
+   "unmatched_frac": 0.0,
+   "class_px": {
+    "trunk": 0,
+    "branch": 5568,
+    "shoot": 397,
+    "spur": 967
+   },
+   "parts": 22
+  },
+  {
+   "key": "lpy_ufo_00000/box_cam4/lpy_ufo_00000_shot06_r",
+   "residual_mm": 0.103,
+   "labelled_px": 6583,
+   "tree_px": 6583,
+   "unmatched_frac": 0.0,
+   "class_px": {
+    "trunk": 0,
+    "branch": 5249,
+    "shoot": 411,
+    "spur": 923
+   },
+   "parts": 22
+  }
+ ]
+}
