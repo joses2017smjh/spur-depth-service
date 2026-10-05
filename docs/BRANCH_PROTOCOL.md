@@ -380,7 +380,7 @@ in that domain. This fixes v3's trunk artefact.
   frames framed, same-row neighbours IGNORE in all 60 frames, all 4 rows in the layout
   (`bench/results/branches_orchard_smoke_gate_2026-10-05.json`, `scripts/check_smoke_gate.py`).
   Viewed on one frame: target uprights labelled, neighbours IGNORE, rows behind background.
-- v4 execution (submitted 2026-10-05 ~10:45 as Slurm dependencies; rows and summaries from
+- v4 execution (submitted 2026-10-05 ~10:08 as Slurm dependencies; rows and summaries from
   frozen clone `6cd4818`, config C + fitted axis): renders 21566499 (69 trees, 6 at a time)
   -> orchard label cache 21566535 -> training 21566536 (`--ufo --orchard`, init 21549500)
   and v3-model predictions on the orchard val/test trees 21566537 -> MFO 21566538 for the v4
