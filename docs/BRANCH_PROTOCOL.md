@@ -314,3 +314,16 @@ If any check fails, nothing more is rendered and the user is asked.
   `bench/results/branches_test_v3_ufo_envyonly_2026-10-05.json`). The Envy + UFO model was
   still training (job 21549500); its rows, the Envy regression rows and the MFO run follow
   automatically.
+- v3 results (all chained jobs completed by 04:23 PDT, 2026-10-05; read at 07:50):
+  - Training 21549500: 49 epochs in 150 min, checkpoint epoch 46. Selection jumped at the
+    epochs where UFO trunk predictions vanished (31 and 46); epoch 46 sits on the plateau
+    (Envy-val 0.81, UFO-val 3-class 0.80, as at the last epochs). GPU: 154 min training +
+    prediction, 4.5 Envy-only prediction, 1 MFO = about 160 of the 240 approved.
+  - UFO test (8 trees), Envy-only vs Envy + UFO: 3-class pixel mIoU 0.49 -> 0.78 (branch
+    0.59 -> 0.94, shoot 0.33 -> 0.66, spur 0.56 -> 0.74), but the graph barely moves.
+    Rendered depth: skeleton F1 0.840 -> 0.833, edge F1 0.738 -> 0.750, cut F1 (Jain)
+    0.585 -> 0.616. Fused depth: skeleton F1 0.468 -> 0.476 (GT-class ceiling 0.480).
+  - Envy test: no regression; every graph metric within 0.005, mIoU 0.794 -> 0.798.
+  - Real MFO: no gain. UFO-mapping test mIoU 0.092 -> 0.082, wood IoU 0.236 -> 0.221, and
+    background called wood 31% -> 36%. The real-image gap is appearance (backgrounds,
+    lighting, bark), not tree architecture.
