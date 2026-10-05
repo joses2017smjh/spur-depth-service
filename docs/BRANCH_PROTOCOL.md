@@ -217,3 +217,43 @@ with run 21523238's.
   the tables report every depth source.
 - GPU: the fine-tune used 81.7 of the 110 approved GPU-minutes (dgxh). Local 2080 Ti:
   CDM about 25 min (selection, sky-fill round and inference), MFO about 8 min.
+
+# v3: synthetic UFO trees (registered 2026-10-04, before any UFO frame was rendered)
+
+Why: on real MFO cherry frames (UFO architecture) BranchNet scored 3-class mIoU 0.12 zero-shot
+after training on Envy renders only. `Computer_Vision/trees` also holds 100 L-Py UFO trees
+(`lpy_ufo_*`) that were never rendered. Budget approved by the user: one smoke tree, then 39
+more if the smoke gate passes (about 1,400 GPU-min of rendering), and 240 GPU-min of training.
+
+## Data
+- Generator: `Computer_Vision/Dataloader/generate_tree2.py` (sha256 `2dedbbc1...`), run as for
+  the Envy set (bark `bark_brown_02`, rigs box + box_cam1-4, 6 heights x stereo l/r, 60 frames,
+  DA2-ft depth), with one change: `scripts/blender/generate_tree2_ufo.patch`. The generator's
+  hierarchy walk kept only `branch_`, `nontrunk_`, `trunk` and `spur_` children, so it would
+  silently drop the UFO laterals (`tertiarybranch_`, 0.26 m, 3 mm, about 18 per tree) and
+  their spurs. Launcher: `scripts/run_render_ufo.sh`. Output:
+  `/nfs/hpc/share/sanchej7/spur-ufo/full_spur_ufo`, with one manifest per tree.
+- Splits, by tree id: train `lpy_ufo_00000`-`00027` (28 trees), val `00028`-`00031` (4),
+  test `00032`-`00039` (8). The smoke tree `00000` is a train tree. The Envy splits are unchanged.
+- Classes: L-Py `trunk` (the horizontal cordon) -> trunk, `branch` (the uprights) -> branch,
+  `tertiarybranch` -> shoot (same scale as Envy's 0.3 m `nontrunk` shoots), `spur` -> spur.
+  The ground-truth walk (`gt.reachable_parts`) follows the patched generator.
+
+## Smoke gate (tree 00000; viewing it is allowed, it is a train tree)
+1. All 60 frames and all 60 DA2-ft maps are written.
+2. Ground-truth depth lies on the cylinder surfaces: median residual <= 2 mm, as for Envy.
+3. The tree is framed: at least 50 frames carry at least 5,000 labelled tree pixels.
+If any check fails, nothing more is rendered and the user is asked.
+
+## Evaluation (fixed before any UFO prediction exists)
+- Models: BranchNet Envy-only (run 21532184) vs BranchNet Envy + UFO (warm start from 21532184,
+  trained on the 94 Envy and 28 UFO train trees, checkpoint by mean tree-class mIoU over the
+  4 Envy and 4 UFO val trees). Assembly: config C + the fitted cut axis.
+- Synthetic: the 8 UFO test trees (new) and the 2 Envy test trees (regression check), every
+  primary metric, depths gt, sensor, da2 and fused, with the GT-class ceiling.
+- Real MFO cherry: same frames, splits and pre-processing as v2, with the resize factor
+  re-chosen on MFO val for each model. Two class mappings: the v2 mapping (leader -> trunk,
+  sidebranch -> branch + shoot), kept for comparison with 0.12, and the UFO mapping (MFO
+  `leader` is the upright: predicted trunk + branch -> leader, shoot -> sidebranch,
+  spur -> spur). Primary: 3-class mIoU under the UFO mapping, plus binary wood IoU, which
+  needs no mapping.

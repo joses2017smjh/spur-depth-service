@@ -1,0 +1,11 @@
+--- a/generate_tree2.py	2026-10-04 21:02:39.889610467 -0700
++++ b/generate_tree2.py	2026-10-04 21:02:39.910610440 -0700
+@@ -804,7 +804,7 @@
+                 parent = queue.pop(0)
+                 for child in hierarchy.get(parent, []):
+                     cl = child.lower()
+-                    if cl.startswith("branch_") or cl.startswith("nontrunk_"):
++                    if cl.startswith(("branch_", "nontrunk_", "tertiarybranch_")):
+                         if RENDER_BRANCHES:
+                             parts_to_render.add(child)
+                             queue.append(child)
