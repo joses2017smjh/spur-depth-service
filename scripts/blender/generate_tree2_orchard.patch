@@ -1,0 +1,16 @@
+--- a/generate_tree2.py	2026-10-05 08:24:10.426281062 -0700
++++ b/generate_tree2.py	2026-10-05 08:24:10.634280845 -0700
+@@ -1852,6 +1852,13 @@
+             if tree_obj is None:
+                 print(f"  Skipping {tree_id}")
+                 continue
++            # Protocol v4: orchard context (opt-in; scripts/blender/orchard_context.py).
++            if os.environ.get("CV_ORCHARD", "0").lower() in ("1", "true", "yes"):
++                import orchard_context
++                layout = orchard_context.populate(globals(), tree_obj, tree_id, texture_entry)
++                with open(os.path.join(OUTPUT_DIR, f"orchard_{tree_id}.json"), "w") as f:
++                    json.dump(layout, f, indent=1)
++                print(f"  Orchard context: {len(layout['trees'])} trees, {layout['extra_rows']} extra rows")
+             # One random other tree behind and left/right (pick from full tree list)
+             bg_obj = None
+             if ENABLE_BACKGROUND_TREE and len(all_metadata_files) >= 2:
