@@ -18,7 +18,15 @@ import numpy as np
 CLASSES = ("background", "trunk", "branch", "shoot", "spur")
 TRUNK, BRANCH, SHOOT, SPUR = 1, 2, 3, 4
 # L-Py part-name prefix -> class id. "nontrunk" parts are the 0.3 m shoots on scaffolds.
-PREFIX_TO_CLASS = {"trunk": TRUNK, "branch": BRANCH, "nontrunk": SHOOT, "spur": SPUR}
+# UFO trees: the trunk is the horizontal cordon, "branch" the uprights, and "tertiarybranch" the
+# 0.26 m laterals on the uprights, which are shoots by scale and role.
+PREFIX_TO_CLASS = {
+    "trunk": TRUNK,
+    "branch": BRANCH,
+    "nontrunk": SHOOT,
+    "tertiarybranch": SHOOT,
+    "spur": SPUR,
+}
 IGNORE = 255
 CUT_OFFSET_M = 0.015
 

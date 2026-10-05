@@ -340,3 +340,63 @@ def test_multiview_fusion_merges_views_votes_parents_and_averages_noise():
     assert len(anchored.parts) == 3
     with pytest.raises(ValueError):
         view_graph(fused, poses[0], K, wood, FuseConfig(view_mode="anchored"))
+
+
+def test_ufo_tertiary_branches_are_shoots_and_rendered():
+    from spur_depth.branches import gt
+    from spur_depth.branches.tree import SHOOT
+
+    h = {
+        "root": ["trunk_1"],
+        "trunk_1": ["branch_2"],
+        "branch_2": ["tertiarybranch_3", "spur_4"],
+        "tertiarybranch_3": ["spur_5"],
+    }
+    assert gt.reachable_parts(h) == [
+        "trunk_1",
+        "branch_2",
+        "spur_4",
+        "tertiarybranch_3",
+        "spur_5",
+    ]
+    assert gt.part_class("tertiarybranch_3") == SHOOT
+
+
+def test_ufo_trees_resolve_to_their_render_root():
+    from pathlib import Path
+
+    from spur_depth.branches import gt
+
+    assert gt.tree_root("lpy_ufo_00003") == gt.UFO_DATA_ROOT
+    assert gt.tree_root("lpy_envy_00003") == gt.DATA_ROOT
+    assert gt.tree_root("lpy_ufo_00003", Path("/x")) == Path("/x")
+    ref = gt.FrameRef("lpy_ufo_00003", "box", "shot01", "l")
+    assert str(ref.path("ann")).startswith(str(gt.UFO_DATA_ROOT))
+
+
+def test_ufo_val_and_test_trees_never_reach_training(tmp_path, monkeypatch):
+    from spur_depth.branches import dataset, gt
+
+    assert not set(gt.UFO_TRAIN) & set(gt.UFO_VAL_TREES + gt.UFO_TEST)
+    assert not set(gt.UFO_VAL_TREES) & set(gt.UFO_TEST)
+    trees = ["lpy_envy_00000", *gt.VAL_TREES, *gt.PAPER_TEST, *gt.UFO_TRAIN[:2]]
+    trees += [*gt.UFO_VAL_TREES[:1], *gt.UFO_TEST[:1]]
+    for t in trees:
+        d = tmp_path / t / "box"
+        d.mkdir(parents=True)
+        for suffix in dataset.REQUIRED_SUFFIXES:
+            (d / f"{t}_shot01_l{suffix}").write_bytes(b"")
+    # Every cached tree "exists" in the render root, UFO ones included.
+    monkeypatch.setattr(gt, "all_trees", lambda root=gt.DATA_ROOT: sorted(trees))
+
+    def tree_set(refs):
+        return {r.tree for r in refs}
+
+    tr, va, te = dataset.split_frames(tmp_path)
+    assert tree_set(tr) == {"lpy_envy_00000"}
+    assert not tree_set(tr) & set(gt.UFO_VAL_TREES + gt.UFO_TEST + gt.VAL_TREES + gt.PAPER_TEST)
+    assert not any(t.startswith("lpy_ufo_") for t in tree_set(va) | tree_set(te))
+    tr, va, te = dataset.split_frames(tmp_path, ufo=True)
+    assert tree_set(tr) == {"lpy_envy_00000", *gt.UFO_TRAIN[:2]}
+    assert not tree_set(tr) & set(gt.UFO_VAL_TREES + gt.UFO_TEST + gt.VAL_TREES + gt.PAPER_TEST)
+    assert gt.UFO_VAL_TREES[0] in tree_set(va) and gt.UFO_TEST[0] in tree_set(te)

@@ -56,8 +56,10 @@ nvidia-smi || true
     --cache "$CACHE" --out "$RUN" --max-minutes "$MAX_MIN" "${@:3}"
 echo "===== train done at $(date -Is)"
 
+PRED_EXTRA=()
+for a in "${@:3}"; do [ "$a" = "--ufo" ] && PRED_EXTRA=(--ufo); done
 "$PY" "$RUN/src/scripts/train_branches.py" predict \
-    --ckpt "$RUN/best.pt" --cache "$CACHE" --out "$RUN/pred"
+    --ckpt "$RUN/best.pt" --cache "$CACHE" --out "$RUN/pred" "${PRED_EXTRA[@]}"
 echo "===== predict done at $(date -Is)"
 
 date -Is > "$RUN/DONE"

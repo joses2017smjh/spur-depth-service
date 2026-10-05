@@ -59,6 +59,19 @@ SCORER_FILES = (
     "docs/BRANCH_PROTOCOL.md",
 )
 METHODS = ("oracle", "tinyunet", "branchnet")
+# Split -> trees. The *_ufo splits are the protocol-v3 synthetic UFO trees.
+SPLITS = {
+    "val": G.VAL_TREES,
+    "test": G.PAPER_TEST,
+    "val_ufo": G.UFO_VAL_TREES,
+    "test_ufo": G.UFO_TEST,
+}
+
+
+def is_test(split: str) -> bool:
+    return split.startswith("test")
+
+
 DEPTHS = ("gt", "sensor", "da2", "fused", "cdm")
 LIFT_ONLY = ("fused", "cdm")  # depth sources the classifier never sees: it gets raw sensor
 
@@ -167,7 +180,7 @@ def fingerprint(prov: dict, method: str, source: str) -> str:
 
 
 def frame_list(args) -> list[G.FrameRef]:
-    trees = G.PAPER_TEST if args.split == "test" else G.VAL_TREES
+    trees = SPLITS[args.split]
     frames = []
     for t in trees:
         fr = G.list_frames([t])[:: args.every]
@@ -183,7 +196,7 @@ def _write_atomic(path: Path, text: str) -> None:
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--split", choices=("val", "test"), required=True)
+    ap.add_argument("--split", choices=tuple(SPLITS), required=True)
     ap.add_argument("--methods", nargs="+", default=["oracle"], choices=METHODS)
     ap.add_argument("--depths", nargs="+", default=["gt"], choices=DEPTHS)
     ap.add_argument("--cache", type=Path, default=CACHE)
@@ -200,7 +213,7 @@ def main(argv=None) -> int:
     cfg = replace(AssembleConfig(), **json.loads(args.cfg))
     if "branchnet" in args.methods and args.pred_dir is None:
         ap.error("--methods branchnet needs --pred-dir")
-    if args.split == "test":
+    if is_test(args.split):
         if args.limit or args.every != 1:
             ap.error("--split test scores every frame: no --limit / --every")
         state = git_state(REPO)
@@ -298,7 +311,7 @@ def summarize_dir(args, prov: dict) -> dict:
     result = {
         "protocol": "docs/BRANCH_PROTOCOL.md v2",
         "split": args.split,
-        "trees": list(G.PAPER_TEST if args.split == "test" else G.VAL_TREES),
+        "trees": list(SPLITS[args.split]),
         "frames_expected": len(expected),
         "frame_list_sha256": hashlib.sha256("\n".join(sorted(expected)).encode()).hexdigest(),
         "argv": {k: (str(v) if isinstance(v, Path) else v) for k, v in vars(args).items()},

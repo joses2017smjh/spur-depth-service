@@ -40,7 +40,7 @@ from spur_depth.branches.tree import CLASSES, IGNORE, TreeGraph
 from spur_depth.pipeline.reconstruct import load_pose
 
 DEFAULT_OUT = Path("/nfs/hpc/share/sanchej7/spur-branch-cache/v1")
-EVAL_TREES = frozenset(gt.PAPER_TEST + gt.VAL_TREES)
+EVAL_TREES = frozenset(gt.PAPER_TEST + gt.VAL_TREES + gt.UFO_VAL_TREES + gt.UFO_TEST)
 NAMES = CLASSES[1:]
 MIN_Z_M = 0.05
 _STATE: dict = {}
@@ -220,7 +220,7 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
     if not 0 <= args.shard < args.n_shards:
         ap.error(f"--shard must be in [0, {args.n_shards})")
-    known = gt.all_trees()
+    known = gt.all_trees() + gt.all_trees(gt.UFO_DATA_ROOT)
     if unknown := sorted(set(args.trees or []) - set(known)):
         ap.error(f"unknown trees under {gt.DATA_ROOT}: {unknown}")
     trees = sorted(args.trees) if args.trees else known

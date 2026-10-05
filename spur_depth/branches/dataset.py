@@ -67,15 +67,26 @@ def cached_frames(cache_root: Path, trees) -> list[gt.FrameRef]:
 
 
 def split_frames(
-    cache_root: Path, data_root: Path = gt.DATA_ROOT
+    cache_root: Path, data_root: Path = gt.DATA_ROOT, ufo: bool = False
 ) -> tuple[list[gt.FrameRef], list[gt.FrameRef], list[gt.FrameRef]]:
-    """(train, val, test) cached frames: test = PAPER_TEST, val = VAL_TREES, train = the rest."""
-    held = set(gt.PAPER_TEST) | set(gt.VAL_TREES)
-    train_trees = [t for t in gt.all_trees(data_root) if t not in held]
+    """(train, val, test) cached frames: test = PAPER_TEST, val = VAL_TREES, train = the rest.
+
+    ``ufo`` adds the protocol-v3 UFO splits (UFO_TRAIN / UFO_VAL_TREES / UFO_TEST); UFO trees
+    are never picked up otherwise, and UFO val and test trees never reach training.
+    """
+    held = set(gt.PAPER_TEST) | set(gt.VAL_TREES) | set(gt.UFO_VAL_TREES) | set(gt.UFO_TEST)
+    train_trees = [
+        t for t in gt.all_trees(data_root) if t not in held and not t.startswith("lpy_ufo_")
+    ]
+    val_trees, test_trees = list(gt.VAL_TREES), list(gt.PAPER_TEST)
+    if ufo:
+        train_trees += list(gt.UFO_TRAIN)
+        val_trees += list(gt.UFO_VAL_TREES)
+        test_trees += list(gt.UFO_TEST)
     return (
         cached_frames(cache_root, train_trees),
-        cached_frames(cache_root, gt.VAL_TREES),
-        cached_frames(cache_root, gt.PAPER_TEST),
+        cached_frames(cache_root, val_trees),
+        cached_frames(cache_root, test_trees),
     )
 
 

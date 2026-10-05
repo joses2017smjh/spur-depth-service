@@ -39,7 +39,7 @@ SELF = Path(__file__).resolve()
 
 
 def groups(split: str) -> list[tuple[str, str]]:
-    trees = G.PAPER_TEST if split == "test" else G.VAL_TREES
+    trees = ev.SPLITS[split]
     return [(t, r) for t in trees for r in G.RIGS]
 
 
@@ -50,7 +50,7 @@ def frame_pose(ref: G.FrameRef, cache: Path) -> np.ndarray:
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--split", choices=("val", "test"), required=True)
+    ap.add_argument("--split", choices=tuple(ev.SPLITS), required=True)
     ap.add_argument("--methods", nargs="+", default=["branchnet"], choices=("oracle", "branchnet"))
     ap.add_argument("--depths", nargs="+", default=["fused"], choices=ev.DEPTHS)
     ap.add_argument("--cache", type=Path, default=ev.CACHE)
@@ -67,7 +67,7 @@ def main(argv=None) -> int:
     fcfg = replace(FuseConfig(), **json.loads(args.fuse))
     if "branchnet" in args.methods and args.pred_dir is None:
         ap.error("--methods branchnet needs --pred-dir")
-    if args.split == "test":
+    if ev.is_test(args.split):
         state = ev.git_state(ev.REPO)
         mine = subprocess.run(
             ["git", "-C", str(ev.REPO), "status", "--porcelain", "--", str(SELF)],

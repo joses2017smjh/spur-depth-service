@@ -34,6 +34,8 @@ from spur_depth.branches.tree import (
 CV_ROOT = Path("/nfs/hpc/share/sanchej7/Computer_Vision")
 METADATA_DIR = CV_ROOT / "trees" / "metadata"
 DATA_ROOT = CV_ROOT / "Data" / "full_spur"
+# UFO renders (protocol v3) live outside the read-only companion; see tree_root.
+UFO_DATA_ROOT = Path("/nfs/hpc/share/sanchej7/spur-ufo/full_spur_ufo")
 BARK = "bark_brown_02"
 TILT_RAD = math.radians(-17.143)
 RIGS = ("box", "box_cam1", "box_cam2", "box_cam3", "box_cam4")
@@ -42,6 +44,10 @@ SIDES = ("l", "r")
 PAPER_TEST = ("lpy_envy_00042", "lpy_envy_00065")
 # Tuning trees for the graph assembly and model selection; never scored as test.
 VAL_TREES = ("lpy_envy_00001", "lpy_envy_00009", "lpy_envy_00015", "lpy_envy_00041")
+# Synthetic UFO splits (protocol v3, fixed before any UFO render existed).
+UFO_TRAIN = tuple(f"lpy_ufo_{i:05d}" for i in range(0, 28))
+UFO_VAL_TREES = tuple(f"lpy_ufo_{i:05d}" for i in range(28, 32))
+UFO_TEST = tuple(f"lpy_ufo_{i:05d}" for i in range(32, 40))
 SAMPLE_STEP_M = 0.01
 MIN_PART_PIXELS = 25
 
@@ -65,7 +71,7 @@ def reachable_parts(hierarchy: dict) -> list[str]:
             if child in seen:
                 continue
             low = child.lower()
-            if low.startswith(("branch_", "nontrunk_", "trunk")):
+            if low.startswith(("branch_", "nontrunk_", "tertiarybranch_", "trunk")):
                 seen.add(child)
                 queue.append(child)
             elif low.startswith("spur_"):
@@ -122,10 +128,17 @@ def load_metadata(tree_id: str, meta_dir: Path = METADATA_DIR) -> dict:
     return json.loads((Path(meta_dir) / f"{tree_id}_metadata.json").read_text())
 
 
+def tree_root(tree: str, root: Path = DATA_ROOT) -> Path:
+    """Render root of ``tree``: UFO trees resolve to UFO_DATA_ROOT unless a root is given."""
+    if Path(root) == DATA_ROOT and tree.startswith("lpy_ufo_"):
+        return UFO_DATA_ROOT
+    return Path(root)
+
+
 def _world_centroids(tree_id: str, ann: dict | None, data_root: Path) -> np.ndarray:
     if ann is not None and ann.get("cylinders_world"):
         return np.asarray(ann["cylinders_world"], dtype=np.float64)
-    side = Path(data_root) / "cylinders_world" / BARK / f"{tree_id}.json"
+    side = tree_root(tree_id, data_root) / "cylinders_world" / BARK / f"{tree_id}.json"
     if side.is_file():
         return np.asarray([c["centroid"] for c in json.loads(side.read_text())], dtype=np.float64)
     raise FileNotFoundError(f"no world centroids for {tree_id}: pass an annotation")
@@ -353,7 +366,9 @@ class FrameRef:
 
     def path(self, kind: str, root: Path = DATA_ROOT) -> Path:
         ext = {"Optical_flow": "png", "mask": "png", "ann": "json"}.get(kind, "npy")
-        return Path(root) / kind / BARK / self.tree / self.rig / f"{self.stem}.{ext}"
+        return (
+            tree_root(self.tree, root) / kind / BARK / self.tree / self.rig / f"{self.stem}.{ext}"
+        )
 
     @property
     def key(self) -> str:

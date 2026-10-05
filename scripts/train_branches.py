@@ -239,7 +239,7 @@ def train(args: argparse.Namespace) -> int:
         torch.backends.cudnn.allow_tf32 = True
     args.out.mkdir(parents=True, exist_ok=True)
 
-    train_refs, val_refs, test_refs = split_frames(args.cache, args.data_root)
+    train_refs, val_refs, test_refs = split_frames(args.cache, args.data_root, ufo=args.ufo)
     if args.limit_train > 0:
         train_refs = train_refs[: args.limit_train]
     print(
@@ -427,8 +427,22 @@ def train(args: argparse.Namespace) -> int:
 
         tv = time.time()
         metrics = validate(model, val_frames, device, amp=dtype is not None)
-        val_s = time.time() - tv
         score = metrics["miou_tree"] if metrics["miou_tree"] is not None else -1.0
+        if args.ufo:
+            # Protocol v3: each domain counts equally in checkpoint selection.
+            by_domain = {}
+            for name in ("envy", "ufo"):
+                sub = [
+                    f
+                    for f in val_frames
+                    if val_refs[f["index"]].tree.startswith("lpy_ufo_") == (name == "ufo")
+                ]
+                by_domain[name] = validate(model, sub, device, amp=dtype is not None)
+            metrics["by_domain"] = by_domain
+            ms = [by_domain[d]["miou_tree"] for d in ("envy", "ufo")]
+            score = float(np.mean(ms)) if all(m is not None for m in ms) else -1.0
+            metrics["selection_score"] = score
+        val_s = time.time() - tv
         is_best = score > best_score
         rec = {
             "epoch": epoch,
@@ -498,6 +512,8 @@ def predict_frames(args: argparse.Namespace) -> int:
     blob_meta = torch.load(args.ckpt, map_location="cpu", weights_only=False)
     ckpt_info = {k: blob_meta.get(k) for k in ("epoch", "iter", "val", "git_commit")}
     del blob_meta
+    if args.ufo:
+        args.trees = list(args.trees) + list(gt.UFO_VAL_TREES + gt.UFO_TEST)
     refs = cached_frames(args.cache, args.trees)
     if args.limit_frames > 0:
         refs = refs[: args.limit_frames]
@@ -609,6 +625,9 @@ def build_parser() -> argparse.ArgumentParser:
     t.add_argument(
         "--init", type=Path, default=None, help="warm start from this checkpoint's weights"
     )
+    t.add_argument(
+        "--ufo", action="store_true", help="add the protocol-v3 UFO train/val trees (v3)"
+    )
 
     p = sub.add_parser("predict", help="full-frame predictions for held-out trees")
     p.add_argument("--ckpt", type=Path, required=True)
@@ -616,6 +635,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--out", type=Path, required=True, help="prediction directory")
     p.add_argument("--data-root", type=Path, default=gt.DATA_ROOT)
     p.add_argument("--trees", nargs="+", default=list(gt.VAL_TREES + gt.PAPER_TEST))
+    p.add_argument("--ufo", action="store_true", help="also predict the UFO val and test trees")
     p.add_argument("--sources", nargs="+", default=["gt", "sensor", "da2"], choices=DEPTH_SOURCES)
     p.add_argument("--limit-frames", type=int, default=0, help="first N frames (tests)")
     p.add_argument("--workers", type=int, default=4, help="loading + sensor simulation")
