@@ -57,7 +57,9 @@ nvidia-smi || true
 echo "===== train done at $(date -Is)"
 
 PRED_EXTRA=()
-for a in "${@:3}"; do [ "$a" = "--ufo" ] && PRED_EXTRA=(--ufo); done
+for a in "${@:3}"; do
+    case "$a" in --ufo | --orchard) PRED_EXTRA+=("$a") ;; esac
+done
 "$PY" "$RUN/src/scripts/train_branches.py" predict \
     --ckpt "$RUN/best.pt" --cache "$CACHE" --out "$RUN/pred" "${PRED_EXTRA[@]}"
 echo "===== predict done at $(date -Is)"

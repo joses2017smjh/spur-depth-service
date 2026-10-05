@@ -400,3 +400,30 @@ def test_ufo_val_and_test_trees_never_reach_training(tmp_path, monkeypatch):
     assert tree_set(tr) == {"lpy_envy_00000", *gt.UFO_TRAIN[:2]}
     assert not tree_set(tr) & set(gt.UFO_VAL_TREES + gt.UFO_TEST + gt.VAL_TREES + gt.PAPER_TEST)
     assert gt.UFO_VAL_TREES[0] in tree_set(va) and gt.UFO_TEST[0] in tree_set(te)
+
+
+def test_orchard_keys_resolve_and_splits_never_leak(tmp_path, monkeypatch):
+    from spur_depth.branches import dataset, gt
+
+    assert gt.base_tree("orchard_lpy_ufo_00003") == "lpy_ufo_00003"
+    assert gt.base_tree("lpy_envy_00003") == "lpy_envy_00003"
+    assert gt.tree_root("orchard_lpy_envy_00003") == gt.ORCHARD_DATA_ROOT
+    assert gt.tree_root("orchard_lpy_ufo_00003") == gt.ORCHARD_DATA_ROOT
+    held = set(gt.VAL_TREES + gt.PAPER_TEST + gt.UFO_VAL_TREES + gt.UFO_TEST)
+    assert len(gt.ORCHARD_TRAIN) == 24 + 28
+    assert not {gt.base_tree(t) for t in gt.ORCHARD_TRAIN} & held
+    assert {gt.base_tree(t) for t in gt.ORCHARD_VAL_TREES} == set(gt.VAL_TREES + gt.UFO_VAL_TREES)
+    assert {gt.base_tree(t) for t in gt.ORCHARD_TEST} == set(gt.PAPER_TEST + gt.UFO_TEST)
+    trees = ["lpy_envy_00000", gt.ORCHARD_TRAIN[0], gt.ORCHARD_VAL_TREES[0], gt.ORCHARD_TEST[-1]]
+    for t in trees:
+        d = tmp_path / t / "box"
+        d.mkdir(parents=True)
+        for suffix in dataset.REQUIRED_SUFFIXES:
+            (d / f"{t}_shot01_l{suffix}").write_bytes(b"")
+    monkeypatch.setattr(gt, "all_trees", lambda root=gt.DATA_ROOT: sorted(trees))
+    tr, va, te = dataset.split_frames(tmp_path)
+    assert {r.tree for r in tr} == {"lpy_envy_00000"}
+    tr, va, te = dataset.split_frames(tmp_path, ufo=True, orchard=True)
+    assert {r.tree for r in tr} == {"lpy_envy_00000", gt.ORCHARD_TRAIN[0]}
+    assert {r.tree for r in va} == {gt.ORCHARD_VAL_TREES[0]}
+    assert {r.tree for r in te} == {gt.ORCHARD_TEST[-1]}

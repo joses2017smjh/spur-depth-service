@@ -67,7 +67,7 @@ def cached_frames(cache_root: Path, trees) -> list[gt.FrameRef]:
 
 
 def split_frames(
-    cache_root: Path, data_root: Path = gt.DATA_ROOT, ufo: bool = False
+    cache_root: Path, data_root: Path = gt.DATA_ROOT, ufo: bool = False, orchard: bool = False
 ) -> tuple[list[gt.FrameRef], list[gt.FrameRef], list[gt.FrameRef]]:
     """(train, val, test) cached frames: test = PAPER_TEST, val = VAL_TREES, train = the rest.
 
@@ -75,14 +75,21 @@ def split_frames(
     are never picked up otherwise, and UFO val and test trees never reach training.
     """
     held = set(gt.PAPER_TEST) | set(gt.VAL_TREES) | set(gt.UFO_VAL_TREES) | set(gt.UFO_TEST)
+    held |= set(gt.ORCHARD_VAL_TREES) | set(gt.ORCHARD_TEST)
     train_trees = [
-        t for t in gt.all_trees(data_root) if t not in held and not t.startswith("lpy_ufo_")
+        t
+        for t in gt.all_trees(data_root)
+        if t not in held and not t.startswith(("lpy_ufo_", gt.ORCHARD_PREFIX))
     ]
     val_trees, test_trees = list(gt.VAL_TREES), list(gt.PAPER_TEST)
     if ufo:
         train_trees += list(gt.UFO_TRAIN)
         val_trees += list(gt.UFO_VAL_TREES)
         test_trees += list(gt.UFO_TEST)
+    if orchard:  # protocol v4: orchard-context renders of the same splits
+        train_trees += list(gt.ORCHARD_TRAIN)
+        val_trees += list(gt.ORCHARD_VAL_TREES)
+        test_trees += list(gt.ORCHARD_TEST)
     return (
         cached_frames(cache_root, train_trees),
         cached_frames(cache_root, val_trees),

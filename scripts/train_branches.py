@@ -141,8 +141,15 @@ def validate(model: BranchNet, frames: list[dict], device: torch.device, amp: bo
     p = ctr[0] / ctr[1] if ctr[1] else 0.0
     r = ctr[2] / ctr[3] if ctr[3] else 0.0
     f1 = 2 * p * r / (p + r) if p + r > 0 else 0.0
+    # Protocol v4 selection: mIoU over the tree classes with ground-truth pixels in these frames
+    # (UFO frames have no trunk, so a predicted trunk does not zero a class nobody can score).
+    gt_px = cm.sum(1)
+    present = [k for k in range(1, n) if gt_px[k] > 0 and np.isfinite(iou[k])]
+    miou_present = float(np.mean([iou[k] for k in present])) if present else float("nan")
     return {
         "miou_tree": _finite(miou),
+        "miou_present": _finite(miou_present),
+        "gt_px": {name: int(v) for name, v in zip(CLASSES, gt_px)},
         "iou": {name: _finite(v) for name, v in zip(CLASSES, iou)},
         "ctr_precision": float(p),
         "ctr_recall": float(r),
@@ -211,6 +218,12 @@ def load_init(model: BranchNet, path: Path) -> dict:
     }
 
 
+def domain_of(tree: str) -> str:
+    if tree.startswith(gt.ORCHARD_PREFIX):
+        return "orchard"
+    return "ufo" if tree.startswith("lpy_ufo_") else "envy"
+
+
 def save_checkpoint(path: Path, model: BranchNet, **meta) -> None:
     """Atomic write, so a job killed mid-save never leaves a truncated best.pt."""
     state = {k: v.detach().cpu().contiguous() for k, v in model.state_dict().items()}
@@ -239,7 +252,9 @@ def train(args: argparse.Namespace) -> int:
         torch.backends.cudnn.allow_tf32 = True
     args.out.mkdir(parents=True, exist_ok=True)
 
-    train_refs, val_refs, test_refs = split_frames(args.cache, args.data_root, ufo=args.ufo)
+    train_refs, val_refs, test_refs = split_frames(
+        args.cache, args.data_root, ufo=args.ufo, orchard=args.orchard
+    )
     if args.limit_train > 0:
         train_refs = train_refs[: args.limit_train]
     print(
@@ -428,19 +443,17 @@ def train(args: argparse.Namespace) -> int:
         tv = time.time()
         metrics = validate(model, val_frames, device, amp=dtype is not None)
         score = metrics["miou_tree"] if metrics["miou_tree"] is not None else -1.0
-        if args.ufo:
-            # Protocol v3: each domain counts equally in checkpoint selection.
+        if args.ufo or args.orchard:
+            # Each domain counts equally in checkpoint selection: protocol v3 (envy, ufo;
+            # tree-class mIoU) and v4 (envy, ufo, orchard; mIoU over classes present).
             by_domain = {}
-            for name in ("envy", "ufo"):
-                sub = [
-                    f
-                    for f in val_frames
-                    if val_refs[f["index"]].tree.startswith("lpy_ufo_") == (name == "ufo")
-                ]
+            for name in ("envy", "ufo", "orchard"):
+                sub = [f for f in val_frames if domain_of(val_refs[f["index"]].tree) == name]
                 if sub:
                     by_domain[name] = validate(model, sub, device, amp=dtype is not None)
             metrics["by_domain"] = by_domain
-            ms = [v["miou_tree"] for v in by_domain.values() if v["miou_tree"] is not None]
+            key = "miou_present" if args.orchard else "miou_tree"
+            ms = [v[key] for v in by_domain.values() if v[key] is not None]
             score = float(np.mean(ms)) if ms else -1.0
             metrics["selection_score"] = score
         val_s = time.time() - tv
@@ -515,6 +528,8 @@ def predict_frames(args: argparse.Namespace) -> int:
     del blob_meta
     if args.ufo:
         args.trees = list(args.trees) + list(gt.UFO_VAL_TREES + gt.UFO_TEST)
+    if args.orchard:
+        args.trees = list(args.trees) + list(gt.ORCHARD_VAL_TREES + gt.ORCHARD_TEST)
     refs = cached_frames(args.cache, args.trees)
     if args.limit_frames > 0:
         refs = refs[: args.limit_frames]
@@ -629,6 +644,9 @@ def build_parser() -> argparse.ArgumentParser:
     t.add_argument(
         "--ufo", action="store_true", help="add the protocol-v3 UFO train/val trees (v3)"
     )
+    t.add_argument(
+        "--orchard", action="store_true", help="add the protocol-v4 orchard-context trees (v4)"
+    )
 
     p = sub.add_parser("predict", help="full-frame predictions for held-out trees")
     p.add_argument("--ckpt", type=Path, required=True)
@@ -637,6 +655,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--data-root", type=Path, default=gt.DATA_ROOT)
     p.add_argument("--trees", nargs="+", default=list(gt.VAL_TREES + gt.PAPER_TEST))
     p.add_argument("--ufo", action="store_true", help="also predict the UFO val and test trees")
+    p.add_argument("--orchard", action="store_true", help="also predict the orchard val/test trees")
     p.add_argument("--sources", nargs="+", default=["gt", "sensor", "da2"], choices=DEPTH_SOURCES)
     p.add_argument("--limit-frames", type=int, default=0, help="first N frames (tests)")
     p.add_argument("--workers", type=int, default=4, help="loading + sensor simulation")

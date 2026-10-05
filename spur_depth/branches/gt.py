@@ -36,6 +36,9 @@ METADATA_DIR = CV_ROOT / "trees" / "metadata"
 DATA_ROOT = CV_ROOT / "Data" / "full_spur"
 # UFO renders (protocol v3) live outside the read-only companion; see tree_root.
 UFO_DATA_ROOT = Path("/nfs/hpc/share/sanchej7/spur-ufo/full_spur_ufo")
+# Orchard-context renders (protocol v4): tree key "orchard_<tree id>" in their own root.
+ORCHARD_PREFIX = "orchard_"
+ORCHARD_DATA_ROOT = Path("/nfs/hpc/share/sanchej7/spur-ufo/full_spur_orchard")
 BARK = "bark_brown_02"
 TILT_RAD = math.radians(-17.143)
 RIGS = ("box", "box_cam1", "box_cam2", "box_cam3", "box_cam4")
@@ -48,6 +51,15 @@ VAL_TREES = ("lpy_envy_00001", "lpy_envy_00009", "lpy_envy_00015", "lpy_envy_000
 UFO_TRAIN = tuple(f"lpy_ufo_{i:05d}" for i in range(0, 28))
 UFO_VAL_TREES = tuple(f"lpy_ufo_{i:05d}" for i in range(28, 32))
 UFO_TEST = tuple(f"lpy_ufo_{i:05d}" for i in range(32, 40))
+# Orchard-context splits (protocol v4, fixed before any orchard render): the same UFO splits;
+# Envy: the first 24 non-held-out ids for training, the Envy val and paper-test trees.
+_ENVY_HELD = {1, 9, 15, 41, 42, 65}
+ORCHARD_TRAIN = tuple(
+    "orchard_" + t
+    for t in [f"lpy_envy_{i:05d}" for i in range(100) if i not in _ENVY_HELD][:24] + list(UFO_TRAIN)
+)
+ORCHARD_VAL_TREES = tuple("orchard_" + t for t in VAL_TREES + UFO_VAL_TREES)
+ORCHARD_TEST = tuple("orchard_" + t for t in PAPER_TEST + UFO_TEST)
 SAMPLE_STEP_M = 0.01
 MIN_PART_PIXELS = 25
 
@@ -124,12 +136,19 @@ class TreeModel:
         return self._kd, self._kd_seg
 
 
+def base_tree(tree: str) -> str:
+    """L-Py tree id behind a render key (``orchard_<id>`` -> ``<id>``)."""
+    return tree[len(ORCHARD_PREFIX) :] if tree.startswith(ORCHARD_PREFIX) else tree
+
+
 def load_metadata(tree_id: str, meta_dir: Path = METADATA_DIR) -> dict:
-    return json.loads((Path(meta_dir) / f"{tree_id}_metadata.json").read_text())
+    return json.loads((Path(meta_dir) / f"{base_tree(tree_id)}_metadata.json").read_text())
 
 
 def tree_root(tree: str, root: Path = DATA_ROOT) -> Path:
-    """Render root of ``tree``: UFO trees resolve to UFO_DATA_ROOT unless a root is given."""
+    """Render root of ``tree``: orchard and UFO trees resolve to their own roots by default."""
+    if Path(root) == DATA_ROOT and tree.startswith(ORCHARD_PREFIX):
+        return ORCHARD_DATA_ROOT
     if Path(root) == DATA_ROOT and tree.startswith("lpy_ufo_"):
         return UFO_DATA_ROOT
     return Path(root)

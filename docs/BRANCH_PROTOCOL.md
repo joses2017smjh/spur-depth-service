@@ -327,3 +327,51 @@ If any check fails, nothing more is rendered and the user is asked.
   - Real MFO: no gain. UFO-mapping test mIoU 0.092 -> 0.082, wood IoU 0.236 -> 0.221, and
     background called wood 31% -> 36%. The real-image gap is appearance (backgrounds,
     lighting, bark), not tree architecture.
+
+# v4: orchard context (registered 2026-10-05, before any orchard frame was rendered)
+
+Why: v3's UFO training raised UFO pixel mIoU from 0.49 to 0.78 but not real MFO (0.092 -> 0.082).
+On real frames the model calls other rows and the ground wood: the renders show one tree on
+bare ground, while real frames show a full row and further rows behind. The user asked for the
+whole orchard, using measured row spacing and 3 more rows. Approved: 40 UFO + 30 Envy trees
+in orchard context (about 3,900 GPU-min) and 240 GPU-min of training.
+
+## Scene (`scripts/blender/orchard_context.py`, `generate_tree2_orchard.patch`, `CV_ORCHARD=1`)
+- Target row: trees on both faces of the V, one per bay; 3 more rows behind the target row,
+  each with posts and wires.
+- Row spacing: Envy V-trellis 3.53 m (Prosser WA; row width 353 +- 3 cm, tree spacing
+  142 cm, 7 wires 46 cm apart, canopy angle 75 deg, tree height 366 cm; Davidson et al. 2016
+  as tabulated in Bhattarai et al., arXiv 2304.04919). UFO sweet cherry 3.05 m (WSU Roza
+  farm, Prosser; 1.83 m within the row).
+- Bays: Envy 3.93 m (the template's post bay; the L-Py Envy trees span 3.96 m). UFO 2.40 m
+  (the L-Py UFO trees span 2.37 m, larger than Roza's 1.83 m spacing). Neighbour trees are
+  drawn from the train split of the same kind.
+- Labels: same-row trees share the target's mask index and match no target cylinder, so the
+  ground truth marks them IGNORE (never trained on, either way). Trees, posts and wires of the
+  other rows are background, as in MFO's real labels.
+- Render keys `orchard_<tree id>` in `spur-ufo/full_spur_orchard`
+  (`scripts/run_render_orchard.sh`); layouts in `orchard_layout/`.
+
+## Splits (by tree id, fixed now)
+- UFO: the v3 splits (train 00000-00027, val 00028-00031, test 00032-00039).
+- Envy: train = the first 24 ids outside the held-out set {00001, 00009, 00015, 00041,
+  00042, 00065}; val = the Envy val trees; test = the paper test trees 00042 and 00065.
+
+## Smoke gate (tree `lpy_ufo_00000`, a train tree)
+The v3 gate (60 frames and DA2 maps, median residual <= 2 mm, >= 50 frames framed), plus:
+same-row neighbours appear as IGNORE in at least 30 frames, and rows behind are rendered
+(the layout file lists all 4 rows). Measured GPU-min per tree is reported before the batch.
+
+## Training (240 GPU-min)
+One job: warm start from run 21549500 (Envy + UFO), `--ufo --orchard`, lr 2e-4, 100
+warm-up iterations, seed 3, 150 min, val frames 144. Checkpoint by the mean over the three
+domains (Envy, UFO and orchard val) of mIoU over the tree classes with ground-truth pixels
+in that domain. This fixes v3's trunk artefact.
+
+## Evaluation (fixed now)
+- Primary: real MFO cherry, both class mappings, resize re-chosen on MFO val. v4 vs v3 vs
+  the Envy-only model.
+- Synthetic regression: single-tree UFO test (8) and Envy test (2), all primary metrics.
+- Orchard test trees (8 UFO + 2 Envy in context): pixel IoU with IGNORE excluded, v3 vs v4.
+  Graph metrics are reported but flagged: neighbour wood the model finds counts against
+  precision there.

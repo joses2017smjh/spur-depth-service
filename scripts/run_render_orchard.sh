@@ -1,0 +1,134 @@
+#!/bin/bash
+#SBATCH -J spur-orchard-render
+#SBATCH -p dgx2,ampere,gpu
+#SBATCH --gres=gpu:1
+#SBATCH -c 8
+#SBATCH --mem=48G
+#SBATCH -t 04:00:00
+#SBATCH -o /nfs/hpc/share/sanchej7/spur-ufo/logs/%x-%A_%a.out
+
+# Render L-Py trees (Envy or UFO) in orchard context (protocol v4): exactly as
+# run_render_ufo.sh (same generator + tertiary-branch patch, rigs, 60 frames, DA2-ft), plus
+# scripts/blender/generate_tree2_orchard.patch + orchard_context.py with CV_ORCHARD=1: the
+# target row filled and 3 rows behind it at the measured row spacing. Outputs are stored
+# under the render key orchard_<tree id> (file stems renamed) in their own root, so they never
+# collide with the single-tree renders.
+#
+#   sbatch --export=NONE --array=0-69%6 scripts/run_render_orchard.sh <commit> <tree-list-file>
+#
+# Array task i renders line i of the tree-list file. Computer_Vision is read-only: the
+# generator is copied (sha256 checked) and patched on node-local disk, Blender's user
+# config and Python byte-code stay off it, and outputs go to OUT on hpc-share.
+
+set -euo pipefail
+COMMIT=${1:?commit} LIST=${2:?tree list file}
+export PATH=/usr/bin:/bin
+export PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
+CV=/nfs/hpc/share/sanchej7/Computer_Vision
+REPO=/nfs/hpc/share/sanchej7/spur-depth-service
+OUT=/nfs/hpc/share/sanchej7/spur-ufo/full_spur_orchard
+BLENDER=/usr/local/apps/blender/4.2.19/blender
+PY=/nfs/hpc/share/sanchej7/miniforge3/envs/depth-env/bin/python
+GEN_SHA=2dedbbc1dd8bd8e720668ed21d8720ceb196215cdc2af542ad9dd4321495f324
+BLEND_SHA=88352362755f4280aee3f5be2b7c7b2fc4d8892771384fbb4fa02c26e9fe0fb4
+# The generator imports these siblings from its own directory.
+MOVECAM_SHA=b74c686c71978f2fc96b8d0268c53cb1c2e15949d7e577d4c5fa8281ea798f2a
+DAYLIGHT_SHA=8440aea1668f72a8fcf763253649c48edc172d68243ebc682f8b6d61d0a40ad0
+CKPT=$CV/checkpoints/full_spur_2tex_all_3view_seed1/best.pth
+BARK=bark_brown_02
+NBOX=4
+EXPECTED=$(( (1 + NBOX) * 6 * 2 ))
+
+TREE=$(sed -n "$(( SLURM_ARRAY_TASK_ID + 1 ))p" "$LIST")
+[ -n "$TREE" ] || { echo "no tree on line $SLURM_ARRAY_TASK_ID of $LIST"; exit 2; }
+KEY=orchard_$TREE
+KIND=$(case "$TREE" in lpy_ufo_*) echo ufo ;; *) echo envy ;; esac)
+echo "===== spur-orchard-render $TREE ($KEY, $KIND) task $SLURM_ARRAY_TASK_ID on $(hostname) $(date -Is) commit $COMMIT"
+nvidia-smi -L || true
+
+if [ "$(find "$OUT/Da2Finetune/$BARK/$KEY" -name '*.npy' 2>/dev/null | wc -l)" -ge "$EXPECTED" ] \
+    && [ -f "$OUT/manifests/$KEY.json" ]; then
+    echo "[SKIP] $KEY already complete"
+    exit 0
+fi
+
+# Storage preflight: the project's 2 TiB hard limit is the refusal line; keep 100 GiB clear.
+used_kb=$(lfs quota -p 30762 /nfs/hpc/share | awk 'NR==3 {gsub(/\*/, "", $2); print $2}')
+if [ -z "$used_kb" ] || [ "$used_kb" -gt $(( (2048 - 100) * 1024 * 1024 )) ]; then
+    echo "refusing: project 30762 uses ${used_kb:-?} KiB (limit 2 TiB minus 100 GiB)"
+    exit 3
+fi
+
+# Frozen inputs: the patch from the committed source, the generator by hash.
+SRC=$(mktemp -d "/tmp/${USER}-orch-${SLURM_JOB_ID}-XXXX")
+trap 'rm -rf -- "$SRC"' EXIT
+git -C "$REPO" show "$COMMIT:scripts/blender/generate_tree2_ufo.patch" > "$SRC/gen.patch"
+git -C "$REPO" show "$COMMIT:scripts/blender/generate_tree2_orchard.patch" > "$SRC/orchard.patch"
+git -C "$REPO" show "$COMMIT:scripts/blender/orchard_context.py" > "$SRC/orchard_context.py"
+cp "$CV/Dataloader/generate_tree2.py" "$CV/Dataloader/move_camera.py" \
+    "$CV/Dataloader/daylight_presets.py" "$SRC/"
+echo "$GEN_SHA  $SRC/generate_tree2.py" | sha256sum -c -
+echo "$MOVECAM_SHA  $SRC/move_camera.py" | sha256sum -c -
+echo "$DAYLIGHT_SHA  $SRC/daylight_presets.py" | sha256sum -c -
+echo "$BLEND_SHA  $CV/orchard_template.blend" | sha256sum -c -
+patch -s "$SRC/generate_tree2.py" < "$SRC/gen.patch"
+patch -s "$SRC/generate_tree2.py" < "$SRC/orchard.patch"
+grep -q 'tertiarybranch_' "$SRC/generate_tree2.py"
+grep -q 'CV_ORCHARD' "$SRC/generate_tree2.py"
+
+LOCAL="$SRC/out"
+mkdir -p "$LOCAL" "$SRC/tmp" "$SRC/cfg" "$SRC/scripts" "$OUT/manifests"
+export COMPUTER_VISION_ROOT=$CV CV_OUTPUT_DIR=$LOCAL CV_TREE_ID_FILTER=$KIND TREE_ID=$TREE
+export CV_ORCHARD=1
+export BARK_NAME=$BARK CV_SKIP_CAM=1 CV_NUM_BOX_CAM_POSES=$NBOX CV_FORCE_RENDER=1
+export BLENDER_USER_CONFIG=$SRC/cfg BLENDER_USER_SCRIPTS=$SRC/scripts TMPDIR=$SRC/tmp
+export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK:-8}
+
+t0=$(date +%s)
+echo "===== STAGE 1 blender $(date -Is)"
+"$BLENDER" -b "$CV/orchard_template.blend" -P "$SRC/generate_tree2.py"
+t1=$(date +%s)
+n_of=$(find "$LOCAL/Optical_flow/$BARK/$TREE" -name '*.png' 2>/dev/null | wc -l)
+echo "Optical_flow frames: $n_of (expected $EXPECTED)"
+[ "$n_of" -ge "$EXPECTED" ] || { echo "blender wrote $n_of / $EXPECTED frames"; exit 4; }
+
+echo "===== STAGE 2 DA2-ft $(date -Is)"
+PYTHONPATH="$CV/depth-anything-v2:$CV/depth-anything-v2/metric_depth:$CV" \
+HF_HOME=/nfs/hpc/share/sanchej7/.cache/huggingface TORCH_HOME=/nfs/hpc/share/sanchej7/.cache/torch \
+HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 XFORMERS_DISABLED=1 MPLCONFIGDIR=$SRC/tmp \
+"$PY" "$CV/infer_monocular_tree.py" --data-root "$LOCAL" --bark "$BARK" --tree "$TREE" \
+    --models da2ft --ckpt "$CKPT" --expected-of "$EXPECTED"
+t2=$(date +%s)
+n_da2=$(find "$LOCAL/Da2Finetune/$BARK/$TREE" -name '*.npy' | wc -l)
+[ "$n_da2" -ge "$EXPECTED" ] || { echo "DA2 wrote $n_da2 / $EXPECTED"; exit 5; }
+
+echo "===== rename to $KEY and copy-back $(date -Is)"
+for kind in Da2Finetune depth mask ann box_mask Optical_flow; do
+    d="$LOCAL/$kind/$BARK/$TREE"
+    [ -d "$d" ] || continue
+    find "$d" -type f -name "${TREE}_*" | while read -r f; do
+        mv "$f" "$(dirname "$f")/orchard_$(basename "$f")"
+    done
+    mkdir -p "$OUT/$kind/$BARK/$KEY"
+    rsync -a "$d/" "$OUT/$kind/$BARK/$KEY/"
+done
+mkdir -p "$OUT/cylinders_world/$BARK" "$OUT/orchard_layout"
+cp "$LOCAL/cylinders_world/$BARK/$TREE.json" "$OUT/cylinders_world/$BARK/$KEY.json"
+cp "$LOCAL/orchard_$TREE.json" "$OUT/orchard_layout/$KEY.json"
+"$PY" - "$OUT/manifests/$KEY.json" <<EOF
+import json, sys
+json.dump({
+    "tree": "$TREE", "key": "$KEY", "kind": "$KIND", "commit": "$COMMIT", "job": "${SLURM_ARRAY_JOB_ID:-}_${SLURM_ARRAY_TASK_ID:-}",
+    "host": "$(hostname)", "gpu": "$(nvidia-smi --query-gpu=name --format=csv,noheader | head -1)",
+    "generator_sha256": "$GEN_SHA", "template_sha256": "$BLEND_SHA",
+    "patch_sha256": "$(sha256sum "$SRC/gen.patch" | cut -c1-64)",
+    "orchard_patch_sha256": "$(sha256sum "$SRC/orchard.patch" | cut -c1-64)",
+    "orchard_context_sha256": "$(sha256sum "$SRC/orchard_context.py" | cut -c1-64)",
+    "patched_generator_sha256": "$(sha256sum "$SRC/generate_tree2.py" | cut -c1-64)",
+    "da2_ckpt": "$CKPT", "bark": "$BARK", "rigs": ["box"] + [f"box_cam{i}" for i in range(1, $NBOX + 1)],
+    "frames": $n_of, "da2_maps": $n_da2,
+    "blender_s": $(( t1 - t0 )), "da2_s": $(( t2 - t1 )),
+}, open(sys.argv[1], "w"), indent=2)
+EOF
+du -sh "$OUT/depth/$BARK/$KEY" "$OUT/Da2Finetune/$BARK/$KEY" "$OUT/Optical_flow/$BARK/$KEY"
+echo "===== done $KEY $(date -Is) blender $(( t1 - t0 ))s da2 $(( t2 - t1 ))s"

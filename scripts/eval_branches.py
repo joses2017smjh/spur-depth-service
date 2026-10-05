@@ -65,6 +65,8 @@ SPLITS = {
     "test": G.PAPER_TEST,
     "val_ufo": G.UFO_VAL_TREES,
     "test_ufo": G.UFO_TEST,
+    "val_orchard": G.ORCHARD_VAL_TREES,
+    "test_orchard": G.ORCHARD_TEST,
 }
 
 
