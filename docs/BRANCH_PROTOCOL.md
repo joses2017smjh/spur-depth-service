@@ -257,3 +257,18 @@ If any check fails, nothing more is rendered and the user is asked.
   `leader` is the upright: predicted trunk + branch -> leader, shoot -> sidebranch,
   spur -> spur). Primary: 3-class mIoU under the UFO mapping, plus binary wood IoU, which
   needs no mapping.
+
+## v3 training run (registered before any UFO frame was labelled)
+- One sbatch job (`scripts/run_train_branches.sh`, frozen commit): `--ufo --init
+  spur-branch-runs/21532184/best.pt --lr 2e-4 --warmup 100 --seed 2 --val-frames 96`,
+  80-150 min of training plus prediction of the Envy and UFO val and test trees, inside
+  the approved 240 GPU-min. Training data: the 94 Envy and 28 UFO train trees. The
+  checkpoint is chosen by the mean of the Envy-val and UFO-val tree-class mIoU (48 val
+  frames each), so each domain counts equally.
+- Smoke-render record: the first smoke job (21549311, about 4 GPU-min) rendered only the
+  front rig because the patched generator copy could not import its sibling
+  `move_camera.py`. The launcher now copies the siblings (hash-checked), and the gate is
+  applied to the second job's output.
+- MFO rescoring (`scripts/rescore_mfo_mapping.py`) reproduces v2's numbers from the saved
+  confusion counts (val/test/train 0.097/0.123/0.112). Under the UFO mapping the Envy-only
+  model scores 0.071/0.092/0.073, with the same wood IoU (0.171/0.236/0.189).
