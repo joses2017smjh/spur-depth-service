@@ -30,6 +30,9 @@ BLENDER=/usr/local/apps/blender/4.2.19/blender
 PY=/nfs/hpc/share/sanchej7/miniforge3/envs/depth-env/bin/python
 GEN_SHA=2dedbbc1dd8bd8e720668ed21d8720ceb196215cdc2af542ad9dd4321495f324
 BLEND_SHA=88352362755f4280aee3f5be2b7c7b2fc4d8892771384fbb4fa02c26e9fe0fb4
+# The generator imports these siblings from its own directory.
+MOVECAM_SHA=b74c686c71978f2fc96b8d0268c53cb1c2e15949d7e577d4c5fa8281ea798f2a
+DAYLIGHT_SHA=8440aea1668f72a8fcf763253649c48edc172d68243ebc682f8b6d61d0a40ad0
 CKPT=$CV/checkpoints/full_spur_2tex_all_3view_seed1/best.pth
 BARK=bark_brown_02
 NBOX=4
@@ -57,8 +60,11 @@ fi
 SRC=$(mktemp -d "/tmp/${USER}-ufo-${SLURM_JOB_ID}-XXXX")
 trap 'rm -rf -- "$SRC"' EXIT
 git -C "$REPO" show "$COMMIT:scripts/blender/generate_tree2_ufo.patch" > "$SRC/gen.patch"
-cp "$CV/Dataloader/generate_tree2.py" "$SRC/generate_tree2.py"
+cp "$CV/Dataloader/generate_tree2.py" "$CV/Dataloader/move_camera.py" \
+    "$CV/Dataloader/daylight_presets.py" "$SRC/"
 echo "$GEN_SHA  $SRC/generate_tree2.py" | sha256sum -c -
+echo "$MOVECAM_SHA  $SRC/move_camera.py" | sha256sum -c -
+echo "$DAYLIGHT_SHA  $SRC/daylight_presets.py" | sha256sum -c -
 echo "$BLEND_SHA  $CV/orchard_template.blend" | sha256sum -c -
 patch -s "$SRC/generate_tree2.py" < "$SRC/gen.patch"
 grep -q 'tertiarybranch_' "$SRC/generate_tree2.py"
