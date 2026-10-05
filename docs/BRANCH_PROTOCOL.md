@@ -281,3 +281,16 @@ If any check fails, nothing more is rendered and the user is asked.
     Trunk IoU on UFO trees is therefore undefined, and mIoU uses the classes present.
   - The top camera height sees no tree, because UFO trees are about 2.4 m tall.
   Neither changes a registered rule. The other 39 trees render unchanged.
+- Execution (submitted 2026-10-04 ~21:45 as Slurm dependencies, so every step runs
+  without anyone looking at intermediate results; rows and summaries come from frozen
+  clone `081b76b`, config C + fitted axis):
+  - renders: array 21549460 (39 trees, 6 at a time);
+  - UFO label cache: 21549499;
+  - Envy + UFO training: 21549500 (150 min plus prediction);
+  - Envy-only predictions on the UFO val/test trees: 21549501;
+  - MFO for the new model: 21549502 (`spur-realdata/v3_envy_ufo`);
+  - test scoring: `test_v3/ufo_envyonly` (GT classes and Envy-only BranchNet, UFO test)
+    21549512/21549513, `test_v3/ufo_envyufo` 21549514/21549515, `test_v3/envy_envyufo` (Envy test,
+    regression check) 21549516/21549517.
+  - GPU, about 180 of the 240 approved minutes: training ~165, Envy-only predictions ~6,
+    MFO ~8. Renders: ~22 GPU-min per tree.
