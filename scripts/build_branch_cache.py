@@ -217,6 +217,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--trees", nargs="+", help="subset of trees to shard (default: all)")
     ap.add_argument("--max-frames", type=int, help="first n frames of each tree (testing)")
     ap.add_argument("--workers", type=int, default=1)
+    ap.add_argument(
+        "--manifest-tag", default="", help="manifest_<tag>shardNN.json (keeps other builds' files)"
+    )
     args = ap.parse_args(argv)
     if not 0 <= args.shard < args.n_shards:
         ap.error(f"--shard must be in [0, {args.n_shards})")
@@ -303,7 +306,9 @@ def main(argv: list[str] | None = None) -> int:
         "errors": errors,
         "frames": rows,
     }
-    write_atomic(out / f"manifest_shard{args.shard:02d}.json", _json(manifest, indent=1))
+    write_atomic(
+        out / f"manifest_{args.manifest_tag}shard{args.shard:02d}.json", _json(manifest, indent=1)
+    )
     print(f"[shard {args.shard}/{args.n_shards}] {manifest['counts']}", flush=True)
     return 1 if errors else 0
 
