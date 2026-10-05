@@ -300,3 +300,12 @@ If any check fails, nothing more is rendered and the user is asked.
   for the failed first smoke = 1,311 of the ~1,400 approved. Label cache: 2,400 UFO frames,
   no errors. Training split: 5,640 Envy + 1,680 UFO train frames; val 240 + 240; test
   120 + 480; no val or test tree in training (checked).
+- Clarification (2026-10-05 01:52, after reading training epoch 1 on val, before any test row):
+  the tree-class mIoU in training selection and in the scorer averages over the classes with
+  a non-empty union (ground truth or prediction), the v1/v2 convention. UFO frames have no
+  trunk pixels, so a trunk predicted on them scores trunk IoU 0. That is a penalty for
+  hallucinated trunk, not an undefined class. At epoch 1 UFO-val mIoU is 0.535 (trunk 0,
+  branch 0.916, shoot 0.595, spur 0.627); over the three classes present it would be 0.713.
+  Envy-val mIoU is 0.790. The selection score can jump at an epoch where UFO trunk
+  predictions vanish entirely. Results report both the 4-class and the 3-class (branch,
+  shoot, spur) UFO mIoU. Training job 21549500 runs on an H100 MIG 3g.40gb slice.
