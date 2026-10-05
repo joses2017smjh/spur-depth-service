@@ -309,3 +309,8 @@ If any check fails, nothing more is rendered and the user is asked.
   Envy-val mIoU is 0.790. The selection score can jump at an epoch where UFO trunk
   predictions vanish entirely. Results report both the 4-class and the 3-class (branch,
   shoot, spur) UFO mIoU. Training job 21549500 runs on an H100 MIG 3g.40gb slice.
+- First v3 test result read at 02:17 PDT, 2026-10-05: `test_v3/ufo_envyonly`, the GT classes
+  and the Envy-only BranchNet on the 8 UFO test trees (complete, clean `081b76b`;
+  `bench/results/branches_test_v3_ufo_envyonly_2026-10-05.json`). The Envy + UFO model was
+  still training (job 21549500); its rows, the Envy regression rows and the MFO run follow
+  automatically.
