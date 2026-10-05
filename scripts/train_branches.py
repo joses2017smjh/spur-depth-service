@@ -437,10 +437,11 @@ def train(args: argparse.Namespace) -> int:
                     for f in val_frames
                     if val_refs[f["index"]].tree.startswith("lpy_ufo_") == (name == "ufo")
                 ]
-                by_domain[name] = validate(model, sub, device, amp=dtype is not None)
+                if sub:
+                    by_domain[name] = validate(model, sub, device, amp=dtype is not None)
             metrics["by_domain"] = by_domain
-            ms = [by_domain[d]["miou_tree"] for d in ("envy", "ufo")]
-            score = float(np.mean(ms)) if all(m is not None for m in ms) else -1.0
+            ms = [v["miou_tree"] for v in by_domain.values() if v["miou_tree"] is not None]
+            score = float(np.mean(ms)) if ms else -1.0
             metrics["selection_score"] = score
         val_s = time.time() - tv
         is_best = score > best_score
