@@ -294,3 +294,9 @@ If any check fails, nothing more is rendered and the user is asked.
     regression check) 21549516/21549517.
   - GPU, about 180 of the 240 approved minutes: training ~165, Envy-only predictions ~6,
     MFO ~8. Renders: ~22 GPU-min per tree.
+- Renders done (2026-10-05 01:39): 40 trees x 60 frames, all with DA2-ft maps and the same
+  patch (manifests in `spur-ufo/full_spur_ufo/manifests`). GPU: 1,285 min for the 39 trees
+  (RTX 8000, A40 and V100 nodes; 33 min per tree on average) + 22 for the smoke tree + 4
+  for the failed first smoke = 1,311 of the ~1,400 approved. Label cache: 2,400 UFO frames,
+  no errors. Training split: 5,640 Envy + 1,680 UFO train frames; val 240 + 240; test
+  120 + 480; no val or test tree in training (checked).
