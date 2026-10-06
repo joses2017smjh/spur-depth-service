@@ -428,3 +428,10 @@ in that domain. This fixes v3's trunk artefact.
   - `branch_orchard_compare.gif`: classes mode, orchard test tree `orchard_lpy_ufo_00035`.
   - `orchard_scene.png`: train trees only.
   - `branch_mfo.png`: numbers only, no MFO image; palette checked with the dataviz validator (ordinal blue ramp).
+- Storage pruning (2026-10-06, with the user's approval; 127 GB freed): deleted the float
+  depth and DA2-ft `.npy` files of the UFO and orchard renders (`spur-ufo/full_spur_*/depth`,
+  `Da2Finetune`) and the proxy's graph cache. The label cache holds their millimetre-quantized
+  copies, which training, prediction and scoring read; RGB, annotations, masks and
+  cylinder/layout files remain. `gt.load_frame` (smoke gates, `render_branch_figures.py`,
+  the proxy) no longer works for UFO and orchard trees, and rebuilding their labels would
+  need a re-render. Envy renders in the read-only companion are untouched.
