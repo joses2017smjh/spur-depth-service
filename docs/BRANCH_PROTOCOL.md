@@ -387,3 +387,8 @@ in that domain. This fixes v3's trunk artefact.
   model (`spur-realdata/v4_orchard`). Scoring into `spur-branch-eval/test_v4/`
   (array/summary): `orchard_v3model` 21566539/40, `orchard_v4model` 21566541/42,
   `ufo_v4model` 21566543/44, `envy_v4model` 21566545/46.
+- Storage cleanup (2026-10-05, with the user's approval): deleted the CDM refined depth maps
+  (`spur-branch-eval/depth/cdm`, `cdm_skyfill`), the unused CDM d435/l515 weights, the hung
+  first BranchNet run (21520501) and the `last.pt` files of finished runs. The CDM numbers,
+  manifests and file hashes stay in the committed evidence; re-scoring `cdm` would first need
+  `scripts/refine_depth_cdm.py` re-run (base checkpoint kept).
