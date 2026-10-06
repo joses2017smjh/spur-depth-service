@@ -392,3 +392,23 @@ in that domain. This fixes v3's trunk artefact.
   first BranchNet run (21520501) and the `last.pt` files of finished runs. The CDM numbers,
   manifests and file hashes stay in the committed evidence; re-scoring `cdm` would first need
   `scripts/refine_depth_cdm.py` re-run (base checkpoint kept).
+- v4 results (training and three scoring runs finished by 21:00 PDT, 2026-10-05; read at 22:00):
+  - Training 21566536: 43 epochs in 150 min (A40), checkpoint epoch 43; val mIoU over the
+    classes present: Envy 0.817, UFO 0.808, orchard 0.780.
+  - Real MFO (primary), resize chosen on MFO val (x1.6). Under the UFO mapping, test mIoU went
+    from 0.092 (Envy-only) and 0.082 (v3) to 0.121. Wood IoU 0.236 / 0.221 -> 0.333.
+    Background called wood fell from 31% / 36% to 8%; labelled-wood recall fell from 0.75 to
+    0.54. Leader IoU 0.206 -> 0.299, spur 0.016 -> 0.032. The gain holds on MFO val (0.071 ->
+    0.093) and train (0.073 -> 0.113). Under the v2 mapping (leader = trunk) test falls to
+    0.045, because v4 calls the uprights "branch", as the UFO renders teach it to.
+  - Synthetic regression: UFO single-tree test pixel IoU branch/shoot/spur 0.94/0.66/0.74 ->
+    0.95/0.68/0.76; Envy test trunk 0.91 -> 0.92. Graph metrics are within 0.016 (UFO
+    skeleton F1 on rendered depth 0.833 -> 0.817; Envy 0.877 -> 0.883).
+  - Orchard test, v4 model: pixel IoU trunk/branch/shoot/spur 0.91/0.92/0.51/0.71. Graph
+    metrics are low, as flagged (skeleton F1 0.36 on rendered depth), because neighbour wood
+    counts against precision.
+  - Incident: the v3-model + GT-class orchard scoring (array 21566539) hit its 2 h limit with
+    1,730 of 4,800 rows written (orchard frames take about 12 min for 8 assemblies). It was
+    resubmitted unchanged (same frozen clone, rows reused by fingerprint) as 21594223 (60
+    shards, 4 h) with summary 21594224. The original summary job 21566540 cannot run
+    (DependencyNeverSatisfied).
