@@ -423,3 +423,8 @@ in that domain. This fixes v3's trunk artefact.
   0.005). With fused depth even GT classes collapse (skeleton F1 0.05): DA2-ft fusion breaks
   on the rows behind the target. The stale summary job 21566540 was cancelled with the
   user's approval.
+- README figures (2026-10-06, rendered after all v3/v4 test rows were read):
+  - `branch_ufo_compare.gif`: UFO test tree `lpy_ufo_00035`.
+  - `branch_orchard_compare.gif`: classes mode, orchard test tree `orchard_lpy_ufo_00035`.
+  - `orchard_scene.png`: train trees only.
+  - `branch_mfo.png`: numbers only, no MFO image; palette checked with the dataviz validator (ordinal blue ramp).

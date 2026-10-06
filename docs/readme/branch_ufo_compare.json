@@ -1,0 +1,95 @@
+{
+  "tree": "lpy_ufo_00035",
+  "rig": "box_cam1",
+  "side": "l",
+  "pred_a": "/nfs/hpc/share/sanchej7/spur-branch-runs/21532184/pred_ufo",
+  "pred_b": "/nfs/hpc/share/sanchej7/spur-branch-runs/21549500/pred",
+  "cfg": {
+    "orphan_cost": 1.2,
+    "junction_bonus": 0.0,
+    "depth_percentile": 50.0,
+    "cut_axis": "fit",
+    "cut_fit_lo_m": 0.03,
+    "cut_fit_hi_m": 0.15
+  },
+  "frames": [
+    {
+      "frame": "lpy_ufo_00035/box_cam1/lpy_ufo_00035_shot01_l",
+      "Envy only": {
+        "skeleton_f1_2cm": 0.6273432989318707,
+        "edge_f1": 0.368421052631579,
+        "cut_recall_jain": 0.4358974358974359
+      },
+      "Envy + UFO": {
+        "skeleton_f1_2cm": 0.6217625273057171,
+        "edge_f1": 0.368421052631579,
+        "cut_recall_jain": 0.4358974358974359
+      }
+    },
+    {
+      "frame": "lpy_ufo_00035/box_cam1/lpy_ufo_00035_shot02_l",
+      "Envy only": {
+        "skeleton_f1_2cm": 0.7277008327812102,
+        "edge_f1": 0.35000000000000003,
+        "cut_recall_jain": 0.3181818181818182
+      },
+      "Envy + UFO": {
+        "skeleton_f1_2cm": 0.7219161590682295,
+        "edge_f1": 0.38461538461538464,
+        "cut_recall_jain": 0.29545454545454547
+      }
+    },
+    {
+      "frame": "lpy_ufo_00035/box_cam1/lpy_ufo_00035_shot03_l",
+      "Envy only": {
+        "skeleton_f1_2cm": 0.7581855178509035,
+        "edge_f1": 0.5246720799500312,
+        "cut_recall_jain": 0.4878048780487805
+      },
+      "Envy + UFO": {
+        "skeleton_f1_2cm": 0.7650691892737079,
+        "edge_f1": 0.5229357798165137,
+        "cut_recall_jain": 0.43902439024390244
+      }
+    },
+    {
+      "frame": "lpy_ufo_00035/box_cam1/lpy_ufo_00035_shot04_l",
+      "Envy only": {
+        "skeleton_f1_2cm": 0.7460390994162884,
+        "edge_f1": 0.4878048780487805,
+        "cut_recall_jain": 0.6190476190476191
+      },
+      "Envy + UFO": {
+        "skeleton_f1_2cm": 0.7316727358656334,
+        "edge_f1": 0.46511627906976744,
+        "cut_recall_jain": 0.5714285714285714
+      }
+    },
+    {
+      "frame": "lpy_ufo_00035/box_cam1/lpy_ufo_00035_shot05_l",
+      "Envy only": {
+        "skeleton_f1_2cm": 1.0,
+        "edge_f1": 0.0,
+        "cut_recall_jain": null
+      },
+      "Envy + UFO": {
+        "skeleton_f1_2cm": 1.0,
+        "edge_f1": 0.0,
+        "cut_recall_jain": null
+      }
+    },
+    {
+      "frame": "lpy_ufo_00035/box_cam1/lpy_ufo_00035_shot06_l",
+      "Envy only": {
+        "skeleton_f1_2cm": null,
+        "edge_f1": null,
+        "cut_recall_jain": null
+      },
+      "Envy + UFO": {
+        "skeleton_f1_2cm": null,
+        "edge_f1": null,
+        "cut_recall_jain": null
+      }
+    }
+  ]
+}

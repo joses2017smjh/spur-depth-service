@@ -18,7 +18,9 @@ Thin branches require depth in metres, explicit camera geometry, and a traceable
 - **Export parity:** Torch versus ONNX Runtime maximum absolute differences of **1.53e-5** for the encoder and **9.54e-7** for fuse/decode. This checks numerical agreement, not accuracy. [Artifact](bench/results/onnx_parity_2026-08-22.json).
 - **Branch perception:** on two held-out trees (120 frames) with fused D435 + DA2-ft depth, the new full-resolution BranchNet plus tree-graph assembly reaches skeleton F1 @2 cm **0.60** and Jain-criterion cut recall **0.40**, against **0.50** and **0.25** with the existing detector. A cut direction fitted past the junction (v2) raises strict cut recall (2 cm, 15°) from **0.12 to 0.17** (fused depth) and from **0.26 to 0.38** (rendered depth). [Section](#branch-perception-detect-localize-connect) · [Evidence](bench/results/branches_test_branchnet_2026-10-02.json) · [v2 evidence](bench/results/branches_test_v2_fitted_axis_2026-10-04.json)
 
-All model accuracy above is synthetic. Real-orchard accuracy is unverified. Predicted-mask depth remains **0.112 m** versus **0.031 m** with ground-truth masks; detection and segmentation remain deployment constraints. [Research notes](docs/RESEARCH.md).
+- **Real images:** on pixel-labelled real cherry frames (MFO, zero-shot, no real image in training), rendering whole orchards (target row plus 3 rows at the measured row spacing) cuts background mistaken for wood from **31% to 8%** and lifts wood IoU from **0.24 to 0.33** and class mIoU from **0.09 to 0.12**. [Section](#v3-and-v4-new-tree-architecture-and-whole-orchards) · [Evidence](bench/results/branches_mfo_rescore_ufo_orchard_2026-10-05.json)
+
+All model accuracy above is synthetic except the MFO line, which is real but zero-shot and far from adapted models. Predicted-mask depth remains **0.112 m** versus **0.031 m** with ground-truth masks; detection and segmentation remain deployment constraints. [Research notes](docs/RESEARCH.md).
 
 ## Camera intrinsics correction
 
@@ -64,7 +66,7 @@ A D435-class camera at 1-4 m cannot measure 6 mm wood: lost thin-wood pixels rea
 - **Learned detector:** BranchNet is a full-resolution RGB-D U-Net on a ResNet-34 with Skeleton Recall loss, whose depth input is drawn per crop from clean, simulated D435, DA2-ft or no depth. It trained for 60 min on one H100 MIG 4g.40gb slice (Slurm 21523238, commit `3fa8420`, 21 epochs, best val tree-class mIoU 0.78 at epoch 20) and was scored once on the test trees with the already-frozen config. A first run (21520501) hung after one epoch on a data-loader fork deadlock and was cancelled. [Training log](bench/results/branchnet_train_2026-10-02.json)
 - **Ground truth:** exact, from the L-Py metadata the renderer used and the corrected `K`: 127,910 of 127,911 tree pixels labelled at 0.06 mm median surface residual, with every part's parent, junction and visibility. [Code](spur_depth/branches/gt.py)
 - **Protocol:** splits, metrics, thresholds and the config-selection rule were committed before test scoring, after three blind reviews of the scorer, harness and assembly; one test frame's figure metrics were seen before scoring and are disclosed in the protocol. [Protocol](docs/BRANCH_PROTOCOL.md) · [Selection](bench/results/branches_val_selection_2026-10-02.json) · [Evidence](bench/results/branches_test_2026-10-02.json) · [BranchNet evidence](bench/results/branches_test_branchnet_2026-10-02.json)
-- **Scope:** synthetic Envy trees, one bark, 2 test trees and 120 correlated frames. The existing stack's part classes come from L-Py radii (10 mm vs 3 mm) that will not transfer to real trees, and BranchNet was trained on renders only; on real cherry images it does not yet transfer (v2, below). TinyUNet's published 0.930 IoU was measured at 256 px; at full resolution its wood IoU here is 0.72.
+- **Scope:** synthetic Envy trees, one bark, 2 test trees and 120 correlated frames. The existing stack's part classes come from L-Py radii (10 mm vs 3 mm) that will not transfer to real trees, and BranchNet is trained on renders only; on real cherry images it transfers only partly (v2-v4, below). TinyUNet's published 0.930 IoU was measured at 256 px; at full resolution its wood IoU here is 0.72.
 
 ### v2: cut direction, multi-view fusion, real images, robot geometry
 
@@ -104,6 +106,32 @@ v2 test rows (same 120 frames, config C, protocol v2):
 [![v1 vs v2 by depth source on the two test trees](docs/readme/branch_v2.png)](bench/results/branches_test_v2_fitted_axis_2026-10-04.json)
 
 Every v2 choice (fit window, CDM checkpoint and sky fill, fusion setting, MFO resize) was fixed on val and registered before its test rows existed; the record, reviews and exposures are in the [protocol](docs/BRANCH_PROTOCOL.md).
+
+### v3 and v4: new tree architecture and whole orchards
+
+[![Held-out UFO cherry tree: Envy-only BranchNet calls an upright the trunk; after UFO renders it is a branch](docs/readme/branch_ufo_compare.gif)](docs/readme/branch_ufo_compare.json)
+
+**v3, a second tree architecture.** The real cherry frames show UFO trees: a low horizontal cordon with vertical uprights, laterals and spurs. Only the Envy V-trellis trees had been rendered. The 100 L-Py UFO trees in the companion project were rendered with the same generator, after a one-line patch: unpatched, it silently dropped every lateral and its spurs. 40 trees were rendered (28 train, 4 val, 8 test), and BranchNet was fine-tuned on Envy + UFO.
+
+- On the 8 held-out UFO trees, pixel mIoU (branch, shoot, spur) rises from **0.49 to 0.78**: uprights 0.59 → 0.94, laterals 0.33 → 0.66, spurs 0.56 → 0.74. Above, the Envy-only model calls an upright the trunk.
+- The 3D graph barely moves: skeleton F1 @2 cm 0.84 → 0.83 with rendered depth, against a 0.95 ceiling on true classes; cut F1 0.59 → 0.62. With fused D435 + DA2-ft depth even true classes reach only 0.48, so on UFO trees depth, not detection, is the limit.
+- No Envy regression (every graph metric within 0.005).
+- On real MFO cherry frames it does **not** help (0.092 → 0.082): the gap is the scene, not the tree shape. [Evidence](bench/results/branches_test_v3_ufo_envyufo_2026-10-05.json)
+
+[![An Envy V-trellis orchard from above, a UFO cherry orchard from the robot's side, and the label rule](docs/readme/orchard_scene.png)](scripts/blender/orchard_context.py)
+
+**v4, the whole orchard.** On real frames the model called the other rows and the ground wood, because every render showed one tree on bare ground. The generator now fills the target row: both faces of the V, one tree per bay, 3.93 m for Envy, which spans the post bay, and 2.4 m for UFO. It also adds **3 rows behind it at the measured row spacing**, each with posts and wires: **3.53 m** for the Envy V-trellis (Prosser, WA; Davidson et al. 2016, tabulated in [arXiv 2304.04919](https://arxiv.org/abs/2304.04919)) and **3.05 m** for UFO cherry (WSU Roza). Same-row trees are ignored in the loss; the rows behind are background, as in MFO's real labels. 70 trees were rendered this way (40 UFO, 30 Envy, same splits), 47-63 trees per scene, and BranchNet was fine-tuned on all three render sets.
+
+[![Held-out UFO tree in a full orchard: v3 paints the rows behind as wood, v4 does not](docs/readme/branch_orchard_compare.gif)](docs/readme/branch_orchard_compare.json)
+
+- **Orchard test** (10 held-out trees in full orchards, rendered depth), v3 → v4 → true classes: pixel mIoU **0.23 → 0.76** → 1.00; skeleton F1 **0.01 → 0.36** → 0.81; edge F1 0.04 → 0.39 → 0.73; cut recall (5 cm / 30°) 0.43 → 0.59 → 0.61. The v3 model calls nearly every pixel of an orchard frame wood. With fused depth every method collapses, true classes included (skeleton F1 0.05): DA2-ft fusion breaks on the rows behind. [Evidence](bench/results/branches_test_v4_orchard_v4model_2026-10-05.json)
+- **Real MFO cherry frames** (zero-shot, test split, resize chosen on MFO val):
+
+[![Real MFO cherry frames: three BranchNet versions on four measures](docs/readme/branch_mfo.png)](bench/results/branches_mfo_rescore_ufo_orchard_2026-10-05.json)
+
+  Background mistaken for wood falls from 31% to **8%**. Wood IoU rises from 0.24 to **0.33** and class mIoU from 0.09 to **0.12** (uprights 0.21 → 0.30, spurs 0.016 → 0.032). The model becomes conservative: it finds 54% of the labelled wood instead of 75%. The gain holds on MFO val and train (0.07 → 0.09 and 0.07 → 0.11). Adapted models in the MFO paper report 47.6-56.2 mIoU, using unlabelled real images in training, with their own class set and metric, so the two are not directly comparable. Real-image adaptation is still the next step.
+- **No regression on single trees:** UFO laterals 0.66 → 0.68, Envy trunk 0.91 → 0.92, graph metrics within 0.016.
+- **Cost:** renders 1,311 GPU-min for UFO and 2,725 for orchards; about 160 GPU-min per fine-tune. Every split, label rule, gate and checkpoint rule was registered before its renders existed, and every chained test score was read only after it was complete. [Protocol v3/v4](docs/BRANCH_PROTOCOL.md)
 
 ## Architecture and decisions
 

@@ -1,0 +1,37 @@
+{
+  "tree": "orchard_lpy_ufo_00035",
+  "rig": "box_cam1",
+  "mode": "classes",
+  "frames": [
+    {
+      "frame": "orchard_lpy_ufo_00035/box_cam1/orchard_lpy_ufo_00035_shot01_l",
+      "v3 (single-tree renders)": 0.20496460239541262,
+      "v4 (+ orchard renders)": 0.824399410499615
+    },
+    {
+      "frame": "orchard_lpy_ufo_00035/box_cam1/orchard_lpy_ufo_00035_shot02_l",
+      "v3 (single-tree renders)": 0.2460270253147803,
+      "v4 (+ orchard renders)": 0.6718290585564411
+    },
+    {
+      "frame": "orchard_lpy_ufo_00035/box_cam1/orchard_lpy_ufo_00035_shot03_l",
+      "v3 (single-tree renders)": 0.39261044358690267,
+      "v4 (+ orchard renders)": 0.8845770388179298
+    },
+    {
+      "frame": "orchard_lpy_ufo_00035/box_cam1/orchard_lpy_ufo_00035_shot04_l",
+      "v3 (single-tree renders)": 0.27949576923255437,
+      "v4 (+ orchard renders)": 0.8853861291193144
+    },
+    {
+      "frame": "orchard_lpy_ufo_00035/box_cam1/orchard_lpy_ufo_00035_shot05_l",
+      "v3 (single-tree renders)": 0.020614700627854296,
+      "v4 (+ orchard renders)": 0.819669280223762
+    },
+    {
+      "frame": "orchard_lpy_ufo_00035/box_cam1/orchard_lpy_ufo_00035_shot06_l",
+      "v3 (single-tree renders)": null,
+      "v4 (+ orchard renders)": null
+    }
+  ]
+}
