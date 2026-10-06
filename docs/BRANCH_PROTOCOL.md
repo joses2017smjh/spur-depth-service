@@ -412,3 +412,14 @@ in that domain. This fixes v3's trunk artefact.
     resubmitted unchanged (same frozen clone, rows reused by fingerprint) as 21594223 (60
     shards, 4 h) with summary 21594224. The original summary job 21566540 cannot run
     (DependencyNeverSatisfied).
+- Orchard test (resubmitted scoring complete, clean `6cd4818`, read 2026-10-06 00:00): on 10
+  orchard test trees (600 frames, rendered depth), v3 -> v4 -> GT classes:
+  - pixel mIoU 0.23 -> 0.76 -> 1.00 (shoot 0.02 -> 0.51, spur 0.07 -> 0.71);
+  - skeleton F1 @2 cm 0.01 -> 0.36 -> 0.81;
+  - edge F1 0.04 -> 0.39 -> 0.73;
+  - cut recall (Jain) 0.43 -> 0.59 -> 0.61.
+  
+  The v3 model calls nearly every pixel of an orchard frame wood (skeleton precision
+  0.005). With fused depth even GT classes collapse (skeleton F1 0.05): DA2-ft fusion breaks
+  on the rows behind the target. The stale summary job 21566540 was cancelled with the
+  user's approval.
