@@ -1,0 +1,46 @@
+{
+  "n_frames_total": 120,
+  "n_fit_frames": 0,
+  "n_hold_frames": 120,
+  "fit_trees": [],
+  "hold_trees": [
+    "lpy_envy_00042",
+    "lpy_envy_00065"
+  ],
+  "note": "24k train set is still missing. Fit is 7 restored trees; headline RMSE is the 2 paper val trees. DA2-only \u2014 not the DINO refiner.",
+  "alpha_beta_holdout_fit": {
+    "alpha": 1.006307781659046,
+    "beta": -0.03462304140524036,
+    "n_pixels": 73274.0,
+    "n_images": null,
+    "source": "least-squares on 7 non-paper trees, trunk mask, erode_r=10, GT 0.5\u201310 m"
+  },
+  "holdout_rmse": {
+    "da2_raw_m": {
+      "n": 78,
+      "rmse_m": 0.037664056332776065,
+      "rmse_std_m": 0.03866355694415802
+    },
+    "da2_holdout_affine_m": {
+      "n": 78,
+      "rmse_m": 0.034366251874510464,
+      "rmse_std_m": 0.041282569641688305
+    },
+    "fit_cohort_raw_m": {
+      "n": 0,
+      "rmse_m": null
+    }
+  },
+  "loo_per_tree": [],
+  "stereo_on_holdout": {
+    "n": 40,
+    "rmse_m": null,
+    "fused_rmse_m": 0.04646375493790032,
+    "flow": "farneback",
+    "note": "Farneback on this rig is not a metric depth source. Stereo variance is floored at 1 m\u00b2 so fusion cannot beat DA2 around. Do not ship stereo fusion; headline is DA2 hold-out affine."
+  },
+  "drift_baseline": {
+    "n_frames": 120,
+    "source": "holdout ('lpy_envy_00042', 'lpy_envy_00065') n=120 calibrated DA2"
+  }
+}

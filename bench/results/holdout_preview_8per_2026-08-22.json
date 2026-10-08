@@ -1,0 +1,54 @@
+{
+  "n_frames_total": 72,
+  "n_fit_frames": 56,
+  "n_hold_frames": 16,
+  "fit_trees": [
+    "lpy_envy_00001",
+    "lpy_envy_00009",
+    "lpy_envy_00015",
+    "lpy_envy_00041",
+    "lpy_envy_00048",
+    "lpy_envy_00073",
+    "lpy_envy_00092"
+  ],
+  "hold_trees": [
+    "lpy_envy_00042",
+    "lpy_envy_00065"
+  ],
+  "note": "24k train set is still missing. Fit is 7 restored trees; headline RMSE is the 2 paper val trees. DA2-only \u2014 not the DINO refiner.",
+  "alpha_beta_holdout_fit": {
+    "alpha": 1.0116849387771987,
+    "beta": -0.020211766667370137,
+    "n_pixels": 11398.0,
+    "n_images": 22,
+    "source": "least-squares on 7 non-paper trees, trunk mask, erode_r=10, GT 0.5\u201310 m"
+  },
+  "holdout_rmse": {
+    "da2_raw_m": {
+      "n": 8,
+      "rmse_m": 0.015396581943032006,
+      "rmse_std_m": 0.008439044730383732
+    },
+    "da2_holdout_affine_m": {
+      "n": 8,
+      "rmse_m": 0.015597965750242582,
+      "rmse_std_m": 0.008691953837313544
+    },
+    "fit_cohort_raw_m": {
+      "n": 28,
+      "rmse_m": 0.02383148909174356,
+      "rmse_std_m": 0.010998243358827804
+    }
+  },
+  "loo_per_tree": [],
+  "stereo_on_holdout": {
+    "n": 0,
+    "rmse_m": null,
+    "fused_rmse_m": null,
+    "flow": "farneback"
+  },
+  "drift_baseline": {
+    "n_frames": 16,
+    "source": "holdout ('lpy_envy_00042', 'lpy_envy_00065') n=16 calibrated DA2"
+  }
+}

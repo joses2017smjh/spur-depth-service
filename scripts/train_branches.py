@@ -59,7 +59,7 @@ SRC_ROOT = Path(__file__).resolve().parents[1]
 CTR_TOL_PX = 2.0
 # Seconds kept free after the last validation for two checkpoint writes to NFS.
 SAVE_MARGIN_S = 30.0
-LOSS_KEYS = ("total", "ce", "dice", "skel", "ctr_bce", "ctr_dice")
+LOSS_KEYS = ("total", "ce", "dice", "skel", "ctr_bce", "ctr_dice", "tgt", "tgt_conf")
 
 
 def git_commit(src: Path = SRC_ROOT) -> str | None:
@@ -338,6 +338,53 @@ def train(args: argparse.Namespace) -> int:
     val_s = (0.5 if cuda else 5.0) * len(val_frames)
     history: list[dict] = []
     best_score, best_epoch = -math.inf, 0
+    uda = None
+    if args.uda != "none":  # protocol v5: adaptation to unlabelled real frames
+        import random as _random
+
+        from spur_depth.branches import uda as U
+
+        paths = [ln.strip() for ln in args.target_list.read_text().splitlines() if ln.strip()]
+        tds = U.TargetFrames(paths, args.tgt_factor, args.crop, seed=args.seed)
+        mfo_val = U.load_mfo_split(args.mfo_root, "val")
+        if args.mfo_val_limit:
+            mfo_val = mfo_val[: args.mfo_val_limit]
+        uda = {
+            "U": U,
+            "teacher": U.EMATeacher(model),
+            "ds": tds,
+            "iter": None,
+            "epoch": 0,
+            "mfo_val": mfo_val,
+            "py_rng": _random.Random(args.seed),
+            "gen": torch.Generator().manual_seed(args.seed),
+        }
+        print(
+            f"UDA {args.uda}: {len(tds)} target frames x{args.tgt_factor}, tgt batch "
+            f"{args.tgt_batch}, tau {args.tau}, MFO val {len(mfo_val)} frames",
+            flush=True,
+        )
+
+    def next_target():
+        while True:
+            if uda["iter"] is None:
+                uda["epoch"] += 1
+                uda["ds"].set_epoch(uda["epoch"])
+                uda["iter"] = iter(
+                    DataLoader(
+                        uda["ds"],
+                        batch_size=args.tgt_batch,
+                        shuffle=True,
+                        drop_last=True,
+                        pin_memory=cuda,
+                        **loader_kwargs(min(args.workers, 4)),
+                    )
+                )
+            try:
+                return next(uda["iter"])
+            except StopIteration:
+                uda["iter"] = None
+
     it, epoch, stop = 0, 0, False
     t_mark = None  # wall time at iteration 5, after worker start-up and cuDNN autotuning
     first_wait = 0.0
@@ -388,6 +435,29 @@ def train(args: argparse.Namespace) -> int:
             with torch.autocast(device.type, dtype=dtype, enabled=dtype is not None):
                 out = model(x)
             loss, comps = loss_fn(out, cls, skel, ctr)
+            if uda is not None:
+                U = uda["U"]
+                tb = next_target()
+                xw = tb["weak"].to(device, non_blocking=True)
+                xs = tb["strong"].to(device, non_blocking=True)
+                lab, wimg = uda["teacher"].pseudo_labels(xw, args.tau, dtype)
+                with torch.autocast(device.type, dtype=dtype, enabled=dtype is not None):
+                    if args.uda == "selftrain":
+                        lt = U.weighted_ce(
+                            model(xs)["seg"], lab, wimg[:, None, None].expand_as(lab)
+                        )
+                    else:  # mic: ClassMix + masked image consistency
+                        nb = min(xs.shape[0], x.shape[0])
+                        xm, ym, wm = U.classmix(
+                            x[:nb], cls[:nb], xs[:nb], lab[:nb], wimg[:nb], uda["py_rng"]
+                        )
+                        lt = U.weighted_ce(model(xm)["seg"], ym, wm)
+                        xk = U.mic_mask(xs, args.mic_patch, args.mic_ratio, uda["gen"])
+                        lt = lt + U.weighted_ce(
+                            model(xk)["seg"], lab, wimg[:, None, None].expand_as(lab)
+                        )
+                loss = loss + args.lambda_tgt * lt
+                comps = dict(comps, tgt=lt.detach(), tgt_conf=wimg.mean())
             vals = torch.stack([loss.detach(), *comps.values()]).tolist()
             if not all(math.isfinite(v) for v in vals):
                 skipped += 1
@@ -401,6 +471,8 @@ def train(args: argparse.Namespace) -> int:
             torch.nn.utils.clip_grad_norm_(model.parameters(), args.clip)
             scaler.step(opt)
             scaler.update()
+            if uda is not None:
+                uda["teacher"].update(model, min(1.0 - 1.0 / (it + 2), args.ema))
             it += 1
             steps += 1
             win_steps += 1
@@ -455,6 +527,13 @@ def train(args: argparse.Namespace) -> int:
             key = "miou_present" if args.orchard else "miou_tree"
             ms = [v[key] for v in by_domain.values() if v[key] is not None]
             score = float(np.mean(ms)) if ms else -1.0
+            metrics["selection_score"] = score
+        if uda is not None:
+            mv = uda["U"].mfo_val_score(
+                model, uda["mfo_val"], args.tgt_factor, device, amp=dtype is not None
+            )
+            metrics["mfo_val"] = mv
+            score = mv["miou3_ufo"] if mv["miou3_ufo"] is not None else -1.0
             metrics["selection_score"] = score
         val_s = time.time() - tv
         is_best = score > best_score
@@ -647,6 +726,17 @@ def build_parser() -> argparse.ArgumentParser:
     t.add_argument(
         "--orchard", action="store_true", help="add the protocol-v4 orchard-context trees (v4)"
     )
+    t.add_argument("--uda", choices=("none", "selftrain", "mic"), default="none", help="(v5)")
+    t.add_argument("--target-list", type=Path, default=None, help="real frames, one path a line")
+    t.add_argument("--mfo-root", type=Path, default=Path("/nfs/hpc/share/sanchej7/spur-realdata"))
+    t.add_argument("--tgt-factor", type=float, default=1.6, help="real-frame resize")
+    t.add_argument("--tgt-batch", type=int, default=6)
+    t.add_argument("--tau", type=float, default=0.968, help="pseudo-label confidence")
+    t.add_argument("--ema", type=float, default=0.999)
+    t.add_argument("--lambda-tgt", type=float, default=1.0)
+    t.add_argument("--mic-patch", type=int, default=32)
+    t.add_argument("--mic-ratio", type=float, default=0.7)
+    t.add_argument("--mfo-val-limit", type=int, default=0, help="first N MFO val frames (tests)")
 
     p = sub.add_parser("predict", help="full-frame predictions for held-out trees")
     p.add_argument("--ckpt", type=Path, required=True)
